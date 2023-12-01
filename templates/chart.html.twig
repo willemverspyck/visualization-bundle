@@ -1,0 +1,199 @@
+{% macro getStyle(type, typeOptions, value) %}
+    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_POSITION')) %}
+        {% if typeOptions.condition is not null %}
+            {% set color = null %}
+
+            {% for condition in typeOptions.condition %}
+                {% if color is null %}
+                    {% if condition.start is not null and condition.end is not null %}
+                        {% if value >= condition.start and value <= condition.end %}
+                            {% set color = condition.color %}
+                        {% endif %}
+                    {% elseif condition.start is not null %}
+                        {% if value >= condition.start %}
+                            {% set color = condition.color %}
+                        {% endif %}
+                    {% elseif condition.end is not null %}
+                        {% if value <= condition.end %}
+                            {% set color = condition.color %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if color is not null %}
+                color: #{{ color }};
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
+        text-align: right;
+    {% endif %}
+{% endmacro %}
+
+{% macro getValue(type, typeOptions, value, format) %}
+    {% import _self as self %}
+
+    {% if value is not null %}
+        {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_ARRAY')) %}
+            {% if value|length > 0 %}
+                <ul>
+                    {% for val in value %}
+                        <li>{{ val }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                -
+            {% endif %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_BOOLEAN')) %}
+            {% if value is same as(true) %}
+                YES
+            {% elseif value is same as(false) %}
+                NO
+            {% else %}
+                -
+            {% endif %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) %}
+            &euro; {{ self.getValueOfNumber(typeOptions, value) }}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_DATE')) %}
+            {{ value|date('Y-m-d') }}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_DATETIME')) %}
+            {{ value|date('Y-m-d H:i:s') }}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_IMAGE')) %}
+            {% if format is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+                <img src="{{ getDirectory(value) }}" alt="" width="40" class="border">
+            {% else %}
+                <img src="{{ absolute_url(value) }}" alt="" width="40" class="border">
+            {% endif %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) %}
+            {{ self.getValueOfNumber(typeOptions, value) }}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
+            {{ self.getValueOfNumber(typeOptions, value * 100) }}%
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_POSITION')) %}
+            {% if value == 0.0 %}
+                {% set image = '/images/position_equal.png' %}
+            {% elseif value > 0 %}
+                {% set image = '/images/position_up.png' %}
+            {% else %}
+                {% set image = '/images/position_down.png' %}
+            {% endif %}
+
+            {% if format is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+                <img src="{{ getDirectory(image) }}" alt="" width="14">
+            {% else %}
+                <img src="{{ absolute_url(image) }}" alt="" width="14">
+            {% endif %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_TIME')) %}
+            {{ value|date('H:i:s') }}
+        {% else %}
+            {% if format is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+                {{ value|u.truncate(40, '...') }}
+            {% else %}
+                {{ value }}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro getValueOfNumber(typeOptions, value) %}
+    {% set precision = 0 %}
+
+    {% if typeOptions.precision is not null %}
+        {% set precision = typeOptions.precision %}
+    {% endif %}
+
+    {% if typeOptions.abbreviation is same as(true) %}
+        {{ getAbbreviation(value, precision) }}
+    {% else %}
+        {{ value|number_format(precision, ',', '.') }}
+    {% endif %}
+{% endmacro %}
+
+{% macro getRoutes(routes) %}
+    {% if routes|length > 0 %}
+        <br>
+        <table class="routes" cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                {% for route in routes %}
+                    <td><a href="{{ absolute_url(route.url) }}" target="_blank" title="{{ route.name }}">{{ route.name }}</a></td>
+                {% endfor %}
+            </tr>
+        </table>
+    {% endif %}
+{% endmacro %}
+
+{% macro getFilters(block) %}
+    {% set filters = block.widget.filters %}
+
+    {% if block.filterView is same as(true) and filters|length > 0 %}
+        <table class="filters" width="100%" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+                <tr>
+                    <th>
+                        <h4>Active filters</h4>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {% for filter in filters %}
+                            {{ filter.name|capitalize }}: {{ filter.data|join(', ') }}
+                            <br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+{% endmacro %}
+
+{% macro getData(block, format, route) %}
+    {% import _self as self %}
+
+    {% set widget = block.widget %}
+
+    {% set fields = widget.fields %}
+    {% set data = widget.data %}
+
+    {% if data|length > 0 %}
+        <div class="data">
+            {% if block.chart is same as(constant('Spyck\\VisualizationBundle\\Entity\\Widget::CHART_TABLE')) %}
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <thead>
+                        <tr>
+                            {% for field in fields %}
+                                <th>{{ field.name }}</th>
+                            {% endfor %}
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                            <tr>
+                                {% for fieldIndex, field in row.fields %}
+                                    {% set definition = attribute(fields, fieldIndex) %}
+
+                                    <td style="{{ self.getStyle(definition['type'], definition['typeOptions'], field.value) }}">
+                                        {{ self.getValue(definition['type'], definition['typeOptions'], field.value, format) }}
+                                        {% if route %}
+                                            {{ self.getRoutes(field.routes) }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                                <td>&nbsp;</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                {% set chart = getChart(block) %}
+
+                <img src="{{ chart }}" alt="{{ block.name }}" width="100%">
+            {% endif %}
+        </div>
+    {% else %}
+        <p>{{ block.descriptionEmpty }}</p>
+    {% endif %}
+{% endmacro %}

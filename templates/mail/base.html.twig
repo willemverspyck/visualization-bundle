@@ -1,0 +1,29 @@
+{% apply spaceless %}
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <title></title>
+            {% block head %}
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            {% endblock %}
+        </head>
+        <body>
+            {% block body %}
+                {% block header %}
+                {% endblock %}
+                <table border="0" cellpadding="0" cellspacing="0" class="tableContainer">
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td class="content">
+                            {% block content %}
+                            {% endblock %}
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                {% block footer %}
+                {% endblock %}
+            {% endblock %}
+        </body>
+    </html>
+{% endapply %}

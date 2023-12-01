@@ -1,0 +1,73 @@
+{% import '@SpyckVisualization/chart.html.twig' as chart %}
+
+{% apply spaceless %}
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <title>{{ dashboard.name }}</title>
+            {% block head %}
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            {% endblock %}
+        </head>
+        <body>
+            {% block body %}
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tbody>
+                        <tr valign="top" align="left">
+                            <td>
+                                <div class="header">
+                                    {% block header %}
+                                        <h1>{{ mail.name }}</h1>
+                                        {% if mail.route %}
+                                            <a href="{{ absolute_url(dashboard.url) }}" target="_blank">Open dashboard</a>
+                                        {% endif %}
+                                        {% if mail.description is not null %}
+                                            <p class="description">
+                                                {{ mail.description }}
+                                            </p>
+                                        {% endif %}
+                                    {% endblock %}
+                                </div>
+                                {% if mail.view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::HTML')) %}
+                                    <div class="content">
+                                        {% for block in dashboard.blocks %}
+                                            <table class="widget" width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                                                <tbody>
+                                                    <tr>
+                                                        <td valign="top" align="left">
+                                                            <h2>{{ block.name }}</h2>
+                                                            {{ chart.getFilters(block) }}
+                                                            <div class="scroll">
+                                                                {% if block.widget.data|length > 0 and block.charts|first is not same as(constant('Spyck\\VisualizationBundle\\Entity\\Widget::CHART_TABLE')) %}
+                                                                    {% set chart = getChart(block) %}
+
+                                                                    <div class="data">
+                                                                        <img src="{{ email.image('@chart/' ~ chart|split('/')|last) }}" width="100%" alt="{{ block.name }}">
+                                                                    </div>
+                                                                {% else %}
+                                                                    {{ chart.getData(block, constant('Spyck\\VisualizationBundle\\View\\ViewInterface::HTML'), mail.route) }}
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                <div class="footer">
+                                    {% block footer %}
+                                        <p>
+                                            This e-mail was sent to: {{ email.to[0].address }}
+                                        </p>
+                                    {% endblock %}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endblock %}
+        </body>
+    </html>
+{% endapply %}

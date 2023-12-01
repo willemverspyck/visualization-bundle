@@ -1,0 +1,13 @@
+filter:
+  option:
+    name: Options
+    description: Filter by options
+download:
+  csv: CSV (Comma separated)
+  html: HTML
+  json: JSON
+  pdf: PDF
+  ssv: CSV (Semicolon separated)
+  tsv: TSV (Tab separated)
+  xlsx: Microsoft Excel (XLSX)
+  xml: XML
