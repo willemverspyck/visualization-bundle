@@ -1,9 +1,9 @@
 # Visualization Bundle
 
-Simple bundle to get dashboards with widgets. 
+Symfony bundle to create dashboards with widgets. 
 
 ## Requirements
-PHP ^8.1
+PHP ^8.2
 
 ## Installation
 Install it using [Composer](https://getcomposer.org/):
