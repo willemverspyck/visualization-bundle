@@ -743,20 +743,16 @@ readonly class WidgetService
             return $url;
         }
 
-        $search = [];
-        $replace = [];
+        $query = preg_replace_callback('/{([\w]+)}/', function (array $matches) use ($data): string {
+            $key = $matches[1];
 
-        foreach ($data as $key => $val) {
-            $search[] = sprintf('{%s}', $key);
-            $replace[] = (string) $val;
-        }
+            if (array_key_exists($key, $data)) {
+                return sprintf('%s', $data[$key]);
+            }
 
-        $query = [];
-
-        foreach ($parameters as $name => $value) {
-            $query[$name] = str_replace($search, $replace, $value);
-        }
-
+            return $key;
+        }, $parameters);
+        
         return sprintf('%s?%s', $url, http_build_query($query));
     }
 
