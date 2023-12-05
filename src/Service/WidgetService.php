@@ -384,6 +384,9 @@ readonly class WidgetService
         $widget->setFilters($filters);
     }
 
+    /**
+     * @throws Exception
+     */
     private function getRequestData(RequestInterface $request, array $variables, bool $fill): ?string
     {
         $parameterBag = new ParameterBag();
@@ -392,7 +395,15 @@ readonly class WidgetService
         $field = $request->getField();
 
         if ($parameterBag->has($field)) {
-            return sprintf('%s', $parameterBag->get($field));
+            $variable = $parameterBag->get($field);
+            
+            $type = gettype($variable);
+            
+            if (false === in_array($type, ['integer', 'string'], true)) {
+                throw new Exception(sprintf('Request data must be "integer" or "string", not "%s"', $type));
+            }
+            
+            return sprintf('%s', $variable);
         }
 
         if (false === $fill) {
