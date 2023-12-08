@@ -57,9 +57,6 @@ class Widget extends AbstractTimestamp implements Stringable
     #[Validator\NotNull(message: 'This value is required')]
     private string $adapter;
 
-    #[Doctrine\Column(name: 'parameters', type: Types::JSON, nullable: false)]
-    private array $parameters;
-
     #[Doctrine\Column(name: 'charts', type: Types::JSON)]
     private array $charts;
 
@@ -151,18 +148,6 @@ class Widget extends AbstractTimestamp implements Stringable
     public function setAdapter(string $adapter): static
     {
         $this->adapter = $adapter;
-
-        return $this;
-    }
-
-    public function getParameters(): array
-    {
-        return $this->parameters;
-    }
-
-    public function setParameters(array $parameters): static
-    {
-        $this->parameters = $parameters;
 
         return $this;
     }
