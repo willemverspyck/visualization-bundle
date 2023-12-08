@@ -83,7 +83,6 @@ class Widget extends AbstractTimestamp implements Stringable
         $this->blocks = new ArrayCollection();
         $this->groups = new ArrayCollection();
 
-        $this->setParameters([]);
         $this->setCharts([]);
     }
 
