@@ -18,6 +18,8 @@ class Widget extends AbstractTimestamp implements Stringable
 {
     public const CHART_AREA = 'area';
     public const CHART_AREA_NAME = 'Area';
+    public const CHART_BAR = 'bar';
+    public const CHART_BAR_NAME = 'Bar';
     public const CHART_COLUMN = 'column';
     public const CHART_COLUMN_NAME = 'Column';
     public const CHART_COUNTRY = 'country';
