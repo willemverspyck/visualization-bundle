@@ -45,12 +45,10 @@ abstract class AbstractDateParameter implements DateParameterInterface
      */
     public function setData(string $data): void
     {
-        $data = DateTime::createFromFormat(DateTimeUtility::FORMAT_DATE, $data);
-
-        if (false === $data) {
-            throw new NotFoundHttpException();
+        try {
+            $this->data = new DateTime($data);
+        } catch (Exception) {
+            throw new NotFoundHttpException(sprintf('Parameter "%s" with "%s" is invalid', $this->getName(), $data));
         }
-
-        $this->data = $data;
     }
 }

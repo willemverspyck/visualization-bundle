@@ -318,6 +318,7 @@ readonly class WidgetService
     /**
      * Set the parameters of a widget.
      *
+     * @throws Exception
      * @throws ParameterException
      */
     private function setParameters(WidgetInterface $widget, array $variables, bool $fill = false): void
