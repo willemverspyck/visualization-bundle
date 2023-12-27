@@ -4,21 +4,26 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Message;
 
-final class MailMessage extends AbstractMessage implements MailMessageInterface
+final class MailMessage implements MailMessageInterface
 {
+    private int $id;
     private int $user;
-
     private string $name;
-
     private ?string $description = null;
-
     private array $variables;
-
     private string $view;
-
     private bool $route;
-
     private bool $merge;
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
 
     public function getUser(): int
     {

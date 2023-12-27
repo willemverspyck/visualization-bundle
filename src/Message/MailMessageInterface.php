@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Message;
 
-interface MailMessageInterface extends AbstractMessageInterface
+interface MailMessageInterface
 {
+    public function setId(int $id): void;
+
+    public function getId(): int;
+
     public function setUser(int $user): void;
 
     public function getUser(): int;
