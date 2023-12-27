@@ -148,27 +148,6 @@ readonly class WidgetService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getCacheKey(WidgetInterface $widgetInstance): string
-    {
-        $widget = $widgetInstance->getWidget();
-
-        $data = [
-            $widget->getAdapter(),
-            serialize($widget->getTimestampCreated()),
-            serialize($widget->getTimestampUpdated()),
-            serialize($widgetInstance->getParameterDataRequest()),
-            serialize($widgetInstance->getFilterDataRequest()),
-        ];
-
-        return CacheUtility::getCacheKey(__CLASS__, $data);
-    }
-
-    /**
-     * Get the data with a callback.
-     *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     */
     public function getWidgetData(WidgetInterface $widgetInstance): WidgetAsModel
     {
         $fields = $this->filterFields($widgetInstance);
@@ -179,19 +158,7 @@ readonly class WidgetService
             }
         }
 
-        if ($this->cacheActive) {
-            $key = $this->getCacheKey($widgetInstance);
-
-            $data = $this->cache->get($key, function (ItemInterface $item) use ($widgetInstance, $fields): array {
-                if (null !== $widgetInstance->getCache()) {
-                    $item->expiresAfter($widgetInstance->getCache());
-                }
-
-                return $this->getData($widgetInstance, $fields);
-            });
-        } else {
-            $data = $this->getData($widgetInstance, $fields);
-        }
+        $data = $this->getDataWithCache($widgetInstance, $fields);
 
         $widgetModel = new WidgetAsModel();
         $widgetModel->setFields($this->getFields($fields));
@@ -397,13 +364,13 @@ readonly class WidgetService
 
         if ($parameterBag->has($field)) {
             $variable = $parameterBag->get($field);
-            
+
             $type = gettype($variable);
-            
+
             if (false === in_array($type, ['integer', 'string'], true)) {
                 throw new Exception(sprintf('Request data must be "integer" or "string", not "%s"', $type));
             }
-            
+
             return sprintf('%s', $variable);
         }
 
@@ -494,6 +461,42 @@ readonly class WidgetService
         }
 
         return $data;
+    }
+
+    private function getDataWithCache(WidgetInterface $widget, array $fields): array
+    {
+        if (false === $this->cacheActive || null === $widget->getCache()) {
+            return $this->getData($widget, $fields);
+        }
+
+        $key = $this->getCacheKey($widget);
+
+        return $this->cache->get($key, function (ItemInterface $item) use ($widget, $fields): array {
+            $item->expiresAfter($widget->getCache());
+
+            return $this->getData($widget, $fields);
+        });
+    }
+
+    /**
+     * Get the data with a callback.
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    private function getCacheKey(WidgetInterface $widgetInstance): string
+    {
+        $widget = $widgetInstance->getWidget();
+
+        $data = [
+            $widget->getAdapter(),
+            serialize($widget->getTimestampCreated()),
+            serialize($widget->getTimestampUpdated()),
+            serialize($widgetInstance->getParameterDataRequest()),
+            serialize($widgetInstance->getFilterDataRequest()),
+        ];
+
+        return CacheUtility::getCacheKey(__CLASS__, $data);
     }
 
     private function getParameters(WidgetInterface $widget): array
