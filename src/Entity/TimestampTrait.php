@@ -8,7 +8,7 @@ use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 
-abstract class AbstractTimestamp implements TimestampInterface
+trait TimestampTrait
 {
     #[Doctrine\Column(name: 'timestamp_created', type: Types::DATETIME_MUTABLE)]
     protected DateTimeInterface $timestampCreated;

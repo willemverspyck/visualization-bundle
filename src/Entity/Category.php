@@ -14,8 +14,10 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 #[Doctrine\Entity(repositoryClass: CategoryRepository::class)]
 #[Doctrine\Table(name: 'visualization_category')]
-class Category extends AbstractTimestamp implements Stringable
+class Category implements Stringable, TimestampInterface
 {
+    use TimestampTrait;
+
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]

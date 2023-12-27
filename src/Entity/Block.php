@@ -10,8 +10,10 @@ use Stringable;
 
 #[Doctrine\Table(name: 'visualization_block')]
 #[Doctrine\Entity]
-class Block extends AbstractTimestamp implements Stringable
+class Block implements Stringable, TimestampInterface
 {
+    use TimestampTrait;
+
     public const SIZE_LARGE = 'L';
     public const SIZE_LARGE_NAME = 'Large';
     public const SIZE_MEDIUM = 'M';

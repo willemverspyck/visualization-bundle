@@ -16,8 +16,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[Doctrine\Entity(repositoryClass: DashboardRepository::class)]
 #[Doctrine\Table(name: 'visualization_dashboard')]
 #[UniqueEntity(fields: 'code')]
-class Dashboard extends AbstractTimestamp implements Stringable
+class Dashboard implements Stringable, TimestampInterface
 {
+    use TimestampTrait;
+
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]

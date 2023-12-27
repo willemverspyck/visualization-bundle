@@ -10,8 +10,10 @@ use Spyck\VisualizationBundle\Repository\FavoriteRepository;
 
 #[Doctrine\Entity(repositoryClass: FavoriteRepository::class)]
 #[Doctrine\Table(name: 'visualization_favorite')]
-class Favorite extends AbstractTimestamp
+class Favorite implements TimestampInterface
 {
+    use TimestampTrait;
+
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]

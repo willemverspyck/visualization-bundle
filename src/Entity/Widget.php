@@ -14,8 +14,10 @@ use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: WidgetRepository::class)]
 #[Doctrine\Table(name: 'visualization_widget')]
-class Widget extends AbstractTimestamp implements Stringable
+class Widget implements Stringable, TimestampInterface
 {
+    use TimestampTrait;
+
     public const CHART_AREA = 'area';
     public const CHART_AREA_NAME = 'Area';
     public const CHART_BAR = 'bar';
