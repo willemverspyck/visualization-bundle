@@ -55,11 +55,11 @@ final class MailMessageEventSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $log = [
+            $messages = [
                 $event->getThrowable()->getPrevious()->getMessage(),
             ];
 
-            $this->logRepository->putLog(user: $user, dashboard: $dashboard, variables: $message->getVariables(), view: $message->getView(), type: Log::TYPE_MAIL, log: $log);
+            $this->logRepository->putLog(user: $user, dashboard: $dashboard, variables: $message->getVariables(), view: $message->getView(), type: Log::TYPE_MAIL, messages: $messages);
         }
     }
 }

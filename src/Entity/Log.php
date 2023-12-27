@@ -44,8 +44,8 @@ class Log
     #[Doctrine\Column(name: 'type', type: Types::SMALLINT, options: ['unsigned' => true])]
     private int $type;
 
-    #[Doctrine\Column(name: 'log', type: Types::JSON, nullable: true)]
-    private ?array $log = null;
+    #[Doctrine\Column(name: 'messages', type: Types::JSON, nullable: true)]
+    private ?array $messages = null;
 
     public function getId(): ?int
     {
@@ -124,19 +124,19 @@ class Log
         return $this;
     }
 
-    public function getLog(): ?array
+    public function getMessages(): ?array
     {
-        return $this->log;
+        return $this->messages;
     }
 
-    public function setLog(?array $log): static
+    public function setMessages(?array $messages): static
     {
-        $this->log = $log;
+        $this->messages = $messages;
 
         return $this;
     }
 
-    public static function getViews(): array
+    public static function getViewData(): array
     {
         return [
             ViewInterface::CSV,
@@ -150,7 +150,7 @@ class Log
         ];
     }
 
-    public static function getTypes(): array
+    public static function getTypeData(): array
     {
         return [
             self::TYPE_API,
