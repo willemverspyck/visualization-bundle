@@ -118,7 +118,7 @@ final class ExportWidgetCommand extends Command
     {
         $question = new ChoiceQuestion(sprintf('Please select a %s:', $name), $data);
         $question->setMaxAttempts(2);
-        $question->setValidator(function (string $id) use ($name, $data): string {
+        $question->setValidator(function (?string $id) use ($name, $data): string {
             if (in_array($id, $data, true)) {
                 throw new RuntimeException(sprintf('Unknown %s', $name));
             }

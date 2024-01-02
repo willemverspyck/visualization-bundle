@@ -13,7 +13,6 @@ final class Config
     private bool $abbreviation = false;
     private ?int $precision = null;
     private Collection $formats;
-    private ?string $class = null;
     private ?array $chart = null;
 
     public function __construct()
@@ -53,18 +52,6 @@ final class Config
     public function setPrecision(?int $precision): static
     {
         $this->precision = $precision;
-
-        return $this;
-    }
-
-    public function getClass(): ?string
-    {
-        return $this->class;
-    }
-
-    public function setClass(?string $class): static
-    {
-        $this->class = $class;
 
         return $this;
     }

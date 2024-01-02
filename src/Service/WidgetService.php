@@ -62,7 +62,7 @@ readonly class WidgetService
     /**
      * @param Countable&IteratorAggregate $widgets
      */
-    public function __construct(#[Autowire(service: 'spyck.visualization.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private ImageService $imageService, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.request')] private array $request, #[TaggedIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
+    public function __construct(#[Autowire(service: 'spyck.visualization.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.request')] private array $request, #[TaggedIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
     {
     }
 
@@ -695,30 +695,9 @@ readonly class WidgetService
             Field::TYPE_CURRENCY, Field::TYPE_NUMBER, Field::TYPE_PERCENTAGE => (float) $value,
             Field::TYPE_DATE => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateFromString($value),
             Field::TYPE_DATETIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateTimeFromString($value),
-            Field::TYPE_IMAGE => $this->getValueForImage($field, $value),
             Field::TYPE_TIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getTimeFromString($value),
             default => $value,
         };
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getValueForImage(Field $field, string $value): ?string
-    {
-        $class = $field->getConfig()->getClass();
-
-        if (null === $class) {
-            return null;
-        }
-
-        $image = $this->imageService->getImage($value, $field->getSource(), $class);
-
-        if (null === $image) {
-            return null;
-        }
-
-        return $this->imageService->getThumbnail($image, 'spyck_visualization');
     }
 
     private function getRoutes(Field $field, array $data = []): array

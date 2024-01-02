@@ -51,7 +51,6 @@ abstract class AbstractView implements ViewInterface
             Field::TYPE_DATE => $value->format('Y-m-d'),
             Field::TYPE_DATETIME => $value->format('Y-m-d H:i:s'),
             Field::TYPE_TIME => $value->format('H:i:s'),
-            Field::TYPE_POSITION => sprintf('/images/position_%s.png', 0.0 === $value ? 'equal' : ($value > 0 ? 'greater' : 'less')),
             default => $value,
         };
     }
