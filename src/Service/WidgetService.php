@@ -55,6 +55,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class WidgetService
@@ -473,7 +474,10 @@ readonly class WidgetService
 
         return $this->cache->get($key, function (ItemInterface $item) use ($widget, $fields): array {
             $item->expiresAfter($widget->getCache());
-            $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
+
+            if ($this->cache instanceof TagAwareCacheInterface) {
+                $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
+            }
 
             return $this->getData($widget, $fields);
         });
