@@ -473,6 +473,7 @@ readonly class WidgetService
 
         return $this->cache->get($key, function (ItemInterface $item) use ($widget, $fields): array {
             $item->expiresAfter($widget->getCache());
+            $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
 
             return $this->getData($widget, $fields);
         });
