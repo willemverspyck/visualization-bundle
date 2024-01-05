@@ -8,6 +8,7 @@ use Countable;
 use Doctrine\ORM\NonUniqueResultException;
 use IteratorAggregate;
 use Psr\Cache\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Spyck\ApiExtension\Model\Pagination;
 use Spyck\VisualizationBundle\Entity\Block;
 use Spyck\VisualizationBundle\Entity\Dashboard;
@@ -46,6 +47,7 @@ use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use DateTimeInterface;
 use Exception;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -58,12 +60,13 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
 readonly class WidgetService
 {
     /**
      * @param Countable&IteratorAggregate $widgets
      */
-    public function __construct(#[Autowire(service: 'spyck.visualization.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.request')] private array $request, #[TaggedIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
+    public function __construct(#[Autowire(service: 'spyck.visualization.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.request')] private array $request, #[TaggedIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
     {
     }
 
@@ -467,12 +470,14 @@ readonly class WidgetService
     private function getDataWithCache(WidgetInterface $widget, array $fields): array
     {
         if (false === $this->cacheActive || null === $widget->getCache()) {
+            $this->logger->info('Cache disabled');
+
             return $this->getData($widget, $fields);
         }
 
         $key = $this->getCacheKey($widget);
 
-        return $this->cache->get($key, function (ItemInterface $item) use ($widget, $fields): array {
+        $data = $this->cache->get($key, function (ItemInterface $item) use ($widget, $fields): array {
             $item->expiresAfter($widget->getCache());
 
             if ($this->cache instanceof TagAwareCacheInterface) {
@@ -480,7 +485,14 @@ readonly class WidgetService
             }
 
             return $this->getData($widget, $fields);
-        });
+        }, null, $metadata);
+
+        $this->logger->info('Cache', [
+            'cache' => $widget->getCache(),
+            'metadata' => $metadata,
+        ]);
+
+        return $data;
     }
 
     /**
