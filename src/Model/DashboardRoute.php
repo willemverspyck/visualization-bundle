@@ -8,7 +8,6 @@ final class DashboardRoute
 {
     private string $name;
     private string $url;
-    private string $callback;
 
     public function getName(): string
     {
@@ -34,24 +33,11 @@ final class DashboardRoute
         return $this;
     }
 
-    public function getCallback(): string
-    {
-        return $this->callback;
-    }
-
-    public function setCallback(string $callback): static
-    {
-        $this->callback = $callback;
-
-        return $this;
-    }
-
     public function toArray(): array
     {
         return [
             'name' => $this->getName(),
             'url' => $this->getUrl(),
-            'callback' => $this->getCallback(),
         ];
     }
 }

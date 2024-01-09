@@ -49,7 +49,6 @@ readonly class DashboardService
             ->setName($dashboard->getName())
             ->setDescription($dashboard->getDescription())
             ->setUrl($dashboardRoute->getUrl())
-            ->setCallback($dashboardRoute->getCallback())
             ->setParameters($this->getDashboardParameters($dashboard, $variables))
             ->setParametersAsString($this->getDashboardParametersAsString($dashboard, $variables))
             ->setParametersAsStringForSlug($this->getDashboardParametersAsString($dashboard, $variables, true))
@@ -227,8 +226,7 @@ readonly class DashboardService
 
         return $dashboardRequest
             ->setName($dashboard->getName())
-            ->setUrl($this->router->generate('spyck_visualization_dashboard_show', $variables, UrlGeneratorInterface::ABSOLUTE_URL))
-            ->setCallback($this->router->generate('spyck_visualization_dashboard_item', $variables, UrlGeneratorInterface::ABSOLUTE_URL));
+            ->setUrl($this->router->generate('spyck_visualization_dashboard_show', $variables, UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     /**
