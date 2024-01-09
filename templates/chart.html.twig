@@ -1,30 +1,30 @@
-{% macro getStyle(type, typeOptions, value) %}
-    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_POSITION')) %}
-        {% if typeOptions.condition is not null %}
+{% macro getStyle(type, config, value) %}
+    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
+        {% for format in config.formats %}
             {% set color = null %}
 
-            {% for condition in typeOptions.condition %}
+            {% if format.name is same as('condition') %}
                 {% if color is null %}
-                    {% if condition.start is not null and condition.end is not null %}
-                        {% if value >= condition.start and value <= condition.end %}
-                            {% set color = condition.color %}
+                    {% if format.start is not null and format.end is not null %}
+                        {% if value >= format.start and value <= format.end %}
+                            {% set color = format.color %}
                         {% endif %}
-                    {% elseif condition.start is not null %}
-                        {% if value >= condition.start %}
-                            {% set color = condition.color %}
+                    {% elseif format.start is not null %}
+                        {% if value >= format.start %}
+                            {% set color = format.color %}
                         {% endif %}
-                    {% elseif condition.end is not null %}
-                        {% if value <= condition.end %}
-                            {% set color = condition.color %}
+                    {% elseif format.end is not null %}
+                        {% if value <= format.end %}
+                            {% set color = format.color %}
                         {% endif %}
                     {% endif %}
                 {% endif %}
-            {% endfor %}
+            {% endif %}
 
             {% if color is not null %}
                 color: #{{ color }};
             {% endif %}
-        {% endif %}
+        {% endfor %}
     {% endif %}
 
     {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
@@ -32,7 +32,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getValue(type, typeOptions, value, format) %}
+{% macro getValue(type, config, value, format) %}
     {% import _self as self %}
 
     {% if value is not null %}
@@ -55,7 +55,7 @@
                 -
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) %}
-            &euro; {{ self.getValueOfNumber(typeOptions, value) }}
+            &euro; {{ self.getValueOfNumber(config, value) }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_DATE')) %}
             {{ value|date('Y-m-d') }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_DATETIME')) %}
@@ -67,9 +67,9 @@
                 <img src="{{ absolute_url(value) }}" alt="" width="40" class="border">
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) %}
-            {{ self.getValueOfNumber(typeOptions, value) }}
+            {{ self.getValueOfNumber(config, value) }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
-            {{ self.getValueOfNumber(typeOptions, value * 100) }}%
+            {{ self.getValueOfNumber(config, value * 100) }}%
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_POSITION')) %}
             {% if value == 0.0 %}
                 {% set image = '/images/position_equal.png' %}
@@ -96,14 +96,14 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getValueOfNumber(typeOptions, value) %}
+{% macro getValueOfNumber(config, value) %}
     {% set precision = 0 %}
 
-    {% if typeOptions.precision is not null %}
-        {% set precision = typeOptions.precision %}
+    {% if config.precision is not null %}
+        {% set precision = config.precision %}
     {% endif %}
 
-    {% if typeOptions.abbreviation is same as(true) %}
+    {% if config.abbreviation is same as(true) %}
         {{ getAbbreviation(value, precision) }}
     {% else %}
         {{ value|number_format(precision, ',', '.') }}
@@ -159,7 +159,7 @@
 
     {% if data|length > 0 %}
         <div class="data">
-            {% if block.chart is same as(constant('Spyck\\VisualizationBundle\\Entity\\Widget::CHART_TABLE')) %}
+            {% if block.charts|first is same as(constant('Spyck\\VisualizationBundle\\Entity\\Widget::CHART_TABLE')) %}
                 <table width="100%" cellspacing="0" cellpadding="0" border="0">
                     <thead>
                         <tr>
@@ -175,8 +175,8 @@
                                 {% for fieldIndex, field in row.fields %}
                                     {% set definition = attribute(fields, fieldIndex) %}
 
-                                    <td style="{{ self.getStyle(definition['type'], definition['typeOptions'], field.value) }}">
-                                        {{ self.getValue(definition['type'], definition['typeOptions'], field.value, format) }}
+                                    <td style="{{ self.getStyle(definition['type'], definition['config'], field.value) }}">
+                                        {{ self.getValue(definition['type'], definition['config'], field.value, format) }}
                                         {% if route %}
                                             {{ self.getRoutes(field.routes) }}
                                         {% endif %}
