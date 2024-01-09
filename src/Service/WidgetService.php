@@ -209,11 +209,12 @@ readonly class WidgetService
             if ($parameter instanceof EntityParameterInterface) {
                 $name = $parameter->getName();
 
-                $parameterFill[$parameter->getField()] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request->get($parameter->getField());
+                $parameterFill[$parameter->getField()] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $parameter->getDataForRequest();
             }
 
+
             if ($parameter instanceof DateParameterInterface) {
-                $parameterFill[$parameter->getField()] = $request->get($parameter->getField());
+                $parameterFill[$parameter->getField()] = $parameter->getDataForRequest();
             }
         }
 
