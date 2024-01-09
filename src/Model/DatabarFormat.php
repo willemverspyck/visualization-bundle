@@ -28,4 +28,12 @@ final class DatabarFormat implements FormatInterface
 
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'type' => 'databar',
+            'color' => $this->getColor(),
+        ];
+    }
 }

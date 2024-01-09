@@ -105,14 +105,10 @@ final class Config
             case Field::TYPE_CURRENCY:
             case Field::TYPE_NUMBER:
             case Field::TYPE_PERCENTAGE:
-            case Field::TYPE_POSITION:
                 $formats = [];
 
                 foreach ($this->getFormats() as $format) {
-                    $formats[] = [
-                        'color' => $format->getColor(),
-                        'type' => 'databar',
-                    ];
+                    $formats[] = $format->toArray();
                 }
 
                 $data['formats'] = $formats;

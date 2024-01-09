@@ -59,4 +59,14 @@ final class ConditionFormat implements FormatInterface
 
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'type' => 'condition',
+            'start' => $this->getStart(),
+            'end' => $this->getEnd(),
+            'color' => $this->getColor(),
+        ];
+    }
 }
