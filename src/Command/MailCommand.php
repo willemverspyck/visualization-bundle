@@ -28,12 +28,19 @@ final class MailCommand extends Command
     {
         $date = new DateTime();
 
-        $schedules = $this->scheduleRepository->getScheduleDataByDate($date);
+        $schedules = $this->scheduleRepository->getScheduleData($date);
 
         foreach ($schedules as $schedule) {
-            $this->mailService->handleMailMessageBySchedule($schedule);
+            if ($this->match($schedule->getHours(), $date->format('G')) && $this->match($schedule->getDays(), $date->format('j')) && $this->match($schedule->getWeeks(), $date->format('W')) && $this->match($schedule->getWeekdays(),$date->format('N'))) {
+                $this->mailService->handleMailMessageBySchedule($schedule);
+            }
         }
 
         return Command::SUCCESS;
+    }
+
+    private function match(array $data, string $value): bool
+    {
+        return 0 === count($data) || in_array($value, $data, true);
     }
 }
