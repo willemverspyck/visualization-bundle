@@ -17,6 +17,11 @@ final class DatabarFormat implements FormatInterface
         $this->setColor($color);
     }
 
+    public function getName(): string
+    {
+        return 'databar';
+    }
+
     public function getColor(): string
     {
         return $this->color;
@@ -32,7 +37,7 @@ final class DatabarFormat implements FormatInterface
     public function toArray(): array
     {
         return [
-            'type' => 'databar',
+            'name' => $this->getName(),
             'color' => $this->getColor(),
         ];
     }

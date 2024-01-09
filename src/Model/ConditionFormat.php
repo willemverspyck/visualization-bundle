@@ -25,6 +25,11 @@ final class ConditionFormat implements FormatInterface
         $this->setColor($color);
     }
 
+    public function getName(): string
+    {
+        return 'condition';
+    }
+
     public function getStart(): ?float
     {
         return $this->start;
@@ -63,7 +68,7 @@ final class ConditionFormat implements FormatInterface
     public function toArray(): array
     {
         return [
-            'type' => 'condition',
+            'name' => $this->getName(),
             'start' => $this->getStart(),
             'end' => $this->getEnd(),
             'color' => $this->getColor(),
