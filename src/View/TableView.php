@@ -63,12 +63,14 @@ final class TableView extends AbstractView
         foreach ($widget->getData() as $row) {
             $data = [];
 
-            foreach ($row['fields'] as $fieldIndex => $field) {
+            foreach ($fields as $fieldIndex => $field) {
+                $cell = $row['fields'][$fieldIndex];
+
                 $data[] = [
-                    'value' => $this->getValue($fields[$fieldIndex]['type'], $fields[$fieldIndex]['config'], $field['value']),
-                    'valueFormat' => $this->getValueFormat($fields[$fieldIndex]['type'], $fields[$fieldIndex]['config'], $field['value']),
-                    'routes' => $field['routes'],
-                    'overlays' => $field['children'],
+                    'value' => $this->getValue($field['type'], $field['config'], $cell['value']),
+                    'valueFormat' => $this->getValueFormat($field['type'], $field['config'], $cell['value']),
+                    'routes' => $cell['routes'],
+                    'overlays' => $cell['children'],
                 ];
             }
 
