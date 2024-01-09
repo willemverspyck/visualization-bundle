@@ -12,7 +12,7 @@ final class WeekEndParameter extends AbstractDateParameter
     {
     }
 
-    public function getField(): string
+    public static function getField(): string
     {
         return RequestInterface::DATE_END;
     }

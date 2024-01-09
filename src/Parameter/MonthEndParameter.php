@@ -8,7 +8,7 @@ use Spyck\VisualizationBundle\Request\RequestInterface;
 
 final class MonthEndParameter extends AbstractDateParameter
 {
-    public function getField(): string
+    public static function getField(): string
     {
         return RequestInterface::DATE_END;
     }

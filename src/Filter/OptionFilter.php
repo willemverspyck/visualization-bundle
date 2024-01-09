@@ -14,7 +14,7 @@ final class OptionFilter extends AbstractOptionFilter
         $this->setType(FilterInterface::TYPE_CHECKBOX);
     }
 
-    public function getField(): string
+    public static function getField(): string
     {
         return 'options';
     }

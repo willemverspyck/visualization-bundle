@@ -13,7 +13,7 @@ interface RequestInterface
     public const OFFSET = 'offset';
     public const OPTION = 'option';
 
-    public function getField(): string;
+    public static function getField(): string;
 
     public static function getName(): string;
 }

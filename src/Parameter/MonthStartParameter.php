@@ -8,7 +8,7 @@ use Spyck\VisualizationBundle\Request\RequestInterface;
 
 final class MonthStartParameter extends AbstractDateParameter
 {
-    public function getField(): string
+    public static function getField(): string
     {
         return RequestInterface::DATE_START;
     }
