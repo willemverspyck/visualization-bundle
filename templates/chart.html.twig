@@ -159,7 +159,11 @@
 
     {% if data|length > 0 %}
         <div class="data">
-            {% if block.charts|first is same as(constant('Spyck\\VisualizationBundle\\Entity\\Widget::CHART_TABLE')) %}
+            {% if hasChart(block) %}
+                {% set chart = getChart(block) %}
+
+                <img src="{{ chart }}" alt="{{ block.name }}" width="100%">
+            {% else %}
                 <table width="100%" cellspacing="0" cellpadding="0" border="0">
                     <thead>
                         <tr>
@@ -187,10 +191,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            {% else %}
-                {% set chart = getChart(block) %}
-
-                <img src="{{ chart }}" alt="{{ block.name }}" width="100%">
             {% endif %}
         </div>
     {% else %}

@@ -18,11 +18,20 @@ readonly class ChartService
     {
     }
 
+    public function hasChart(): bool
+    {
+        return null !== $this->command && null !== $this->directory;
+    }
+
     /**
      * @throws Exception
      */
     public function getChart(Block $block): string
     {
+        if (false === $this->hasChart()) {
+            throw new Exception('Chart not configured');
+        }
+
         $widget = $block->getWidget();
         $type = $block->getCharts()[0];
 

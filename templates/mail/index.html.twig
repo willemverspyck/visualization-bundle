@@ -38,7 +38,7 @@
                                                             <h2>{{ block.name }}</h2>
                                                             {{ chart.getFilters(block) }}
                                                             <div class="scroll">
-                                                                {% if block.widget.data|length > 0 and block.charts|first is not same as(constant('Spyck\\VisualizationBundle\\Entity\\Widget::CHART_TABLE')) %}
+                                                                {% if hasChart(block) and block.widget.data|length > 0 %}
                                                                     {% set chart = getChart(block) %}
 
                                                                     <div class="data">
