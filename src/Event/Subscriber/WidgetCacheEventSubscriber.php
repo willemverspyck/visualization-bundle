@@ -22,7 +22,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 #[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
 final class WidgetCacheEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(#[Autowire(service: 'spyck.visualization.cache.adapter')] private readonly CacheInterface $cache, private readonly LoggerInterface $logger)
+    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private readonly CacheInterface $cache, private readonly LoggerInterface $logger)
     {
     }
 

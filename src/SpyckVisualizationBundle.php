@@ -20,19 +20,19 @@ final class SpyckVisualizationBundle extends AbstractBundle
     {
         $container->import('../config/services.php');
 
-        $builder->setParameter('spyck.visualization.cache.active', $config['cache']['active']);
-        $builder->setAlias('spyck.visualization.cache.adapter', $config['cache']['adapter']);
+        $builder->setParameter('spyck.visualization.config.cache.active', $config['cache']['active']);
+        $builder->setAlias('spyck.visualization.config.cache.adapter', $config['cache']['adapter']);
 
-        $builder->setParameter('spyck.visualization.chart.command', $config['chart']['command']);
-        $builder->setParameter('spyck.visualization.chart.directory', $config['chart']['directory']);
+        $builder->setParameter('spyck.visualization.config.chart.command', $config['chart']['command']);
+        $builder->setParameter('spyck.visualization.config.chart.directory', $config['chart']['directory']);
 
-        $builder->setParameter('spyck.visualization.directory', $config['directory']);
+        $builder->setParameter('spyck.visualization.config.directory', $config['directory']);
 
-        $builder->setParameter('spyck.visualization.mailer.from_email', $config['mailer']['fromEmail']);
-        $builder->setParameter('spyck.visualization.mailer.from_name', $config['mailer']['fromName']);
+        $builder->setParameter('spyck.visualization.config.mail.fromEmail', $config['mail']['fromEmail']);
+        $builder->setParameter('spyck.visualization.config.mail.fromName', $config['mail']['fromName']);
 
-        $builder->setParameter('spyck.visualization.request', $config['request']);
+        $builder->setParameter('spyck.visualization.config.request', $config['request']);
 
-        $builder->setParameter('spyck.visualization.user.class', $config['user']['class']);
+        $builder->setParameter('spyck.visualization.config.user.class', $config['user']['class']);
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class MailService
 {
-    public function __construct(private BodyRendererInterface $bodyRenderer, private MailRepository $mailRepository, private MessageBusInterface $messageBus, private MailerInterface $mailer, #[Autowire(param: 'spyck.visualization.mailer.from_email')] private string $fromEmail, #[Autowire(param: 'spyck.visualization.mailer.from_name')] private string $fromName)
+    public function __construct(private BodyRendererInterface $bodyRenderer, private MailRepository $mailRepository, private MessageBusInterface $messageBus, private MailerInterface $mailer, #[Autowire(param: 'spyck.visualization.config.mail.fromEmail')] private string $fromEmail, #[Autowire(param: 'spyck.visualization.config.mail.fromName')] private string $fromName)
     {
     }
 

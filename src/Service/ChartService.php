@@ -14,7 +14,7 @@ use Twig\Environment;
 
 readonly class ChartService
 {
-    public function __construct(private Environment $environment, #[Autowire(param: 'spyck.visualization.chart.command')] private string $command, #[Autowire(param: 'spyck.visualization.chart.directory')] private string $directory)
+    public function __construct(private Environment $environment, #[Autowire(param: 'spyck.visualization.config.chart.command')] private ?string $command, #[Autowire(param: 'spyck.visualization.config.chart.directory')] private ?string $directory)
     {
     }
 

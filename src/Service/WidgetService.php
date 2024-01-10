@@ -66,7 +66,7 @@ readonly class WidgetService
     /**
      * @param Countable&IteratorAggregate $widgets
      */
-    public function __construct(#[Autowire(service: 'spyck.visualization.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.request')] private array $request, #[TaggedIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
+    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.config.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.config.request')] private array $request, #[TaggedIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
     {
     }
 

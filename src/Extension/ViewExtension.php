@@ -16,7 +16,7 @@ use Twig\TwigFunction;
 #[Autoconfigure(tags: ['twig.extension'])]
 final class ViewExtension extends AbstractExtension
 {
-    public function __construct(private readonly ChartService $chartService, #[Autowire(param: 'spyck.visualization.directory')] private readonly string $directory)
+    public function __construct(private readonly ChartService $chartService, #[Autowire(param: 'spyck.visualization.config.directory')] private readonly string $directory)
     {
     }
 

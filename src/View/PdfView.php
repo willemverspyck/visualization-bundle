@@ -13,7 +13,7 @@ use Twig\Environment;
 
 final class PdfView extends AbstractView
 {
-    public function __construct(private readonly Environment $environment, #[Autowire(param: 'spyck.visualization.chart.directory')] private readonly string $chartDirectory, #[Autowire(param: 'spyck.visualization.directory')] private readonly string $directory)
+    public function __construct(private readonly Environment $environment, #[Autowire(param: 'spyck.visualization.config.chart.directory')] private readonly ?string $chartDirectory, #[Autowire(param: 'spyck.visualization.config.directory')] private readonly string $directory)
     {
     }
 

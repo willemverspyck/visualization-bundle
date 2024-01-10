@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class UserRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry, #[Autowire(param: 'spyck.visualization.user.class')] private readonly string $class)
+    public function __construct(ManagerRegistry $managerRegistry, #[Autowire(param: 'spyck.visualization.config.user.class')] private readonly string $class)
     {
         parent::__construct($managerRegistry, $this->class);
     }
