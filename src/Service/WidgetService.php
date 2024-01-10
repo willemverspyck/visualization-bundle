@@ -201,20 +201,15 @@ readonly class WidgetService
 
         $fields = $route->getData();
 
-        $parameters = $this->getDashboardParameterData($dashboard);
-
         $request = $this->requestStack->getCurrentRequest();
+
+        $parameters = $this->getDashboardParameterData($dashboard);
 
         foreach ($parameters as $parameter) {
             if ($parameter instanceof EntityParameterInterface) {
                 $name = $parameter->getName();
 
-                $parameterFill[$parameter->getField()] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $parameter->getDataForRequest();
-            }
-
-
-            if ($parameter instanceof DateParameterInterface) {
-                $parameterFill[$parameter->getField()] = $parameter->getDataForRequest();
+                $parameterFill[$parameter->getField()] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request?->get($parameter->getField());
             }
         }
 
