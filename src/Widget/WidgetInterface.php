@@ -36,9 +36,9 @@ interface WidgetInterface
 
     public function getProperties(): iterable;
 
-    public function setView(string $view): static;
+    public function setView(?string $view): static;
 
-    public function getView(): string;
+    public function getView(): ?string;
 
     public function setWidget(Widget $widget): static;
 

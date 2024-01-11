@@ -26,9 +26,17 @@ interface MailMessageInterface
 
     public function getVariables(): array;
 
-    public function setView(string $view): void;
+    public function setView(?string $view): void;
 
-    public function getView(): string;
+    public function getView(): ?string;
+
+    public function isInline(): bool;
+
+    public function setInline(bool $inline): void;
+
+    public function hasRoute(): bool;
+
+    public function setRoute(bool $route): void;
 
     public function setMerge(bool $merge): void;
 

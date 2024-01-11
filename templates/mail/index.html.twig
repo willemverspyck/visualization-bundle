@@ -28,7 +28,7 @@
                                         {% endif %}
                                     {% endblock %}
                                 </div>
-                                {% if mail.view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::HTML')) %}
+                                {% if mail.inline is same as(true) %}
                                     <div class="content">
                                         {% for block in dashboard.blocks %}
                                             <table class="widget" width="100%" cellspacing="0" cellpadding="0" border="0" align="center">

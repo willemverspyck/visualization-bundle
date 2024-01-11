@@ -30,7 +30,7 @@ readonly class BlockService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getBlockAsModel(Block $block, array $variables = [], string $view = ViewInterface::JSON, bool $preload = false): BlockAsModel
+    public function getBlockAsModel(Block $block, array $variables = [], string $view = null, bool $preload = false): BlockAsModel
     {
         $blockModel = new BlockAsModel();
 
@@ -51,7 +51,7 @@ readonly class BlockService
         $blockModel->setFilters($this->getBlockFilter($widgetInstance));
         $blockModel->setParameters($this->getBlockParameters($widgetInstance));
         $blockModel->setDownloads($this->getDownloads($block));
-        $blockModel->setUrl($this->getBlockUrl($block, ViewInterface::TABLE));
+        $blockModel->setUrl($this->getBlockUrl($block, ViewInterface::JSON));
         $blockModel->setCharts($this->getCharts($block, $widget));
         $blockModel->setFilter($block->hasFilter());
         $blockModel->setFilterView($block->hasFilterView());

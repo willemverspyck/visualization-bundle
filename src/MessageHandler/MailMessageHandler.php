@@ -106,7 +106,7 @@ final class MailMessageHandler
 
         $attachments = [];
 
-        if (ViewInterface::HTML !== $mailMessage->getView()) {
+        if (null !== $mailMessage->getView()) {
             $view = $this->viewService->getView($mailMessage->getView());
 
             if (null === $view->isMerge()) {

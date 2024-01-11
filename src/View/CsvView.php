@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\View;
 
 use Spyck\VisualizationBundle\Model\Block;
+use Spyck\VisualizationBundle\Model\Config;
 use Spyck\VisualizationBundle\Model\Dashboard;
+use DateTimeInterface;
 use Exception;
 use SplFileObject;
+use Spyck\VisualizationBundle\Model\Field;
 
 class CsvView extends AbstractView
 {
@@ -77,6 +80,18 @@ class CsvView extends AbstractView
     public static function isMerge(): ?bool
     {
         return false;
+    }
+
+    protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): bool|float|int|string|null
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return match ($type) {
+            Field::TYPE_BOOLEAN => $value ? 'TRUE' : 'FALSE',
+            default => parent::getValue($type, $config, $value),
+        };
     }
 
     protected function getSeparator(): string

@@ -11,11 +11,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 interface ViewInterface
 {
     public const CSV = 'csv';
-    public const HTML = 'html';
     public const JSON = 'json';
     public const PDF = 'pdf';
     public const SSV = 'ssv';
-    public const TABLE = 'table';
     public const TSV = 'tsv';
     public const XLSX = 'xlsx';
     public const XML = 'xml';

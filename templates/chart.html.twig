@@ -1,3 +1,18 @@
+{% trans_default_domain 'SpyckVisualizationBundle' %}
+
+{% macro getClass(type, config) %}
+    {% set classes = [type] %}
+
+    {% for format in config.formats %}
+        {% set name = 'format' ~ format.name|capitalize %}
+        {% if name not in classes %}
+            {% set classes = classes|merge([name]) %}
+        {% endif %}
+    {% endfor %}
+
+    {{ classes|join(' ') }}
+{% endmacro %}
+
 {% macro getStyle(type, config, value) %}
     {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
         {% for format in config.formats %}
@@ -25,10 +40,6 @@
                 color: #{{ color }};
             {% endif %}
         {% endfor %}
-    {% endif %}
-
-    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
-        text-align: right;
     {% endif %}
 {% endmacro %}
 
@@ -110,6 +121,18 @@
     {% endif %}
 {% endmacro %}
 
+{% macro getPreValue(type, config, value, format) %}
+    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
+        {% for format in config.formats %}
+            {% if format.name is same as('databar') %}
+                {% set width = value * 100 %}
+
+                <span style="background-color: #{{ format.color }}; width: {{ value|round }}px;">&nbsp;</span>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
 {% macro getRoutes(routes) %}
     {% if routes|length > 0 %}
         <br>
@@ -139,7 +162,7 @@
                 <tr>
                     <td>
                         {% for filter in filters %}
-                            {{ filter.name|capitalize }}: {{ filter.data|join(', ') }}
+                            {{ filter.name|trans }}: {{ filter.data|join(', ') }}
                             <br>
                         {% endfor %}
                     </td>
@@ -168,7 +191,7 @@
                     <thead>
                         <tr>
                             {% for field in fields %}
-                                <th>{{ field.name }}</th>
+                                <th class="{{ self.getClass(field['type'], field['config']) }}">{{ field.name }}</th>
                             {% endfor %}
                             <th>&nbsp;</th>
                         </tr>
@@ -179,7 +202,8 @@
                                 {% for fieldIndex, field in row.fields %}
                                     {% set definition = attribute(fields, fieldIndex) %}
 
-                                    <td style="{{ self.getStyle(definition['type'], definition['config'], field.value) }}">
+                                    <td class="{{ self.getClass(definition['type'], definition['config']) }}" style="{{ self.getStyle(definition['type'], definition['config'], field.value) }}">
+                                        {{ self.getPreValue(definition['type'], definition['config'], field.value, format) }}
                                         {{ self.getValue(definition['type'], definition['config'], field.value, format) }}
                                         {% if route %}
                                             {{ self.getRoutes(field.routes) }}

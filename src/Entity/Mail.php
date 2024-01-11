@@ -41,8 +41,11 @@ class Mail implements Stringable
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
 
-    #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8)]
-    private string $view;
+    #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8, nullable: true)]
+    private ?string $view = null;
+
+    #[Doctrine\Column(name: 'inline', type: Types::BOOLEAN)]
+    private bool $inline;
 
     #[Doctrine\Column(name: 'route', type: Types::BOOLEAN)]
     private bool $route;
@@ -146,14 +149,26 @@ class Mail implements Stringable
         return $this;
     }
 
-    public function getView(): string
+    public function getView(): ?string
     {
         return $this->view;
     }
 
-    public function setView(string $view): static
+    public function setView(?string $view): static
     {
         $this->view = $view;
+
+        return $this;
+    }
+
+    public function isInline(): bool
+    {
+        return $this->inline;
+    }
+
+    public function setInline(bool $inline): static
+    {
+        $this->inline = $inline;
 
         return $this;
     }

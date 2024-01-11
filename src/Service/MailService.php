@@ -51,6 +51,7 @@ readonly class MailService
         $mailMessage->setDescription($mail->getDescription());
         $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
         $mailMessage->setView($mail->getView());
+        $mailMessage->setInline($mail->isInline());
         $mailMessage->setRoute($mail->hasRoute());
         $mailMessage->setMerge($mail->isMerge());
 

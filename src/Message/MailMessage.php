@@ -11,7 +11,8 @@ final class MailMessage implements MailMessageInterface
     private string $name;
     private ?string $description = null;
     private array $variables;
-    private string $view;
+    private ?string $view = null;
+    private bool $inline;
     private bool $route;
     private bool $merge;
 
@@ -65,19 +66,24 @@ final class MailMessage implements MailMessageInterface
         $this->variables = $variables;
     }
 
-    public function getView(): string
+    public function getView(): ?string
     {
         return $this->view;
     }
 
-    public function setView(string $view): void
+    public function setView(?string $view): void
     {
         $this->view = $view;
     }
 
-    public function setRoute(bool $route): void
+    public function isInline(): bool
     {
-        $this->route = $route;
+        return $this->inline;
+    }
+
+    public function setInline(bool $inline): void
+    {
+        $this->inline = $inline;
     }
 
     public function hasRoute(): bool
@@ -85,13 +91,18 @@ final class MailMessage implements MailMessageInterface
         return $this->route;
     }
 
-    public function setMerge(bool $merge): void
+    public function setRoute(bool $route): void
     {
-        $this->merge = $merge;
+        $this->route = $route;
     }
 
     public function isMerge(): bool
     {
         return $this->merge;
+    }
+
+    public function setMerge(bool $merge): void
+    {
+        $this->merge = $merge;
     }
 }

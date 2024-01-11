@@ -34,7 +34,7 @@ readonly class DashboardService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getDashboardAsModel(Dashboard $dashboard, array $variables = [], string $view = ViewInterface::JSON, bool $preload = false): DashboardAsModel
+    public function getDashboardAsModel(Dashboard $dashboard, array $variables = [], string $view = null, bool $preload = false): DashboardAsModel
     {
         $user = $this->userService->getUser();
 

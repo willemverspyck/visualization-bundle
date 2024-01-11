@@ -21,7 +21,7 @@ abstract class AbstractWidget implements WidgetInterface
 {
     private const CACHE = 3600;
 
-    private string $view;
+    private ?string $view = null;
     private Widget $widget;
 
     /**
@@ -184,14 +184,14 @@ abstract class AbstractWidget implements WidgetInterface
         return [];
     }
 
-    public function setView(string $view): static
+    public function setView(?string $view): static
     {
         $this->view = $view;
 
         return $this;
     }
 
-    public function getView(): string
+    public function getView(): ?string
     {
         return $this->view;
     }

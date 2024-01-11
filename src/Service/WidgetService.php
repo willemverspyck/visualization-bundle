@@ -36,6 +36,7 @@ use Spyck\VisualizationBundle\Repository\WidgetRepository;
 use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Spyck\VisualizationBundle\Utility\CacheUtility;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
+use Spyck\VisualizationBundle\View\JsonView;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
@@ -133,7 +134,7 @@ readonly class WidgetService
      * @throws InvalidArgumentException
      * @throws ParameterException
      */
-    public function getWidgetAsModel(Block $block, array $variables, string $view): WidgetAsModel
+    public function getWidgetAsModel(Block $block, array $variables, ?string $view): WidgetAsModel
     {
         $parameterBag = BlockUtility::getParameterBag($block, $variables);
 

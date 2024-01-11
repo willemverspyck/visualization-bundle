@@ -47,7 +47,6 @@ abstract class AbstractView implements ViewInterface
 
         return match ($type) {
             Field::TYPE_ARRAY => implode(', ', $value),
-            Field::TYPE_BOOLEAN => $value ? 'TRUE' : 'FALSE',
             Field::TYPE_DATE => $value->format('Y-m-d'),
             Field::TYPE_DATETIME => $value->format('Y-m-d H:i:s'),
             Field::TYPE_TIME => $value->format('H:i:s'),

@@ -40,8 +40,8 @@ class Log
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
 
-    #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8)]
-    private string $view;
+    #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8, nullable: true)]
+    private ?string $view = null;
 
     #[Doctrine\Column(name: 'type', type: Types::SMALLINT, options: ['unsigned' => true])]
     private int $type;
@@ -102,12 +102,12 @@ class Log
         return $this;
     }
 
-    public function getView(): string
+    public function getView(): ?string
     {
         return $this->view;
     }
 
-    public function setView(string $view): static
+    public function setView(?string $view): static
     {
         $this->view = $view;
 
