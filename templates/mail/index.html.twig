@@ -45,7 +45,7 @@
                                                                         <img src="{{ email.image('@chart/' ~ chart|split('/')|last) }}" width="100%" alt="{{ block.name }}">
                                                                     </div>
                                                                 {% else %}
-                                                                    {{ chart.getData(block, constant('Spyck\\VisualizationBundle\\View\\ViewInterface::HTML'), mail.route) }}
+                                                                    {{ chart.getData(block, null, mail.route) }}
                                                                 {% endif %}
                                                             </div>
                                                         </td>

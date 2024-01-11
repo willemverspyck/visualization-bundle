@@ -43,7 +43,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getValue(type, config, value, format) %}
+{% macro getValue(type, config, value, view) %}
     {% import _self as self %}
 
     {% if value is not null %}
@@ -72,7 +72,7 @@
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_DATETIME')) %}
             {{ value|date('Y-m-d H:i:s') }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_IMAGE')) %}
-            {% if format is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+            {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                 <img src="{{ getDirectory(value) }}" alt="" width="40" class="border">
             {% else %}
                 <img src="{{ absolute_url(value) }}" alt="" width="40" class="border">
@@ -90,7 +90,7 @@
                 {% set image = '/images/position_down.png' %}
             {% endif %}
 
-            {% if format is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+            {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                 <img src="{{ getDirectory(image) }}" alt="" width="14">
             {% else %}
                 <img src="{{ absolute_url(image) }}" alt="" width="14">
@@ -98,7 +98,7 @@
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_TIME')) %}
             {{ value|date('H:i:s') }}
         {% else %}
-            {% if format is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+            {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                 {{ value|u.truncate(40, '...') }}
             {% else %}
                 {{ value }}
@@ -121,13 +121,11 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getPreValue(type, config, value, format) %}
+{% macro getPreValue(type, config, value, view) %}
     {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
         {% for format in config.formats %}
             {% if format.name is same as('databar') %}
-                {% set width = value * 100 %}
-
-                <span style="background-color: #{{ format.color }}; width: {{ value|round }}px;">&nbsp;</span>
+                <span style="background-color: {{ '#' ~ format.color }}; width: {{ value * 100|round }}px;">&nbsp;</span>
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -172,7 +170,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getData(block, format, route) %}
+{% macro getData(block, view, route) %}
     {% import _self as self %}
 
     {% set widget = block.widget %}
@@ -203,8 +201,8 @@
                                     {% set definition = attribute(fields, fieldIndex) %}
 
                                     <td class="{{ self.getClass(definition['type'], definition['config']) }}" style="{{ self.getStyle(definition['type'], definition['config'], field.value) }}">
-                                        {{ self.getPreValue(definition['type'], definition['config'], field.value, format) }}
-                                        {{ self.getValue(definition['type'], definition['config'], field.value, format) }}
+                                        {{ self.getPreValue(definition['type'], definition['config'], field.value, view) }}
+                                        {{ self.getValue(definition['type'], definition['config'], field.value, view) }}
                                         {% if route %}
                                             {{ self.getRoutes(field.routes) }}
                                         {% endif %}
