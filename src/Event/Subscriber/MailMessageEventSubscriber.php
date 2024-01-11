@@ -12,6 +12,7 @@ use Spyck\VisualizationBundle\Repository\DashboardRepository;
 use Spyck\VisualizationBundle\Repository\UserRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Throwable;
 
 final class MailMessageEventSubscriber implements EventSubscriberInterface
 {
@@ -26,7 +27,7 @@ final class MailMessageEventSubscriber implements EventSubscriberInterface
     {
         return [
             WorkerMessageFailedEvent::class => [
-                'onMessageFailed',
+                'onWorkerMessageFailed',
             ],
         ];
     }
@@ -34,7 +35,7 @@ final class MailMessageEventSubscriber implements EventSubscriberInterface
     /**
      * @throws Exception
      */
-    public function onMessageFailed(WorkerMessageFailedEvent $event): void
+    public function onWorkerMessageFailed(WorkerMessageFailedEvent $event): void
     {
         if ($event->willRetry()) {
             return;
@@ -55,11 +56,24 @@ final class MailMessageEventSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $messages = [
-                $event->getThrowable()->getPrevious()->getMessage(),
-            ];
+            $messages = $this->getMessages($event->getThrowable());
 
             $this->logRepository->putLog(user: $user, dashboard: $dashboard, variables: $message->getVariables(), view: $message->getView(), type: Log::TYPE_MAIL, messages: $messages);
         }
+    }
+
+    private function getMessages(Throwable $throwable): array
+    {
+        $data = [
+            $throwable->getMessage(),
+        ];
+
+        $previous = $throwable->getPrevious();
+
+        if (null === $previous) {
+            return $data;
+        }
+
+        return array_merge($data, $this->getMessages($previous));
     }
 }
