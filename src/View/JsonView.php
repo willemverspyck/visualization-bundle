@@ -20,4 +20,9 @@ final class JsonView extends AbstractSerializerView
     {
         return ViewInterface::JSON;
     }
+
+    public static function getDescription(): string
+    {
+        return 'JSON';
+    }
 }

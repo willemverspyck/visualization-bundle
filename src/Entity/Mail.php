@@ -219,20 +219,6 @@ class Mail implements Stringable
         $this->users->removeElement($user);
     }
 
-    public static function getViews(): array
-    {
-        return [
-            ViewInterface::CSV,
-            ViewInterface::HTML,
-            ViewInterface::JSON,
-            ViewInterface::PDF,
-            ViewInterface::SSV,
-            ViewInterface::TSV,
-            ViewInterface::XLSX,
-            ViewInterface::XML,
-        ];
-    }
-
     public function __clone()
     {
         $this->id = null;

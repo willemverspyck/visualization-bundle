@@ -17,7 +17,9 @@ use Doctrine\ORM\Mapping as Doctrine;
 class Log
 {
     public const TYPE_API = 1;
+    public const TYPE_API_NAME = 'API';
     public const TYPE_MAIL = 2;
+    public const TYPE_MAIL_NAME = 'Mail';
 
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]
@@ -136,26 +138,18 @@ class Log
         return $this;
     }
 
-    public static function getViewData(): array
+    public static function getTypes(bool $inverse = false): array
     {
-        return [
-            ViewInterface::CSV,
-            ViewInterface::HTML,
-            ViewInterface::JSON,
-            ViewInterface::PDF,
-            ViewInterface::SSV,
-            ViewInterface::TSV,
-            ViewInterface::XLSX,
-            ViewInterface::XML,
+        $data = [
+            self::TYPE_API => self::TYPE_API_NAME,
+            self::TYPE_MAIL => self::TYPE_MAIL_NAME,
         ];
-    }
 
-    public static function getTypeData(): array
-    {
-        return [
-            self::TYPE_API,
-            self::TYPE_MAIL,
-        ];
+        if (false === $inverse) {
+            return $data;
+        }
+
+        return array_flip($data);
     }
 
     #[Doctrine\PrePersist]

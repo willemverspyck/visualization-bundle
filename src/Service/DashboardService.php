@@ -26,7 +26,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class DashboardService
 {
-    public function __construct(private BlockService $blockService, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private WidgetService $widgetService)
+    public function __construct(private BlockService $blockService, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private WidgetService $widgetService, private ViewService $viewService)
     {
     }
 
@@ -253,12 +253,10 @@ readonly class DashboardService
     {
         $data = [];
 
-        $formats = Mail::getViews();
-
-        foreach ($formats as $format) {
+        foreach ($this->viewService->getViews() as $name => $view) {
             $data[] = [
-                'id' => $format,
-                'name' => $this->translator->trans(id: sprintf('download.%s', $format), domain: 'SpyckVisualizationBundle'),
+                'id' => $name,
+                'name' => $this->translator->trans(id: sprintf('download.%s', $name), domain: 'SpyckVisualizationBundle'),
             ];
         }
 

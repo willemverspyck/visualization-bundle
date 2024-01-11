@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Form;
 
 use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Message\MailMessage;
+use Spyck\VisualizationBundle\Service\ViewService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -17,6 +18,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 final class DashboardMailType extends AbstractType
 {
+    public function __construct(private readonly ViewService $viewService)
+    {
+    }
+
     /**
      * Build the form.
      */
@@ -35,7 +40,7 @@ final class DashboardMailType extends AbstractType
             ])
             ->add('view', TextType::class, [
                 'constraints' => [
-                    new Choice(choices: Mail::getViews()),
+                    new Choice(choices: $this->getViews()),
                     new NotBlank(),
                 ],
             ])
@@ -56,5 +61,12 @@ final class DashboardMailType extends AbstractType
     public function getBlockPrefix(): string
     {
         return '';
+    }
+
+    private function getViews(): array
+    {
+        $data = $this->viewService->getViews();
+
+        return array_keys($data);
     }
 }

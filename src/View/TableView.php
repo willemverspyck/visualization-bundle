@@ -95,6 +95,11 @@ final class TableView extends AbstractView
         return 'table';
     }
 
+    public static function getDescription(): string
+    {
+        return 'Table';
+    }
+
     public static function isMerge(): ?bool
     {
         return false;

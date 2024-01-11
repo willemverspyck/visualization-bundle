@@ -30,7 +30,7 @@ abstract class AbstractSerializerView extends AbstractView
 
         $widget = $block->getWidget();
 
-        return $this->serializer->serialize($widget, $this->getName(), [
+        return $this->serializer->serialize($widget, $this->getExtension(), [
             AbstractNormalizer::GROUPS => [
                 Response::GROUP,
             ],

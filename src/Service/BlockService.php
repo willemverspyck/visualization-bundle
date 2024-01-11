@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class BlockService
 {
-    public function __construct(private RouterInterface $router, private RepositoryService $repositoryService, private TranslatorInterface $translator, private WidgetService $widgetService)
+    public function __construct(private RouterInterface $router, private RepositoryService $repositoryService, private TranslatorInterface $translator, private WidgetService $widgetService, private ViewService $viewService)
     {
     }
 
@@ -165,14 +165,10 @@ readonly class BlockService
     {
         $data = [];
 
-        $formats = array_filter(Mail::getViews(), function (string $format): bool {
-            return ViewInterface::HTML !== $format;
-        });
-
-        foreach ($formats as $format) {
+        foreach ($this->viewService->getViews() as $name => $view) {
             $data[] = [
-                'name' => $this->translator->trans(id: sprintf('download.%s', $format), domain: 'SpyckVisualizationBundle'),
-                'url' => $this->getBlockUrl($block, $format),
+                'name' => $this->translator->trans(id: sprintf('download.%s', $name), domain: 'SpyckVisualizationBundle'),
+                'url' => $this->getBlockUrl($block, $name),
             ];
         }
 

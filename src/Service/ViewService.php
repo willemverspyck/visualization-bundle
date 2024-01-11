@@ -34,7 +34,7 @@ readonly class ViewService
     }
 
     /**
-     * @return array<string, ViewInterface>
+     * @return array<string, string>
      *
      * @throws Exception
      */
@@ -42,8 +42,8 @@ readonly class ViewService
     {
         $data = [];
 
-        foreach ($this->views->getIterator() as $index => $view) {
-            $data[$index] = $view;
+        foreach ($this->views->getIterator() as $view) {
+            $data[$view->getName()] = $view->getDescription();
         }
 
         return $data;
