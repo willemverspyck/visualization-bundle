@@ -17,8 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'spyck:visualization:export:widget', description: 'Command to export a widget.')]
-final class ExportWidgetCommand extends Command
+#[AsCommand(name: 'spyck:visualization:widget:export', description: 'Command to export a widget.')]
+final class WidgetExportCommand extends Command
 {
     public function __construct(private readonly WidgetService $widgetService, private readonly ViewService $viewService)
     {
