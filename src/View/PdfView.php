@@ -64,9 +64,4 @@ final class PdfView extends AbstractView
     {
         return 'pdf';
     }
-
-    public static function getDescription(): string
-    {
-        return 'PDF';
-    }
 }

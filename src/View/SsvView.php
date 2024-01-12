@@ -15,9 +15,4 @@ final class SsvView extends CsvView
     {
         return ';';
     }
-
-    public static function getDescription(): string
-    {
-        return 'CSV (Semicolon)';
-    }
 }

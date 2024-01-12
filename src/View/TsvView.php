@@ -21,11 +21,6 @@ final class TsvView extends CsvView
         return ViewInterface::TSV;
     }
 
-    public static function getDescription(): string
-    {
-        return 'TSV';
-    }
-
     protected function getSeparator(): string
     {
         return chr(9);

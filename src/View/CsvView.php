@@ -69,11 +69,6 @@ class CsvView extends AbstractView
         return ViewInterface::CSV;
     }
 
-    public static function getDescription(): string
-    {
-        return 'CSV (Comma)';
-    }
-
     /**
      * {@inheritDoc}
      */

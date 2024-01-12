@@ -20,9 +20,4 @@ final class XmlView extends AbstractSerializerView
     {
         return ViewInterface::XML;
     }
-
-    public static function getDescription(): string
-    {
-        return 'XML';
-    }
 }

@@ -28,8 +28,6 @@ interface ViewInterface
 
     public static function getName(): string;
 
-    public static function getDescription(): string;
-
     /**
      * Return boolean if it can be merged or not, or NULL when it doesn't matter.
      */

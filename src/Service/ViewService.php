@@ -9,13 +9,14 @@ use Exception;
 use IteratorAggregate;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class ViewService
 {
     /**
      * @param Countable&IteratorAggregate $views
      */
-    public function __construct(#[TaggedIterator(tag: 'spyck.visualization.view', defaultIndexMethod: 'getName')] private iterable $views)
+    public function __construct(private TranslatorInterface $translator, #[TaggedIterator(tag: 'spyck.visualization.view', defaultIndexMethod: 'getName')] private iterable $views)
     {
     }
 
@@ -43,7 +44,9 @@ readonly class ViewService
         $data = [];
 
         foreach ($this->views->getIterator() as $view) {
-            $data[$view->getName()] = $view->getDescription();
+            $name = $view->getName();
+
+            $data[$name] = $this->translator->trans(id: sprintf('view.%s.name', $name), domain: 'SpyckVisualizationBundle');
         }
 
         return $data;

@@ -2,12 +2,20 @@ filter:
   option:
     name: Options
     description: Filter by options
-download:
-  csv: CSV (Comma separated)
-  html: HTML
-  json: JSON
-  pdf: PDF
-  ssv: CSV (Semicolon separated)
-  tsv: TSV (Tab separated)
-  xlsx: Microsoft Excel (XLSX)
-  xml: XML
+view:
+  csv:
+    name: CSV (Comma separated)
+  html:
+    name: HTML
+  json:
+    name: JSON
+  pdf:
+    name: PDF
+  ssv:
+    name: CSV (Semicolon separated)
+  tsv:
+    name: TSV (Tab separated)
+  xlsx:
+    name: Microsoft Excel (XLSX)
+  xml:
+    name: XML

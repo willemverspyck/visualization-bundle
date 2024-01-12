@@ -70,11 +70,6 @@ final class ExcelView extends AbstractView
         return ViewInterface::XLSX;
     }
 
-    public static function getDescription(): string
-    {
-        return 'Microsoft Excel';
-    }
-
     /**
      * {@inheritDoc}
      */
