@@ -31,7 +31,12 @@ final class MailCommand extends Command
         $schedules = $this->scheduleRepository->getScheduleData($date);
 
         foreach ($schedules as $schedule) {
-            if ($this->match($schedule->getHours(), $date->format('G')) && $this->match($schedule->getDays(), $date->format('j')) && $this->match($schedule->getWeeks(), $date->format('W')) && $this->match($schedule->getWeekdays(),$date->format('N'))) {
+            $hour = (int) $date->format('G');
+            $day = (int) $date->format('j');
+            $week = (int) $date->format('W');
+            $weekday = (int) $date->format('N');
+
+            if ($this->match($schedule->getHours(), $hour) && $this->match($schedule->getDays(), $day) && $this->match($schedule->getWeeks(), $week) && $this->match($schedule->getWeekdays(), $weekday)) {
                 $this->mailService->handleMailMessageBySchedule($schedule);
             }
         }
@@ -39,7 +44,7 @@ final class MailCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function match(array $data, string $value): bool
+    private function match(array $data, int $value): bool
     {
         return 0 === count($data) || in_array($value, $data, true);
     }
