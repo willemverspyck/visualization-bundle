@@ -205,23 +205,22 @@ readonly class WidgetService
             'dashboardId' => $dashboard->getId(),
         ], UrlGeneratorInterface::ABSOLUTE_URL));
 
-        $parameterFill = [];
+        $parameters = [];
+        $parametersForDashboard = $this->getDashboardParameterData($dashboard);
 
         $fields = $route->getData();
 
         $request = $this->requestStack->getCurrentRequest();
 
-        $parameters = $this->getDashboardParameterData($dashboard);
-
-        foreach ($parameters as $parameter) {
+        foreach ($parametersForDashboard as $parameter) {
             if ($parameter instanceof EntityParameterInterface) {
                 $name = $parameter->getName();
 
-                $parameterFill[$parameter->getField()] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request?->get($parameter->getField());
+                $parameters[$parameter->getField()] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request?->get($parameter->getField());
             }
         }
 
-        $route->setParameters($parameterFill);
+        $route->setParameters($parameters);
     }
 
     /**
@@ -724,37 +723,48 @@ readonly class WidgetService
         $content = [];
 
         foreach ($field->getRoutes() as $route) {
-            $content[] = [
-                'name' => $route->getName(),
-                'url' => $this->getRouteUrl($route, $data),
-            ];
+            $url = $this->getRouteUrl($route, $data);
+
+            if (null !== $url) {
+                $content[] = [
+                    'name' => $route->getName(),
+                    'url' => $url,
+                ];
+            }
         }
 
         return $content;
     }
 
-    private function getRouteUrl(RouteInterface $route, array $data): string
+    /**
+     * @throws Exception
+     */
+    private function getRouteUrl(RouteInterface $route, array $data): ?string
     {
-        $url = $route->getUrl();
+        $query = [];
 
-        $parameters = array_filter($route->getParameters(), function (?string $value) {
-            return null !== $value;
-        });
+        $parameters = $route->getParameters();
 
-        if (0 === count($parameters)) {
-            return $url;
-        }
+        foreach ($parameters as $name => $value) {
+            if (1 === preg_match('/{([\w]+)}/', $value, $matches)) {
+                $key = $matches[1];
 
-        $query = preg_replace_callback('/{([\w]+)}/', function (array $matches) use ($data): string {
-            $key = $matches[1];
+                if (false === array_key_exists($key, $data)) {
+                    throw new Exception(sprintf('Route parameter "%s" not found in data', $key));
+                }
 
-            if (array_key_exists($key, $data)) {
-                return sprintf('%s', $data[$key]);
+                $value = $data[$key];
             }
 
-            return $key;
-        }, $parameters);
-        
+            if (null === $value) {
+                return null;
+            }
+
+            $query[$name] = $value;
+        }
+
+        $url = $route->getUrl();
+
         return sprintf('%s?%s', $url, http_build_query($query));
     }
 
