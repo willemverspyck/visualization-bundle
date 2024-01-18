@@ -44,7 +44,7 @@ final class WidgetExportCommand extends Command
 
             $option = $this->getOption($input, $output, 'widget', $data);
 
-            $input->setOption('widget', $data[$option]);
+            $input->setOption('widget', $option);
         }
 
         $view = $input->getOption('view');
@@ -54,7 +54,7 @@ final class WidgetExportCommand extends Command
 
             $option = $this->getOption($input, $output, 'view', $data);
 
-            $input->setOption('view', $data[$option]);
+            $input->setOption('view', $option);
         }
     }
 
@@ -73,13 +73,15 @@ final class WidgetExportCommand extends Command
         $optionVariableKey = $input->getOption('variableKey');
         $optionVariableValue = $input->getOption('variableValue');
 
-        if (false === in_array($optionWidget, $this->getWidgets(), true)) {
+        $widgets = $this->getWidgets();
+        
+        if (false === array_key_exists($optionWidget, $widgets)) {
             $style->error(sprintf('Widget "%s" not found.', $optionWidget));
 
             return Command::FAILURE;
         }
 
-        if (false === in_array($optionView, $this->getViews(), true)) {
+        if (false === array_key_exists($optionView, $this->getViews())) {
             $style->error(sprintf('View "%s" not found.', $optionView));
 
             return Command::FAILURE;
@@ -94,7 +96,7 @@ final class WidgetExportCommand extends Command
         $variables = array_combine($optionVariableKey, $optionVariableValue);
 
         try {
-            $dashboard = $this->widgetService->getWidgetDataByAdapter($optionWidget, $variables);
+            $dashboard = $this->widgetService->getWidgetDataByAdapter($widgets[$optionWidget], $variables);
         } catch (ParameterException $parameterException) {
             $style->error($parameterException->getMessage());
 
@@ -114,7 +116,7 @@ final class WidgetExportCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function getOption(InputInterface $input, OutputInterface $output, string $name, array $data): int
+    private function getOption(InputInterface $input, OutputInterface $output, string $name, array $data): string
     {
         $question = new ChoiceQuestion(sprintf('Please select a %s:', $name), $data);
         $question->setMaxAttempts(2);
@@ -126,7 +128,7 @@ final class WidgetExportCommand extends Command
             return $id;
         });
 
-        return (int) $this->getHelper('question')->ask($input, $output, $question);
+        return $this->getHelper('question')->ask($input, $output, $question);
     }
 
     private function getWidgets(): array
@@ -136,6 +138,6 @@ final class WidgetExportCommand extends Command
 
     private function getViews(): array
     {
-        return array_keys($this->viewService->getViews());
+        return $this->viewService->getViews();
     }
 }
