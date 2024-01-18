@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Service;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Mail;
@@ -128,62 +129,33 @@ readonly class DashboardService
     {
         $data = [];
 
-        $childrenExclude = [];
-
-        $hasMultipleRequest = false;
+        $multipleParameters = new ArrayCollection();
 
         $parameters = $this->getDashboardParameterData($dashboard, $variables);
 
-        foreach ([new DayRangeParameter(), new MonthRangeParameter(), new WeekRangeParameter()] as $multipleRequest) {
-            $children = $multipleRequest->getChildren();
+        array_walk ($parameters, function (ParameterInterface $parameter) use (&$data, &$multipleParameters, $slug): void {
+            $parent = $parameter->getParent();
 
-            $intersect = array_uintersect($parameters, $children, function (RequestInterface $a, RequestInterface $b): int {
-                if (get_class($a) === get_class($b)) {
-                    return 0;
-                }
+            if (null === $parent) {
+                $name = get_class($parameter);
 
-                return get_class($a) > get_class($b) ? 1 : -1;
-            });
+                $data[$name] = $parameter->getDataAsString($slug);
 
-            if (count($intersect) === count($children)) {
-                $childrenExclude = array_merge($childrenExclude, $children);
-
-                if (false === $hasMultipleRequest) {
-                    $range = [];
-
-                    foreach ($intersect as $intersects) {
-                        $range[] = $intersects->getDataAsString($slug);
-                    }
-
-                    $reflectionClass = new ReflectionClass($multipleRequest);
-
-                    $name = $reflectionClass->getShortName();
-
-                    $data[$name] = implode(' - ', $range);
-
-                    $hasMultipleRequest = true;
-                }
-            }
-        }
-
-        $difference = array_udiff($parameters, $childrenExclude, function (RequestInterface $a, RequestInterface $b): int {
-            if (get_class($a) === get_class($b)) {
-                return 0;
+                return;
             }
 
-            return get_class($a) > get_class($b) ? 1 : -1;
+            if (false === $multipleParameters->contains($parent)) {
+                $multipleParameters->add($parent);
+            }
         });
 
-        foreach ($difference as $name => $parameter) {
+        foreach ($multipleParameters as $parameter) {
+            $name = get_class($parameter);
+
             $data[$name] = $parameter->getDataAsString($slug);
         }
 
-        /** If there is a dateRange object, put it at the end of the array */
-        if ($hasMultipleRequest) {
-            $data = array_slice($data, 1) + array_slice($data, 0, 1);
-        }
-
-        return array_filter($data);
+        return $data;
     }
 
     /**

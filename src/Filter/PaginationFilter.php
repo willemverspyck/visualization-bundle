@@ -10,8 +10,14 @@ final class PaginationFilter extends AbstractMultipleRequest
 {
     public function __construct()
     {
-        $this
-            ->addChild(new LimitFilter())
-            ->addChild(new OffsetFilter());
+        $limitFilter = new LimitFilter();
+        $limitFilter->setParent($this);
+
+        $this->addChild($limitFilter);
+
+        $offsetFilter = new OffsetFilter();
+        $offsetFilter->setParent($this);
+
+        $this->addChild($offsetFilter);
     }
 }

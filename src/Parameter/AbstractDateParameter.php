@@ -10,7 +10,7 @@ use Exception;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-abstract class AbstractDateParameter implements DateParameterInterface
+abstract class AbstractDateParameter extends AbstractParameter implements DateParameterInterface
 {
     private ?DateTimeInterface $data = null;
 

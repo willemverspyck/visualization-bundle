@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Parameter;
 
-abstract class AbstractEntityParameter implements EntityParameterInterface
+abstract class AbstractEntityParameter extends AbstractParameter implements EntityParameterInterface
 {
     private ?int $data = null;
     private ?object $dataAsObject = null;

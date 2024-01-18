@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Request;
 
+use Spyck\VisualizationBundle\Parameter\ParameterInterface;
+
 abstract class AbstractMultipleRequest implements MultipleRequestInterface
 {
     private array $children = [];
@@ -21,5 +23,22 @@ abstract class AbstractMultipleRequest implements MultipleRequestInterface
     public function getChildren(): array
     {
         return $this->children;
+    }
+
+    public function getDataAsString(bool $slug = false): ?string
+    {
+        $data = [];
+
+        foreach ($this->getChildren() as $child) {
+            if ($child instanceof ParameterInterface) {
+                $data[] = $child->getDataAsString($slug);
+            }
+        }
+
+        if (count($data) > 0) {
+            return implode(' - ', $data);
+        }
+
+        return null;
     }
 }

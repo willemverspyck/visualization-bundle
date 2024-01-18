@@ -12,4 +12,6 @@ interface MultipleRequestInterface
      * @return array<int, RequestInterface>
      */
     public function getChildren(): array;
+
+    public function getDataAsString(bool $slug = false): ?string;
 }

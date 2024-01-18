@@ -4,10 +4,25 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Filter;
 
+use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
+
 abstract class AbstractFilter implements FilterInterface
 {
+    private ?MultipleRequestInterface $parent = null;
     private ?array $data = null;
     private string $type;
+
+    public function getParent(): ?MultipleRequestInterface
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?MultipleRequestInterface $parent): self
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
 
     public function getData(): ?array
     {

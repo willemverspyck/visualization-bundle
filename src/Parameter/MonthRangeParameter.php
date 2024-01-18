@@ -10,8 +10,14 @@ final class MonthRangeParameter extends AbstractMultipleRequest
 {
     public function __construct()
     {
-        $this
-            ->addChild(new MonthStartParameter())
-            ->addChild(new MonthEndParameter());
+        $monthStartParameter = new MonthStartParameter();
+        $monthStartParameter->setParent($this);
+
+        $this->addChild($monthStartParameter);
+
+        $monthEndParameter = new MonthEndParameter();
+        $monthEndParameter->setParent($this);
+
+        $this->addChild($monthEndParameter);
     }
 }

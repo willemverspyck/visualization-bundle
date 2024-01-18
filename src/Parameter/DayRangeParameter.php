@@ -10,8 +10,14 @@ final class DayRangeParameter extends AbstractMultipleRequest
 {
     public function __construct()
     {
-        $this
-            ->addChild(new DayStartParameter())
-            ->addChild(new DayEndParameter());
+        $dayStartParameter = new DayStartParameter();
+        $dayStartParameter->setParent($this);
+
+        $this->addChild($dayStartParameter);
+
+        $dayEndParameter = new DayEndParameter();
+        $dayEndParameter->setParent($this);
+
+        $this->addChild($dayEndParameter);
     }
 }

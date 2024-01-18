@@ -132,10 +132,8 @@ final class MailMessageHandler
             $mailMessage->getName(),
         ];
 
-        foreach ($dashboardAsModel->getParametersAsString() as $name => $parameter) {
-            if (false === in_array($name, ['DayRangeParameter', 'MonthRangeParameter', 'WeekRangeParameter'], true)) {
-                $subject[] = sprintf('%s', $parameter->getDataAsString());
-            }
+        foreach ($dashboardAsModel->getParametersAsString() as $parameter) {
+            $subject[] = $parameter;
         }
 
         $this->mailService->sendMail($user->getEmail(), $user->getName(), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments);

@@ -10,8 +10,14 @@ final class WeekRangeParameter extends AbstractMultipleRequest
 {
     public function __construct(bool $full = false)
     {
-        $this
-            ->addChild(new WeekStartParameter())
-            ->addChild(new WeekEndParameter($full));
+        $weekStartParameter = new WeekStartParameter();
+        $weekStartParameter->setParent($this);
+
+        $this->addChild($weekStartParameter);
+
+        $weekEndParameter = new WeekEndParameter();
+        $weekEndParameter->setParent($this);
+
+        $this->addChild($weekEndParameter);
     }
 }
