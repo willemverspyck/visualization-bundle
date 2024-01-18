@@ -38,6 +38,7 @@ abstract class AbstractSerializerView extends AbstractView
 
         $content = [
             'data' => [],
+            'total' => $widget->getTotal(),
             'fields' => [],
             'properties' => $widget->getProperties(),
             'events' => $widget->getEvents(),

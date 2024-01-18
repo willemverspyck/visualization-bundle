@@ -17,6 +17,8 @@ interface WidgetInterface
 
     public function getData(): iterable;
 
+    public function getTotal(): ?int;
+
     public function getEvents(): iterable;
 
     /**

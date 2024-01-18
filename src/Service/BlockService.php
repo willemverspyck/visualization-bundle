@@ -150,7 +150,7 @@ readonly class BlockService
             '_format' => $format,
         ];
 
-        return $this->router->generate('spyck_visualization_widget_show', $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->router->generate('spyck_visualization_widget_item', $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**

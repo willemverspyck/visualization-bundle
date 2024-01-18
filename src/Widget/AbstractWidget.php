@@ -134,6 +134,11 @@ abstract class AbstractWidget implements WidgetInterface
         return self::CACHE;
     }
 
+    public function getTotal(): ?int
+    {
+        return null;
+    }
+
     public function getEvents(): array
     {
         return [];

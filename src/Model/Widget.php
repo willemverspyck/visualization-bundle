@@ -9,18 +9,13 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class Widget
 {
-    #[Serializer\Groups('spyck:visualization:widget:item')]
     private iterable $data;
-
-    #[Serializer\Groups('spyck:visualization:widget:item')]
+    private int $total;
     private iterable $fields;
-
     private iterable $properties;
     private iterable $events;
     private iterable $filters;
     private iterable $parameters;
-
-    #[Serializer\Groups('spyck:visualization:widget:item')]
     private ?Pagination $pagination = null;
 
     public function getData(): iterable
@@ -31,6 +26,18 @@ final class Widget
     public function setData(iterable $data): static
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
+
+    public function setTotal(int $total): static
+    {
+        $this->total = $total;
 
         return $this;
     }

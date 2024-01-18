@@ -164,15 +164,22 @@ readonly class WidgetService
         }
 
         $data = $this->getDataWithCache($widgetInstance, $fields);
+        $total = $widgetInstance->getTotal();
+        $totalIncluded = null === $total;
+
+        if (null === $total) {
+            $total = iterator_count($data);
+        }
 
         $widgetModel = new WidgetAsModel();
         $widgetModel->setFields($this->getFields($fields));
         $widgetModel->setData($data);
+        $widgetModel->setTotal($total);
         $widgetModel->setEvents($widgetInstance->getEvents());
         $widgetModel->setProperties($widgetInstance->getProperties());
         $widgetModel->setParameters($this->getParameters($widgetInstance));
         $widgetModel->setFilters($this->getFilters($widgetInstance));
-        $widgetModel->setPagination($this->getPagination($widgetInstance));
+        $widgetModel->setPagination($this->getPagination($widgetInstance, $total, $totalIncluded));
 
         return $widgetModel;
     }
@@ -546,7 +553,7 @@ readonly class WidgetService
         foreach ($filters as $filter) {
             if ($filter instanceof EntityFilterInterface) {
                 $data = $filter->getDataAsObject();
-
+                
                 if (null !== $data) {
                     $content[] = [
                         'name' => $this->translator->trans(id: sprintf('filter.%s.name', $filter->getName()), domain: 'SpyckVisualizationBundle'),
@@ -614,7 +621,7 @@ readonly class WidgetService
     /**
      * Get the data of the route.
      */
-    private function getPagination(WidgetInterface $widget): ?Pagination
+    private function getPagination(WidgetInterface $widget, int $total, bool $totalIncluded): ?Pagination
     {
         $pagination = $widget->getPagination();
 
@@ -622,7 +629,7 @@ readonly class WidgetService
             return null;
         }
 
-        $name = 'spyck_visualization_widget_show';
+        $name = 'spyck_visualization_widget_item';
 
         $parameters = $this->getPaginationParameters($name);
 
@@ -632,9 +639,7 @@ readonly class WidgetService
 
         $next = null;
 
-        $data = $widget->getData();
-
-        if (iterator_count($data) >= $pagination['limit']) {
+        if ($totalIncluded ? $total >= $pagination['limit'] : $total > $pagination['limit']) {
             $next = $this->urlGenerator->generate($name, array_merge($parameters, [
                 'limit' => $pagination['limit'],
                 'offset' => $pagination['offset'] + $pagination['limit'],
