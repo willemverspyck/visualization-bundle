@@ -238,15 +238,12 @@ readonly class DashboardService
             ], UrlGeneratorInterface::ABSOLUTE_URL),
             'fields' => [
                 'view' => [
-                    'data' => $data,
                     'name' => 'Format',
-                    'parameter' => 'view',
-                    'type' => 'radio',
+                    'field' => 'view',
+                    'data' => $data,
                 ],
             ],
-            'parameters' => [
-                'variables' => $variables,
-            ],
+            'variables' => $variables,
         ];
     }
 }

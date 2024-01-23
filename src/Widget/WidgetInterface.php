@@ -38,6 +38,8 @@ interface WidgetInterface
 
     public function getProperties(): iterable;
 
+    public function getType(): ?string;
+
     public function setView(?string $view): static;
 
     public function getView(): ?string;

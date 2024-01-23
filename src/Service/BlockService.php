@@ -127,8 +127,8 @@ readonly class BlockService
             if (count($returnEntityData) > 0) {
                 $filterModel = new Filter();
                 $filterModel->setName($this->translator->trans(id: sprintf('filter.%s.description', $name), domain: 'SpyckVisualizationBundle'));
-                $filterModel->setType($filter->getType());
-                $filterModel->setParameter($filter->getField());
+                $filterModel->setField($filter->getField());
+                $filterModel->setConfig($filter->getConfig());
                 $filterModel->setData($returnEntityData);
 
                 $data[] = $filterModel;

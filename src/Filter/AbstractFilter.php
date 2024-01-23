@@ -9,8 +9,8 @@ use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
 abstract class AbstractFilter implements FilterInterface
 {
     private ?MultipleRequestInterface $parent = null;
+    private ?array $config = null;
     private ?array $data = null;
-    private string $type;
 
     public function getParent(): ?MultipleRequestInterface
     {
@@ -24,6 +24,16 @@ abstract class AbstractFilter implements FilterInterface
         return $this;
     }
 
+    public function getConfig(): ?array
+    {
+        return $this->config;
+    }
+
+    public function setConfig(?array $config): void
+    {
+        $this->config = $config;
+    }
+
     public function getData(): ?array
     {
         return $this->data;
@@ -32,15 +42,5 @@ abstract class AbstractFilter implements FilterInterface
     public function setData(array $data): void
     {
         $this->data = $data;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): void
-    {
-        $this->type = $type;
     }
 }

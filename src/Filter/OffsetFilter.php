@@ -10,7 +10,9 @@ final class OffsetFilter extends AbstractOptionFilter
 {
     public function __construct()
     {
-        $this->setType(FilterInterface::TYPE_INPUT);
+        $this->setConfig([
+            'type' => FilterInterface::TYPE_INPUT,
+        ]);
     }
 
     public static function getField(): string

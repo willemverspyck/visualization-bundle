@@ -13,10 +13,10 @@ final class Filter
     private string $name;
 
     #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
-    private string $type;
+    private string $field;
 
     #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
-    private string $parameter;
+    private ?array $config = null;
 
     /**
      * @todo: This must be an object with id, name, parent (array with id, field) and select
@@ -37,26 +37,26 @@ final class Filter
         return $this;
     }
 
-    public function getType(): string
+    public function getField(): string
     {
-        return $this->type;
+        return $this->field;
     }
 
-    public function setType(string $type): static
+    public function setField(string $field): static
     {
-        $this->type = $type;
+        $this->field = $field;
 
         return $this;
     }
 
-    public function getParameter(): string
+    public function getConfig(): ?array
     {
-        return $this->parameter;
+        return $this->config;
     }
 
-    public function setParameter(string $parameter): static
+    public function setConfig(?array $config): static
     {
-        $this->parameter = $parameter;
+        $this->config = $config;
 
         return $this;
     }

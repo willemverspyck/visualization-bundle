@@ -44,6 +44,23 @@ final class FieldUtility
         return null;
     }
 
+    /**
+     * Get the rate of the difference.
+     */
+    public static function getSubtractRate(array $data, array $parameters): ?float
+    {
+        ArrayUtility::hasKeysInArrayWithException(['value', 'subtract'], $parameters);
+
+        $dataValue = self::getValue($parameters['value'], $data);
+        $dataSubtract = self::getValue($parameters['subtract'], $data);
+
+        if (null !== $dataValue && null !== $dataSubtract && $dataSubtract > 0) {
+            return ($dataValue / $dataSubtract) - 1;
+        }
+
+        return null;
+    }
+
     public static function getValue(bool|Callback|DateTimeInterface|float|int|string|null $value, array $data): bool|DateTimeInterface|float|int|string|null
     {
         if ($value instanceof Callback) {

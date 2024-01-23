@@ -189,6 +189,11 @@ abstract class AbstractWidget implements WidgetInterface
         return [];
     }
 
+    public function getType(): ?string
+    {
+        return null;
+    }
+
     public function setView(?string $view): static
     {
         $this->view = $view;

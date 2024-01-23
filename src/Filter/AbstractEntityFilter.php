@@ -8,7 +8,9 @@ abstract class AbstractEntityFilter extends AbstractFilter implements EntityFilt
 {
     public function __construct()
     {
-        $this->setType(FilterInterface::TYPE_CHECKBOX);
+        $this->setConfig([
+            'type' => FilterInterface::TYPE_CHECKBOX,
+        ]);
     }
 
     private ?array $dataAsObject = null;
