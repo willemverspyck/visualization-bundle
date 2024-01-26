@@ -28,7 +28,7 @@
         "doctrine/orm": "^2",
         "doctrine/persistence": "^3",
         "nelmio/api-doc-bundle": "^4",
-        "phpoffice/phpspreadsheet": "^1",
+        "phpoffice/phpspreadsheet": "^1|^2",
         "psr/cache": "^3",
         "spyck/api-extension": "^1",
         "symfony/cache": "^6|^7",
