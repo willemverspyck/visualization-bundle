@@ -16,13 +16,12 @@ use Spyck\VisualizationBundle\Filter\OptionFilter;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractWidget implements WidgetInterface
 {
-    private const CACHE = 3600;
-
-    private ?string $view = null;
-    private Widget $widget;
+    private ?int $cache = null;
 
     /**
      * @var array|FilterInterface[]
@@ -34,9 +33,26 @@ abstract class AbstractWidget implements WidgetInterface
      */
     private array $parameters = [];
 
-    public function setFilters(array $filters): void
+    private ?string $view = null;
+    private Widget $widget;
+
+    public function getFilter(string $name): ?array
     {
-        $this->filters = $filters;
+        if (false === array_key_exists($name, $this->filters)) {
+            return null;
+        }
+
+        $filter = $this->filters[$name];
+
+        if ($filter instanceof FilterInterface) {
+            if ($filter instanceof EntityFilterInterface) {
+                return $filter->getDataAsObject();
+            }
+
+            return $filter->getData();
+        }
+
+        return null;
     }
 
     /**
@@ -58,9 +74,31 @@ abstract class AbstractWidget implements WidgetInterface
         return $content;
     }
 
-    public function setParameters(array $parameters): void
+    public function setFilters(array $filters): void
     {
-        $this->parameters = $parameters;
+        $this->filters = $filters;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getParameter(string $name): object
+    {
+        if (false === array_key_exists($name, $this->parameters)) {
+            throw new Exception(sprintf('Parameter "%s" not found', $name));
+        }
+
+        $parameter = $this->parameters[$name];
+
+        if ($parameter instanceof DateParameterInterface) {
+            return $parameter->getData();
+        }
+
+        if ($parameter instanceof EntityParameterInterface) {
+            return $parameter->getDataAsObject();
+        }
+
+        throw new Exception(sprintf('Parameter "%s" not found', $name));
     }
 
     /**
@@ -88,50 +126,20 @@ abstract class AbstractWidget implements WidgetInterface
         return $data;
     }
 
-    public function getFilter(string $name): ?array
+    public function setParameters(array $parameters): void
     {
-        if (false === array_key_exists($name, $this->filters)) {
-            return null;
-        }
-
-        $filter = $this->filters[$name];
-
-        if ($filter instanceof FilterInterface) {
-            if ($filter instanceof EntityFilterInterface) {
-                return $filter->getDataAsObject();
-            }
-
-            return $filter->getData();
-        }
-
-        return null;
+        $this->parameters = $parameters;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getParameter(string $name): object
+    #[Required]
+    public function setCache(#[Autowire(param: 'spyck.visualization.config.cache.expiry')] ?int $cache): void
     {
-        if (false === array_key_exists($name, $this->parameters)) {
-            throw new Exception(sprintf('Parameter "%s" not found', $name));
-        }
-
-        $parameter = $this->parameters[$name];
-
-        if ($parameter instanceof DateParameterInterface) {
-            return $parameter->getData();
-        }
-
-        if ($parameter instanceof EntityParameterInterface) {
-            return $parameter->getDataAsObject();
-        }
-
-        throw new Exception(sprintf('Parameter "%s" not found', $name));
+        $this->cache = $cache;
     }
 
     public function getCache(): ?int
     {
-        return self::CACHE;
+        return $this->cache;
     }
 
     public function getTotal(): ?int
