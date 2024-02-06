@@ -9,15 +9,18 @@ use Psr\Cache\InvalidArgumentException;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Dashboard;
+use Spyck\VisualizationBundle\Entity\Log;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Form\DashboardMailType;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
+use Spyck\VisualizationBundle\Repository\LogRepository;
 use Spyck\VisualizationBundle\Service\LogService;
 use Spyck\VisualizationBundle\Service\DashboardService;
 use Exception;
 use OpenApi\Attributes as OpenApi;
+use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +65,7 @@ final class DashboardController extends AbstractController
     #[Schema\Forbidden]
     #[Schema\NotFound]
     #[Schema\ResponseForItem(type: DashboardAsModel::class, groups: ['spyck:visualization:dashboard:item'])]
-    public function item(LogService $activityService, DashboardRepository $dashboardRepository, DashboardService $dashboardService, Request $request, ResponseService $responseService, int $dashboardId): Response
+    public function item(DashboardRepository $dashboardRepository, DashboardService $dashboardService, LogRepository $logRepository, Request $request, ResponseService $responseService, TokenStorageInterface $tokenStorage, int $dashboardId): Response
     {
         $dashboard = $dashboardRepository->getDashboardById($dashboardId);
 
@@ -75,9 +78,11 @@ final class DashboardController extends AbstractController
         $requests = $dashboardService->checkDashboardParameterData($dashboard, $variables);
 
         if (null === $requests) {
-            $activityService->putLog($dashboard);
-
             $data = $dashboardService->getDashboardAsModel($dashboard, $variables);
+
+            $user = $tokenStorage->getToken()?->getUser();
+
+            $logRepository->putLog(user: $user, dashboard: $dashboard, variables: $data->getVariables(), view: ViewInterface::JSON, type: Log::TYPE_API);
 
             return $responseService->getResponseForItem(data: $data, groups: ['spyck:visualization:dashboard:item']);
         }

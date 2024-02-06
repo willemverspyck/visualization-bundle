@@ -45,6 +45,8 @@ final class Dashboard
     #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
     private array $downloads = [];
 
+    private array $variables = [];
+
     /**
      * @var ArrayCollection<int, Block>
      */
@@ -181,6 +183,18 @@ final class Dashboard
     public function setDownloads(array $downloads): static
     {
         $this->downloads = $downloads;
+
+        return $this;
+    }
+
+    public function getVariables(): array
+    {
+        return $this->variables;
+    }
+
+    public function setVariables(array $variables): static
+    {
+        $this->variables = $variables;
 
         return $this;
     }

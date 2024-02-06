@@ -41,25 +41,27 @@ final class MailMessageEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $message = $event->getEnvelope()->getMessage();
+        $mailMessage = $event->getEnvelope()->getMessage();
 
-        if ($message instanceof MailMessageInterface) {
-            $user = $this->userRepository->getUserById($message->getUser());
-
-            if (null === $user) {
-                return;
-            }
-
-            $dashboard = $this->dashboardRepository->getDashboardById($message->getId(), false);
-
-            if (null === $dashboard) {
-                return;
-            }
-
-            $messages = $this->getMessages($event->getThrowable());
-
-            $this->logRepository->putLog(user: $user, dashboard: $dashboard, variables: $message->getVariables(), view: $message->getView(), type: Log::TYPE_MAIL, messages: $messages);
+        if (false === $mailMessage instanceof MailMessageInterface) {
+            return;
         }
+
+        $user = $this->userRepository->getUserById($mailMessage->getUser());
+
+        if (null === $user) {
+            return;
+        }
+
+        $dashboard = $this->dashboardRepository->getDashboardById($mailMessage->getId(), false);
+
+        if (null === $dashboard) {
+            return;
+        }
+
+        $messages = $this->getMessages($event->getThrowable());
+
+        $this->logRepository->putLog(user: $user, dashboard: $dashboard, variables: $mailMessage->getVariables(), view: $mailMessage->getView(), type: Log::TYPE_MAIL, messages: $messages);
     }
 
     private function getMessages(Throwable $throwable): array

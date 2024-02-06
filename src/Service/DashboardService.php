@@ -43,9 +43,9 @@ readonly class DashboardService
 
         $dashboardRoute = $this->getDashboardRoute($dashboard, $variables);
 
-        $dashboardModel = new DashboardAsModel();
+        $dashboardAsModel = new DashboardAsModel();
 
-        $dashboardModel
+        $dashboardAsModel
             ->setUser($user)
             ->setName($dashboard->getName())
             ->setDescription($dashboard->getDescription())
@@ -53,15 +53,16 @@ readonly class DashboardService
             ->setParameters($this->getDashboardParameters($dashboard, $variables))
             ->setParametersAsString($this->getDashboardParametersAsString($dashboard, $variables))
             ->setParametersAsStringForSlug($this->getDashboardParametersAsString($dashboard, $variables, true))
-            ->setDownloads($this->getDownloads($dashboard, $variables));
+            ->setDownloads($this->getDownloads($dashboard, $variables))
+            ->setVariables($this->getVariables($dashboard, $variables));
 
         foreach ($dashboard->getBlocks() as $block) {
             $blockAsModel = $this->blockService->getBlockAsModel($block, $variables, $view, $preload);
 
-            $dashboardModel->addBlock($blockAsModel);
+            $dashboardAsModel->addBlock($blockAsModel);
         }
 
-        return $dashboardModel;
+        return $dashboardAsModel;
     }
 
     /**
@@ -97,14 +98,18 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function getDashboardParameters(Dashboard $dashboard, array $variables): array
+    public function getDashboardParameters(Dashboard $dashboard, array $variables, bool $field = false): array
     {
         $data = [];
 
         foreach ($this->getDashboardParameterData($dashboard, $variables) as $parameter) {
-            $reflectionClass = new ReflectionClass($parameter);
+            if ($field) {
+                $name = $parameter::getField();
+            } else {
+                $reflectionClass = new ReflectionClass($parameter);
 
-            $name = $reflectionClass->getShortName();
+                $name = $reflectionClass->getShortName();
+            }
 
             if ($parameter instanceof DateParameterInterface) {
                 $data[$name] = $parameter->getDataForRequest();
@@ -245,5 +250,12 @@ readonly class DashboardService
             ],
             'variables' => $variables,
         ];
+    }
+
+    private function getVariables(Dashboard $dashboard, array $variables): array
+    {
+        $data = $this->getDashboardParameters($dashboard, $variables, true);
+
+        return array_merge($data, $variables);
     }
 }
