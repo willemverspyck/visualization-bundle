@@ -40,7 +40,7 @@ class MailRepository extends AbstractRepository
     public function getMailDataBySchedule(Schedule $schedule): array
     {
         return $this->createQueryBuilder('mail')
-            ->innerJoin('mail.schedule', 'schedule', Join::WITH, 'schedule = :schedule')
+            ->innerJoin('mail.schedules', 'schedule', Join::WITH, 'schedule = :schedule')
             ->innerJoin('mail.dashboard', 'dashboard')
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')

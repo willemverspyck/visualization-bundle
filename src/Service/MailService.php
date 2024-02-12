@@ -24,23 +24,23 @@ readonly class MailService
     {
     }
 
-    public function handleMailMessageByMail(Mail $mail, array $parameters = []): void
+    public function executeMailMessageByMail(Mail $mail, array $parameters = []): void
     {
         foreach ($mail->getUsers() as $user) {
-            $this->handleMailMessage($mail, $user, $parameters);
+            $this->executeMailMessage($mail, $user, $parameters);
         }
     }
 
-    public function handleMailMessageBySchedule(Schedule $schedule, array $parameters = []): void
+    public function executeMailMessageBySchedule(Schedule $schedule, array $parameters = []): void
     {
         $mails = $this->mailRepository->getMailDataBySchedule($schedule);
 
         foreach ($mails as $mail) {
-            $this->handleMailMessageByMail($mail, $parameters);
+            $this->executeMailMessageByMail($mail, $parameters);
         }
     }
 
-    public function handleMailMessage(Mail $mail, UserInterface $user, array $parameters = []): void
+    public function executeMailMessage(Mail $mail, UserInterface $user, array $parameters = []): void
     {
         $dashboard = $mail->getDashboard();
 

@@ -37,7 +37,7 @@ final class MailCommand extends Command
             $weekday = (int) $date->format('N');
 
             if ($this->match($schedule->getHours(), $hour) && $this->match($schedule->getDays(), $day) && $this->match($schedule->getWeeks(), $week) && $this->match($schedule->getWeekdays(), $weekday)) {
-                $this->mailService->handleMailMessageBySchedule($schedule);
+                $this->mailService->executeMailMessageBySchedule($schedule);
             }
         }
 

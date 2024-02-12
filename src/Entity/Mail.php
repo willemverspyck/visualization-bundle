@@ -21,10 +21,6 @@ class Mail implements Stringable
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $id = null;
 
-    #[Doctrine\ManyToOne(targetEntity: Schedule::class)]
-    #[Doctrine\JoinColumn(name: 'schedule_id', referencedColumnName: 'id', nullable: true)]
-    private ?Schedule $schedule = null;
-
     #[Doctrine\ManyToOne(targetEntity: Dashboard::class)]
     #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', nullable: false)]
     private Dashboard $dashboard;
@@ -57,6 +53,15 @@ class Mail implements Stringable
     private bool $active;
 
     /**
+     * @var Collection<int, Schedule>
+     */
+    #[Doctrine\ManyToMany(targetEntity: Schedule::class)]
+    #[Doctrine\JoinTable(name: 'visualization_mail_schedule')]
+    #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id')]
+    #[Doctrine\InverseJoinColumn(name: 'schedule_id', referencedColumnName: 'id')]
+    private Collection $schedules;
+
+    /**
      * @var Collection<int, UserInterface>
      */
     #[Doctrine\ManyToMany(targetEntity: UserInterface::class)]
@@ -67,6 +72,7 @@ class Mail implements Stringable
 
     public function __construct()
     {
+        $this->schedules = new ArrayCollection();
         $this->users = new ArrayCollection();
 
         $this->setRoute(true);
@@ -75,18 +81,6 @@ class Mail implements Stringable
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getSchedule(): ?Schedule
-    {
-        return $this->schedule;
-    }
-
-    public function setSchedule(?Schedule $schedule): static
-    {
-        $this->schedule = $schedule;
-
-        return $this;
     }
 
     public function getDashboard(): Dashboard
@@ -207,6 +201,31 @@ class Mail implements Stringable
         $this->active = $active;
 
         return $this;
+    }
+
+    public function addSchedule(Schedule $schedule): static
+    {
+        $this->schedules->add($schedule);
+
+        return $this;
+    }
+
+    public function clearSchedules(): void
+    {
+        $this->schedules->clear();
+    }
+
+    /**
+     * @return Collection<int, Schedule>
+     */
+    public function getSchedules(): Collection
+    {
+        return $this->schedules;
+    }
+
+    public function removeSchedule(Schedule $schedule): void
+    {
+        $this->schedules->removeElement($schedule);
     }
 
     public function addUser(UserInterface $user): static
