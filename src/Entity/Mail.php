@@ -57,8 +57,8 @@ class Mail implements Stringable
      */
     #[Doctrine\ManyToMany(targetEntity: Schedule::class)]
     #[Doctrine\JoinTable(name: 'visualization_mail_schedule')]
-    #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id')]
-    #[Doctrine\InverseJoinColumn(name: 'schedule_id', referencedColumnName: 'id')]
+    #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Doctrine\InverseJoinColumn(name: 'schedule_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Collection $schedules;
 
     /**
@@ -66,8 +66,8 @@ class Mail implements Stringable
      */
     #[Doctrine\ManyToMany(targetEntity: UserInterface::class)]
     #[Doctrine\JoinTable(name: 'visualization_mail_user')]
-    #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id')]
-    #[Doctrine\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Doctrine\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Collection $users;
 
     public function __construct()
