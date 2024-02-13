@@ -46,6 +46,7 @@ use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\OptionFilter;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
+use Stringable;
 use DateTimeInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -530,10 +531,14 @@ readonly class WidgetService
                 $data = $parameter->getDataAsObject();
 
                 if (null !== $data) {
+                    if (false === $data instanceof Stringable) {
+                        throw new Exception(sprintf('Object "%s" must be instance of "%s"', get_class($data), Stringable::class));
+                    }
+
                     $content[] = [
                         'name' => $parameter->getName(),
                         'data' => [
-                            $data->getName(),
+                            $data->__toString(),
                         ],
                     ];
                 }
@@ -557,7 +562,11 @@ readonly class WidgetService
                     $content[] = [
                         'name' => $this->translator->trans(id: sprintf('filter.%s.name', $filter->getName()), domain: 'SpyckVisualizationBundle'),
                         'data' => array_map(function (object $entity): string {
-                            return $entity->getName();
+                            if ($entity instanceof Stringable) {
+                                throw new Exception(sprintf('Object "%s" must be instance of "%s"', get_class($data), Stringable::class));
+                            }
+
+                            return $entity->__toString();
                         }, $data),
                     ];
                 }
