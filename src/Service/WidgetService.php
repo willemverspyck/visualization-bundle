@@ -520,6 +520,9 @@ readonly class WidgetService
         return CacheUtility::getCacheKey(__CLASS__, $data);
     }
 
+    /**
+     * @throws Exception
+     */
     private function getParameters(WidgetInterface $widget): array
     {
         $content = [];
@@ -548,6 +551,9 @@ readonly class WidgetService
         return $content;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getFilters(WidgetInterface $widget): array
     {
         $content = [];
@@ -562,7 +568,7 @@ readonly class WidgetService
                     $content[] = [
                         'name' => $this->translator->trans(id: sprintf('filter.%s.name', $filter->getName()), domain: 'SpyckVisualizationBundle'),
                         'data' => array_map(function (object $entity): string {
-                            if ($entity instanceof Stringable) {
+                            if (false === $entity instanceof Stringable) {
                                 throw new Exception(sprintf('Object "%s" must be instance of "%s"', get_class($entity), Stringable::class));
                             }
 
