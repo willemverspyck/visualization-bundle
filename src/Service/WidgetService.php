@@ -563,7 +563,7 @@ readonly class WidgetService
                         'name' => $this->translator->trans(id: sprintf('filter.%s.name', $filter->getName()), domain: 'SpyckVisualizationBundle'),
                         'data' => array_map(function (object $entity): string {
                             if ($entity instanceof Stringable) {
-                                throw new Exception(sprintf('Object "%s" must be instance of "%s"', get_class($data), Stringable::class));
+                                throw new Exception(sprintf('Object "%s" must be instance of "%s"', get_class($entity), Stringable::class));
                             }
 
                             return $entity->__toString();
