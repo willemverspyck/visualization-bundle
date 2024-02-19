@@ -376,7 +376,7 @@ readonly class WidgetService
             $type = gettype($variable);
 
             if (false === in_array($type, ['integer', 'string'], true)) {
-                throw new Exception(sprintf('Request data must be "integer" or "string", not "%s"', $type));
+                throw new Exception(sprintf('Request data of field "%s" must be "integer" or "string", not "%s"', $field, $type));
             }
 
             return sprintf('%s', $variable);
