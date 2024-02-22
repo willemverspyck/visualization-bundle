@@ -761,6 +761,10 @@ readonly class WidgetService
         $parameters = $route->getParameters();
 
         foreach ($parameters as $name => $value) {
+            if (null === $value) {
+                return null;
+            }
+
             if (1 === preg_match('/{([\w]+)}/', $value, $matches)) {
                 $key = $matches[1];
 
@@ -769,10 +773,6 @@ readonly class WidgetService
                 }
 
                 $value = $data[$key];
-            }
-
-            if (null === $value) {
-                return null;
             }
 
             $query[$name] = $value;
