@@ -143,8 +143,7 @@ final class ExcelView extends AbstractView
             $columnConditional = $this->getColumnFormats($field['type'], $field['config']);
 
             if (null !== $columnConditional) {
-                $style
-                    ->setConditionalStyles($columnConditional);
+                $style->setConditionalStyles($columnConditional);
             }
         }
 
@@ -156,6 +155,10 @@ final class ExcelView extends AbstractView
 
                 $sheet->setCellValueExplicit([$fieldIndex + 1, $rowIndex + 2], $value, $columnType);
             }
+        }
+
+        foreach ($sheet->getColumnIterator() as $column) {
+            $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
         }
 
         $sheet->setAutoFilter($sheet->calculateWorksheetDimension());
