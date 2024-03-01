@@ -16,6 +16,7 @@ use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Filter\LimitFilter;
 use Spyck\VisualizationBundle\Filter\OffsetFilter;
+use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
 use Spyck\VisualizationBundle\Model\Callback;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
@@ -578,7 +579,7 @@ readonly class WidgetService
                 }
             }
 
-            if ($filter instanceof OptionFilter) { // OptionFilterInterface shows limit and offset
+            if ($filter instanceof OptionFilterInterface) {
                 $data = $filter->getDataAsOptions();
 
                 if (null !== $data) {
