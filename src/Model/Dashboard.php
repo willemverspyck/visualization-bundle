@@ -24,11 +24,8 @@ final class Dashboard
     #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
     private ?string $url = null;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
-    private ?string $callback = null;
-
     /**
-     * @todo: Incorrect OpenApi
+     * @todo: How to handle this in OpenApi
      */
     #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
     #[OpenApi\Property(type: 'string')]
@@ -39,7 +36,7 @@ final class Dashboard
     private array $parametersAsStringForSlug = [];
 
     /**
-     * @todo: Can be replaced with object
+     * @todo: How to handle this in OpenApi
      */
     #[OpenApi\Property(type: 'string')]
     #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
@@ -114,18 +111,6 @@ final class Dashboard
     public function setUrl(?string $url): static
     {
         $this->url = $url;
-
-        return $this;
-    }
-
-    public function getCallback(): ?string
-    {
-        return $this->callback;
-    }
-
-    public function setCallback(?string $callback): static
-    {
-        $this->callback = $callback;
 
         return $this;
     }
