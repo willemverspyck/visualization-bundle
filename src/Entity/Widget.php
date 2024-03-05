@@ -233,6 +233,7 @@ class Widget implements Stringable, TimestampInterface
     {
         $data = [
             self::CHART_AREA => self::CHART_AREA_NAME,
+            self::CHART_BAR => self::CHART_BAR_NAME,
             self::CHART_COLUMN => self::CHART_COLUMN_NAME,
             self::CHART_COUNTRY => self::CHART_COUNTRY_NAME,
             self::CHART_GANTT => self::CHART_GANTT_NAME,
