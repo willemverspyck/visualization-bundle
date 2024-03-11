@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Command;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 use Spyck\VisualizationBundle\Repository\ScheduleRepository;
 use Spyck\VisualizationBundle\Service\MailService;
@@ -26,7 +26,7 @@ final class MailCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $date = new DateTime();
+        $date = new DateTimeImmutable();
 
         $schedules = $this->scheduleRepository->getScheduleData($date);
 

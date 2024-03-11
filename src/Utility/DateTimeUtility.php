@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Utility;
 
-use DateTime;
-use DateTimeInterface;
+use DateTimeImmutable;
 use Exception;
 
 final class DateTimeUtility
@@ -17,13 +16,13 @@ final class DateTimeUtility
     /**
      * @throws Exception
      */
-    public static function getDateFromString(?string $content, string $format = self::FORMAT_DATE): ?DateTimeInterface
+    public static function getDateFromString(?string $content, string $format = self::FORMAT_DATE): ?DateTimeImmutable
     {
         if (null === $content) {
             return null;
         }
 
-        $date = DateTime::createFromFormat($format, $content);
+        $date = DateTimeImmutable::createFromFormat($format, $content);
 
         if (false === $date) {
             throw new Exception(sprintf('Date value "%s" not valid', $content));
@@ -37,13 +36,13 @@ final class DateTimeUtility
     /**
      * @throws Exception
      */
-    public static function getDateTimeFromString(?string $content, string $format = self::FORMAT_DATETIME): ?DateTimeInterface
+    public static function getDateTimeFromString(?string $content, string $format = self::FORMAT_DATETIME): ?DateTimeImmutable
     {
         if (null === $content) {
             return null;
         }
 
-        $date = DateTime::createFromFormat($format, $content);
+        $date = DateTimeImmutable::createFromFormat($format, $content);
 
         if (false === $date) {
             throw new Exception(sprintf('DateTime value "%s" not valid', $content));
@@ -55,13 +54,13 @@ final class DateTimeUtility
     /**
      * @throws Exception
      */
-    public static function getTimeFromString(?string $content, string $format = self::FORMAT_TIME): ?DateTimeInterface
+    public static function getTimeFromString(?string $content, string $format = self::FORMAT_TIME): ?DateTimeImmutable
     {
         if (null === $content) {
             return null;
         }
 
-        $date = DateTime::createFromFormat($format, $content);
+        $date = DateTimeImmutable::createFromFormat($format, $content);
 
         if (false === $date) {
             throw new Exception(sprintf('Time value "%s" not valid', $content));

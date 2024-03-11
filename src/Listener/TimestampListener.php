@@ -2,7 +2,7 @@
 
 namespace Spyck\VisualizationBundle\Listener;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
@@ -18,7 +18,7 @@ final class TimestampListener
         $object = $prePersistEventArgs->getObject();
 
         if ($object instanceof TimestampInterface) {
-            $object->setTimestampCreated(new DateTime());
+            $object->setTimestampCreated(new DateTimeImmutable());
         }
     }
 
@@ -27,7 +27,7 @@ final class TimestampListener
         $object = $preUpdateEventArgs->getObject();
 
         if ($object instanceof TimestampInterface) {
-            $object->setTimestampUpdated(new DateTime());
+            $object->setTimestampUpdated(new DateTimeImmutable());
         }
     }
 }

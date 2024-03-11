@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Parameter;
 
-use DateTime;
-use DateTimeInterface;
+use DateTimeImmutable;
 use Exception;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class AbstractDateParameter extends AbstractParameter implements DateParameterInterface
 {
-    private ?DateTimeInterface $data = null;
+    private ?DateTimeImmutable $data = null;
 
-    public function getData(): ?DateTimeInterface
+    public function getData(): ?DateTimeImmutable
     {
         return $this->data;
     }
@@ -46,7 +45,7 @@ abstract class AbstractDateParameter extends AbstractParameter implements DatePa
     public function setData(string $data): void
     {
         try {
-            $this->data = new DateTime($data);
+            $this->data = new DateTimeImmutable($data);
         } catch (Exception) {
             throw new NotFoundHttpException(sprintf('Parameter "%s" with "%s" is invalid', $this->getName(), $data));
         }

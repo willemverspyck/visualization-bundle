@@ -31,7 +31,7 @@ final class WeekEndParameter extends AbstractDateParameter
         }
 
         if ($this->full) {
-            $data->modify('Last Sunday');
+            return $data->modify('Last Sunday')->format('Y-m-d');
         }
 
         return $data->format('Y-m-d');

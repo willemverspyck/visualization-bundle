@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Parameter;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 
 interface DateParameterInterface extends ParameterInterface
 {
-    public function getData(): ?DateTimeInterface;
+    public function getData(): ?DateTimeImmutable;
 
     public function getDataForQueryBuilder(): ?string;
 

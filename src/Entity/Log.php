@@ -6,8 +6,7 @@ namespace Spyck\VisualizationBundle\Entity;
 
 use Spyck\VisualizationBundle\Repository\LogRepository;
 use Spyck\VisualizationBundle\View\ViewInterface;
-use DateTime;
-use DateTimeInterface;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 
@@ -34,8 +33,8 @@ class Log
     #[Doctrine\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true)]
     private ?UserInterface $user = null;
 
-    #[Doctrine\Column(name: 'timestamp', type: Types::DATETIME_MUTABLE)]
-    private DateTimeInterface $timestamp;
+    #[Doctrine\Column(name: 'timestamp', type: Types::DATETIME_IMMUTABLE)]
+    private DateTimeImmutable $timestamp;
 
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
@@ -78,12 +77,12 @@ class Log
         return $this;
     }
 
-    public function getTimestamp(): DateTimeInterface
+    public function getTimestamp(): DateTimeImmutable
     {
         return $this->timestamp;
     }
 
-    public function setTimestamp(DateTimeInterface $timestamp): static
+    public function setTimestamp(DateTimeImmutable $timestamp): static
     {
         $this->timestamp = $timestamp;
 
@@ -155,7 +154,7 @@ class Log
     #[Doctrine\PrePersist]
     public function prePersist(): void
     {
-        $date = new DateTime();
+        $date = new DateTimeImmutable();
 
         $this->setTimestamp($date);
     }

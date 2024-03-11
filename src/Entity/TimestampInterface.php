@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Entity;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 
 interface TimestampInterface
 {
-    public function getTimestampCreated(): DateTimeInterface;
+    public function getTimestampCreated(): DateTimeImmutable;
 
-    public function setTimestampCreated(DateTimeInterface $timestampCreated): self;
+    public function setTimestampCreated(DateTimeImmutable $timestampCreated): self;
 
-    public function getTimestampUpdated(): ?DateTimeInterface;
+    public function getTimestampUpdated(): ?DateTimeImmutable;
 
-    public function setTimestampUpdated(DateTimeInterface $timestampUpdated): self;
+    public function setTimestampUpdated(DateTimeImmutable $timestampUpdated): self;
 }
