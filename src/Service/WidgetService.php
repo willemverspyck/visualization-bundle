@@ -774,6 +774,10 @@ readonly class WidgetService
                 }
 
                 $value = $data[$key];
+
+                if (null === $value) {
+                    return null;
+                }
             }
 
             $query[$name] = $value;
