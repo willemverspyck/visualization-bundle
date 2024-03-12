@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\MessageHandler;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Log;
 use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Message\MailMessageInterface;
 use Spyck\VisualizationBundle\Entity\Dashboard;
+use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
@@ -99,35 +102,6 @@ final class MailMessageHandler
     {
         $dashboardAsModel = $this->dashboardService->getDashboardAsModel($dashboard, $mailMessage->getVariables(), $mailMessage->getView(), true);
 
-        $data = [
-            'dashboard' => $dashboardAsModel,
-            'mail' => $mailMessage,
-        ];
-
-        $attachments = [];
-
-        if (null !== $mailMessage->getView()) {
-            $view = $this->viewService->getView($mailMessage->getView());
-
-            if (null === $view->isMerge()) {
-                $merge = $mailMessage->isMerge();
-            } else {
-                $merge = $view->isMerge();
-            }
-
-            if ($merge) {
-                $attachments[] = $this->getAttachment($dashboardAsModel, $view);
-            } else {
-                foreach ($dashboardAsModel->getBlocks() as $block) {
-                    $dashboardAsModel->clearBlocks();
-
-                    $dashboardAsModel->addBlock($block);
-
-                    $attachments[] = $this->getAttachment($dashboardAsModel, $view, $block->getName());
-                }
-            }
-        }
-
         $subject = [
             $mailMessage->getName(),
         ];
@@ -136,7 +110,40 @@ final class MailMessageHandler
             $subject[] = $parameter;
         }
 
-        $this->mailService->sendMail($user->getEmail(), $user->getName(), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments);
+        $data = [
+            'dashboard' => $dashboardAsModel,
+            'mail' => $mailMessage,
+        ];
+
+        $attachments = $this->getAttachments($dashboardAsModel, $mailMessage);
+
+        $this->mailService->sendMail($user->getEmail(), $user->getName(), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments->toArray());
+    }
+
+    private function getAttachments(DashboardAsModel $dashboardAsModel, MailMessage $mailMessage): ArrayCollection
+    {
+        $attachments = new ArrayCollection();
+
+        if (null === $mailMessage->getView()) {
+            return $attachments;
+        }
+
+        $view = $this->viewService->getView($mailMessage->getView());
+
+        $merge = null === $view->isMerge() ? $mailMessage->isMerge() : $view->isMerge();
+
+        if ($merge) {
+            $attachments->add($this->getAttachment($dashboardAsModel, $view));
+
+            return $attachments;
+        }
+
+        return $dashboardAsModel->getBlocks()->map(function (BlockAsModel $block) use ($dashboardAsModel, $view): DataPart {
+            $dashboardAsModelClone = clone $dashboardAsModel;
+            $dashboardAsModelClone->addBlock($block);
+
+            return $this->getAttachment($dashboardAsModelClone, $view, $block->getName());
+        });
     }
 
     private function getAttachment(DashboardAsModel $dashboard, ViewInterface $view, string $name = null): DataPart

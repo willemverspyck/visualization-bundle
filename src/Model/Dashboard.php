@@ -208,4 +208,9 @@ final class Dashboard
     {
         $this->blocks->removeElement($block);
     }
+
+    public function __clone(): void
+    {
+        $this->blocks = new ArrayCollection();
+    }
 }
