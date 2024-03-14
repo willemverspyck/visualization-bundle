@@ -1,5 +1,7 @@
 {% import '@SpyckVisualization/chart.html.twig' as chart %}
 
+{% trans_default_domain 'SpyckVisualizationBundle' %}
+
 {% apply spaceless %}
     <!DOCTYPE html>
     <html lang="en">
@@ -53,7 +55,7 @@
                                                             <thead>
                                                                 <tr>
                                                                     {% for field in fields %}
-                                                                        <th class="{{ chart.getClass(field['type'], field['config']) }}">{{ field.name }}</th>
+                                                                        <th class="{{ chart.getClass(field['type'], field['config'])|spaceless }}">{{ field.name }}</th>
                                                                     {% endfor %}
                                                                     <th>&nbsp;</th>
                                                                 </tr>
@@ -64,9 +66,9 @@
                                                                         {% for fieldIndex, field in row.fields %}
                                                                             {% set definition = attribute(fields, fieldIndex) %}
 
-                                                                            <td class="{{ chart.getClass(definition['type'], definition['config']) }}" style="{{ chart.getStyle(definition['type'], definition['config'], field.value) }}">
-                                                                                {{ chart.getPreValue(definition['type'], definition['config'], field.value, null) }}
-                                                                                {{ chart.getValue(definition['type'], definition['config'], field.value, null) }}
+                                                                            <td class="{{ chart.getClass(definition['type'], definition['config'])|spaceless }}" style="{{ chart.getStyle(definition['type'], definition['config'], field.value)|spaceless }}">
+                                                                                {{ chart.getPreValue(definition['type'], definition['config'], field.value, null)|spaceless }}
+                                                                                {{ chart.getValue(definition['type'], definition['config'], field.value, null)|spaceless }}
                                                                                 {% if mail.route and field.routes|length > 0 %}
                                                                                     {% block route %}
                                                                                         <br>
