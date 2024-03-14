@@ -59,9 +59,9 @@
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_BOOLEAN')) %}
             {% if value is same as(true) %}
-                YES
+                Yes
             {% elseif value is same as(false) %}
-                NO
+                No
             {% else %}
                 -
             {% endif %}
@@ -73,9 +73,9 @@
             {{ value|date('Y-m-d H:i:s') }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_IMAGE')) %}
             {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                <img src="{{ getDirectory(value) }}" alt="" width="40" class="border">
+                <img src="{{ getDirectory(value) }}" alt="" width="32" height="32" align="top">
             {% else %}
-                <img src="{{ absolute_url(value) }}" alt="" width="40" class="border">
+                <img src="{{ absolute_url(value) }}" alt="" width="32" height="32" align="top">
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) %}
             {{ self.getValueOfNumber(config, value) }}
@@ -83,7 +83,7 @@
             {{ self.getValueOfNumber(config, value * 100) }}%
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_POSITION')) %}
             {% if value == 0.0 %}
-                {% set image = '/images/position_equal.png' %}
+                {% set image = '/images/position.png' %}
             {% elseif value > 0 %}
                 {% set image = '/images/position_up.png' %}
             {% else %}
@@ -91,9 +91,11 @@
             {% endif %}
 
             {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                <img src="{{ getDirectory(image) }}" alt="" width="14">
+                <img src="{{ getDirectory(image) }}" alt="" width="16" height="16" align="top">
+                {{ value }}
             {% else %}
-                <img src="{{ absolute_url(image) }}" alt="" width="14">
+                <img src="{{ absolute_url(image) }}" alt="" width="16" height="16" align="top">
+                {{ value }}
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_TIME')) %}
             {{ value|date('H:i:s') }}
@@ -125,97 +127,14 @@
     {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
         {% for format in config.formats %}
             {% if format.name is same as('databar') %}
-                <span style="background-color: {{ '#' ~ format.color }}; width: {{ value * 100|round }}px;">&nbsp;</span>
+                <span style="background-color: {{ '#' ~ format.color }};">
+                    {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+                        <img src="{{ getDirectory('/images/blank.png') }}" alt="" width="{{ value * 100|round }}" height="14">
+                    {% else %}
+                        <img src="{{ absolute_url('/images/blank.png') }}" alt="" width="{{ value * 100|round }}" height="14">
+                    {% endif %}
+                </span>
             {% endif %}
         {% endfor %}
-    {% endif %}
-{% endmacro %}
-
-{% macro getRoutes(routes) %}
-    {% if routes|length > 0 %}
-        <br>
-        <table class="routes" cellspacing="0" cellpadding="0" border="0">
-            <tr>
-                {% for route in routes %}
-                    <td><a href="{{ absolute_url(route.url) }}" target="_blank" title="{{ route.name }}">{{ route.name }}</a></td>
-                {% endfor %}
-            </tr>
-        </table>
-    {% endif %}
-{% endmacro %}
-
-{% macro getFilters(block) %}
-    {% set filters = block.widget.filters %}
-
-    {% if block.filterView is same as(true) and filters|length > 0 %}
-        <table class="filters" width="100%" cellspacing="0" cellpadding="0" border="0">
-            <thead>
-                <tr>
-                    <th>
-                        <h4>Active filters</h4>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        {% for filter in filters %}
-                            {{ filter.name|trans }}: {{ filter.data|join(', ') }}
-                            <br>
-                        {% endfor %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    {% endif %}
-{% endmacro %}
-
-{% macro getData(block, view, route) %}
-    {% import _self as self %}
-
-    {% set widget = block.widget %}
-
-    {% set fields = widget.fields %}
-    {% set data = widget.data %}
-
-    {% if data|length > 0 %}
-        <div class="data">
-            {% if hasChart(block) %}
-                {% set chart = getChart(block) %}
-
-                <img src="{{ chart }}" alt="{{ block.name }}" width="100%">
-            {% else %}
-                <table width="100%" cellspacing="0" cellpadding="0" border="0">
-                    <thead>
-                        <tr>
-                            {% for field in fields %}
-                                <th class="{{ self.getClass(field['type'], field['config']) }}">{{ field.name }}</th>
-                            {% endfor %}
-                            <th>&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in data %}
-                            <tr>
-                                {% for fieldIndex, field in row.fields %}
-                                    {% set definition = attribute(fields, fieldIndex) %}
-
-                                    <td class="{{ self.getClass(definition['type'], definition['config']) }}" style="{{ self.getStyle(definition['type'], definition['config'], field.value) }}">
-                                        {{ self.getPreValue(definition['type'], definition['config'], field.value, view) }}
-                                        {{ self.getValue(definition['type'], definition['config'], field.value, view) }}
-                                        {% if route %}
-                                            {{ self.getRoutes(field.routes) }}
-                                        {% endif %}
-                                    </td>
-                                {% endfor %}
-                                <td>&nbsp;</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-        </div>
-    {% else %}
-        <p>{{ block.descriptionEmpty }}</p>
     {% endif %}
 {% endmacro %}
