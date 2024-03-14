@@ -8,6 +8,7 @@ use Countable;
 use Exception;
 use IteratorAggregate;
 use Spyck\VisualizationBundle\View\ViewInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -16,7 +17,7 @@ readonly class ViewService
     /**
      * @param Countable&IteratorAggregate $views
      */
-    public function __construct(private TranslatorInterface $translator, #[TaggedIterator(tag: 'spyck.visualization.view', defaultIndexMethod: 'getName')] private iterable $views)
+    public function __construct(private TranslatorInterface $translator, #[TaggedIterator(tag: 'spyck.visualization.view', defaultIndexMethod: 'getName')] private iterable $views, #[Autowire(param: 'spyck.visualization.config.view.exclude')] private readonly ?array $exclude)
     {
     }
 
@@ -46,7 +47,9 @@ readonly class ViewService
         foreach ($this->views->getIterator() as $view) {
             $name = $view->getName();
 
-            $data[$name] = $this->translator->trans(id: sprintf('view.%s.name', $name), domain: 'SpyckVisualizationBundle');
+            if (null === $this->exclude || false === in_array($name, $this->exclude, true)) {
+                $data[$name] = $this->translator->trans(id: sprintf('view.%s.name', $name), domain: 'SpyckVisualizationBundle');
+            }
         }
 
         return $data;

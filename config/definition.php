@@ -113,5 +113,16 @@ return static function (DefinitionConfigurator $definition) {
                 ->end()
                 ->isRequired()
             ->end()
+        ->end()
+        ->children()
+            ->arrayNode('view')
+                ->children()
+                    ->arrayNode('exclude')
+                        ->scalarPrototype()
+                        ->end()
+                    ->end()
+                ->end()
+                ->addDefaultsIfNotSet()
+            ->end()
         ->end();
 };

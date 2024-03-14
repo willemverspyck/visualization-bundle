@@ -35,5 +35,7 @@ final class SpyckVisualizationBundle extends AbstractBundle
         $builder->setParameter('spyck.visualization.config.request', $config['request']);
 
         $builder->setParameter('spyck.visualization.config.user.class', $config['user']['class']);
+
+        $builder->setParameter('spyck.visualization.config.view.exclude', $config['view']['exclude']);
     }
 }
