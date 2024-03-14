@@ -80,7 +80,7 @@
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
             {{ self.getValueOfNumber(config, value * 100) }}%
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_POSITION')) %}
-            {% if value == 0.0 %}
+            {% if value is same as(0.0) %}
                 {% set image = '/images/position.png' %}
             {% elseif value > 0 %}
                 {% set image = '/images/position_up.png' %}
@@ -90,10 +90,11 @@
 
             {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                 <img src="{{ getDirectory(image) }}" alt="" width="16" height="16" align="top">
-                {{ value }}
             {% else %}
                 <img src="{{ absolute_url(image) }}" alt="" width="16" height="16" align="top">
-                {{ value }}
+            {% endif %}
+            {% if value is not same as(0.0) %}
+                <span>{{ value }}</span>
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_TIME')) %}
             {{ value|date('H:i:s') }}
