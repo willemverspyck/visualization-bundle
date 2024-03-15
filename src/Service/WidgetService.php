@@ -199,7 +199,9 @@ readonly class WidgetService
         $dashboard = $this->dashboardRepository->getDashboardByCode($route->getCode());
 
         if (null === $dashboard) {
-            throw new Exception(sprintf('Dashboard not found (%s)', $route->getCode()));
+            $this->logger->warning(sprintf('Dashboard not found (%s)', $route->getCode()));
+            
+            return;
         }
 
         $route->setName($dashboard->getName());
