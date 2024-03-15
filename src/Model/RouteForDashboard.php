@@ -6,19 +6,19 @@ namespace Spyck\VisualizationBundle\Model;
 
 final class RouteForDashboard implements RouteInterface
 {
-    private string $name;
+    private ?string $name = null;
     private string $code;
-    private string $url;
-    private array $parameters;
+    private ?string $url = null;
+    private array $parameters = [];
     private array $data;
 
-    public function __construct(string $code, array $parameters)
+    public function __construct(string $code, array $data)
     {
         $this->setCode($code);
-        $this->setData($parameters);
+        $this->setData($data);
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -38,6 +38,18 @@ final class RouteForDashboard implements RouteInterface
     public function setCode(string $code): static
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }
@@ -62,18 +74,6 @@ final class RouteForDashboard implements RouteInterface
     public function setData(array $data): static
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(string $url): static
-    {
-        $this->url = $url;
 
         return $this;
     }

@@ -204,7 +204,10 @@ readonly class WidgetService
             return;
         }
 
-        $route->setName($dashboard->getName());
+        if (null === $route->getName()) {
+            $route->setName($dashboard->getName());
+        }
+
         $route->setUrl($this->urlGenerator->generate('spyck_visualization_dashboard_show', [
             'dashboardId' => $dashboard->getId(),
         ], UrlGeneratorInterface::ABSOLUTE_URL));
@@ -759,6 +762,10 @@ readonly class WidgetService
      */
     private function getRouteUrl(RouteInterface $route, array $data): ?string
     {
+        if (null === $route->getName() || null === $route->getUrl()) {
+            return null;
+        }
+        
         $query = [];
 
         $parameters = $route->getParameters();

@@ -6,9 +6,9 @@ namespace Spyck\VisualizationBundle\Model;
 
 final class Route implements RouteInterface
 {
-    private string $name;
-    private string $url;
-    private array $parameters;
+    private ?string $name = null;
+    private ?string $url = null;
+    private array $parameters = [];
 
     public function __construct(string $name, string $url, array $parameters = [])
     {
@@ -17,7 +17,7 @@ final class Route implements RouteInterface
         $this->setParameters($parameters);
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -29,7 +29,7 @@ final class Route implements RouteInterface
         return $this;
     }
 
-    public function getUrl(): string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
