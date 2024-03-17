@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Repository\CategoryRepository;
 use Stringable;
 use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: CategoryRepository::class)]
 #[Doctrine\Table(name: 'visualization_category')]
@@ -26,6 +27,7 @@ class Category implements Stringable, TimestampInterface
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
     #[Serializer\Groups(groups: ['spyck:visualization:category:list'])]
+    #[Validator\NotNull]
     private string $name;
 
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]

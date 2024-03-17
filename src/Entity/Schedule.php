@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Stringable;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Table(name: 'visualization_schedule')]
 #[Doctrine\Entity]
@@ -18,6 +19,7 @@ class Schedule implements Stringable
     private ?int $id = null;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 256)]
+    #[Validator\NotNull]
     private string $name;
 
     #[Doctrine\Column(name: 'hours', type: Types::JSON)]

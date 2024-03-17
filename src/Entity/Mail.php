@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Repository\MailRepository;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Stringable;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: MailRepository::class)]
 #[Doctrine\Table(name: 'visualization_mail')]
@@ -23,9 +24,11 @@ class Mail implements Stringable
 
     #[Doctrine\ManyToOne(targetEntity: Dashboard::class)]
     #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', nullable: false)]
+    #[Validator\NotNull]
     private Dashboard $dashboard;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 256)]
+    #[Validator\NotNull]
     private string $name;
 
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]

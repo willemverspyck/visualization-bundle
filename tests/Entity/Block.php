@@ -100,9 +100,9 @@ final class BlockTest extends TestCase
         $this->assertTrue($this->block->isActive());
     }
 
-    public function testGetSizeData()
+    public function testGetSizes()
     {
-        $sizeData = Block::getSizeData();
+        $sizeData = Block::getSizes(false);
 
         $this->assertArrayHasKey(Block::SIZE_LARGE, $sizeData);
         $this->assertArrayHasKey(Block::SIZE_MEDIUM, $sizeData);

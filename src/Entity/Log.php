@@ -9,6 +9,7 @@ use Spyck\VisualizationBundle\View\ViewInterface;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: LogRepository::class)]
 #[Doctrine\HasLifecycleCallbacks]
@@ -27,6 +28,7 @@ class Log
 
     #[Doctrine\ManyToOne(targetEntity: Dashboard::class)]
     #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', nullable: false)]
+    #[Validator\NotNull]
     private Dashboard $dashboard;
 
     #[Doctrine\ManyToOne(targetEntity: UserInterface::class)]
@@ -43,6 +45,8 @@ class Log
     private ?string $view = null;
 
     #[Doctrine\Column(name: 'type', type: Types::SMALLINT, options: ['unsigned' => true])]
+    #[Validator\Choice(callback: [self::class, 'getTypes'])]
+    #[Validator\NotNull]
     private int $type;
 
     #[Doctrine\Column(name: 'messages', type: Types::JSON, nullable: true)]
@@ -137,7 +141,7 @@ class Log
         return $this;
     }
 
-    public static function getTypes(bool $inverse = false): array
+    public static function getTypes(bool $inverse = true): array
     {
         $data = [
             self::TYPE_API => self::TYPE_API_NAME,

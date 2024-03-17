@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Repository\MenuRepository;
 use Stringable;
 use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: MenuRepository::class)]
 #[Doctrine\Table(name: 'visualization_menu')]
@@ -32,6 +33,7 @@ class Menu implements Stringable
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
     #[Serializer\Groups(groups: ['spyck:visualization:menu:list'])]
+    #[Validator\NotNull]
     private string $name;
 
     /**
@@ -42,6 +44,7 @@ class Menu implements Stringable
     private array $variables;
 
     #[Doctrine\Column(name: 'position', type: Types::SMALLINT, options: ['unsigned' => true])]
+    #[Validator\NotNull]
     private int $position;
 
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]

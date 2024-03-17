@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Stringable;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Table(name: 'visualization_block')]
 #[Doctrine\Entity]
@@ -28,10 +29,12 @@ class Block implements Stringable, TimestampInterface
 
     #[Doctrine\ManyToOne(targetEntity: Dashboard::class, inversedBy: 'blocks')]
     #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', nullable: false)]
+    #[Validator\NotNull]
     private Dashboard $dashboard;
 
     #[Doctrine\ManyToOne(targetEntity: Widget::class, inversedBy: 'blocks')]
     #[Doctrine\JoinColumn(name: 'widget_id', referencedColumnName: 'id', nullable: false)]
+    #[Validator\NotNull]
     private Widget $widget;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128, nullable: true)]
@@ -41,6 +44,8 @@ class Block implements Stringable, TimestampInterface
     private ?string $description = null;
 
     #[Doctrine\Column(name: 'size', type: Types::STRING, length: 128)]
+    #[Validator\Choice(callback: [self::class, 'getSizes'])]
+    #[Validator\NotNull]
     private string $size;
 
     #[Doctrine\Column(name: 'position', type: Types::SMALLINT, options: ['unsigned' => true])]
@@ -205,7 +210,7 @@ class Block implements Stringable, TimestampInterface
         return $this;
     }
 
-    public static function getSizeData(bool $inverse = false): array
+    public static function getSizes(bool $inverse = true): array
     {
         $data = [
             self::SIZE_LARGE => self::SIZE_LARGE_NAME,

@@ -12,6 +12,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Stringable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: DashboardRepository::class)]
 #[Doctrine\Table(name: 'visualization_dashboard')]
@@ -34,6 +35,7 @@ class Dashboard implements Stringable, TimestampInterface
     private ?UserInterface $user;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
+    #[Validator\NotNull]
     private string $name;
 
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
@@ -53,6 +55,7 @@ class Dashboard implements Stringable, TimestampInterface
      */
     #[Doctrine\OneToMany(mappedBy: 'dashboard', targetEntity: Block::class, cascade: ['persist'], orphanRemoval: true)]
     #[Doctrine\OrderBy(value: ['position' => Criteria::ASC])]
+    #[Validator\Valid]
     private Collection $blocks;
 
     public function __construct()

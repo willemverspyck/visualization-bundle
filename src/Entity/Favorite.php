@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Repository\FavoriteRepository;
+use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: FavoriteRepository::class)]
 #[Doctrine\Table(name: 'visualization_favorite')]
@@ -21,10 +22,12 @@ class Favorite implements TimestampInterface
 
     #[Doctrine\ManyToOne(targetEntity: UserInterface::class)]
     #[Doctrine\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    #[Validator\NotNull]
     private UserInterface $user;
 
     #[Doctrine\ManyToOne(targetEntity: Dashboard::class)]
     #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', nullable: false)]
+    #[Validator\NotNull]
     private Dashboard $dashboard;
 
     public function __construct()

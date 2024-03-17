@@ -47,21 +47,21 @@ class Widget implements Stringable, TimestampInterface
     private GroupInterface $group;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
-    #[Validator\NotNull(message: 'This value is required')]
+    #[Validator\NotNull]
     private string $name;
 
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
     protected ?string $description = null;
 
     #[Doctrine\Column(name: 'description_empty', type: Types::TEXT, nullable: true)]
-    #[Validator\NotNull(message: 'This value is required')]
     protected ?string $descriptionEmpty = null;
 
     #[Doctrine\Column(name: 'adapter', type: Types::STRING, length: 128)]
-    #[Validator\NotNull(message: 'This value is required')]
+    #[Validator\NotNull]
     private string $adapter;
 
     #[Doctrine\Column(name: 'charts', type: Types::JSON)]
+    #[Validator\Length(min: 1)]
     private array $charts;
 
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
