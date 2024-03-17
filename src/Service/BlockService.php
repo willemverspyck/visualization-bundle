@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Service;
 
+use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Block;
-use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
+use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
 use Spyck\VisualizationBundle\Model\Filter;
 use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
-use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
-use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
-use Exception;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -30,7 +29,7 @@ readonly class BlockService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getBlockAsModel(Block $block, array $variables = [], string $view = null, bool $preload = false): BlockAsModel
+    public function getBlockAsModel(Block $block, array $variables = [], ?string $view = null, bool $preload = false): BlockAsModel
     {
         $blockModel = new BlockAsModel();
 

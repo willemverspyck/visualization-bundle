@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\View;
 
-use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalDataBar;
-use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalFormatValueObject;
-use Spyck\VisualizationBundle\Model\Block;
-use Spyck\VisualizationBundle\Model\ConditionFormat;
-use Spyck\VisualizationBundle\Model\Config;
-use Spyck\VisualizationBundle\Model\Dashboard;
-use Spyck\VisualizationBundle\Model\DatabarFormat;
-use Spyck\VisualizationBundle\Model\Field;
 use DateTimeInterface;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -20,8 +12,16 @@ use PhpOffice\PhpSpreadsheet\Settings;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Conditional;
+use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalDataBar;
+use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalFormatValueObject;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Psr\Cache\CacheItemPoolInterface;
+use Spyck\VisualizationBundle\Model\Block;
+use Spyck\VisualizationBundle\Model\ConditionFormat;
+use Spyck\VisualizationBundle\Model\Config;
+use Spyck\VisualizationBundle\Model\Dashboard;
+use Spyck\VisualizationBundle\Model\DatabarFormat;
+use Spyck\VisualizationBundle\Model\Field;
 use Symfony\Component\Cache\Psr16Cache;
 
 final class ExcelView extends AbstractView
@@ -70,9 +70,6 @@ final class ExcelView extends AbstractView
         return ViewInterface::XLSX;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): bool|float|int|string|null
     {
         if (null === $value) {

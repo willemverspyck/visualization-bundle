@@ -11,7 +11,7 @@ final class DataUtility
     /**
      * @throws Exception
      */
-    public static function assert(bool $condition, Exception $exception = null): void
+    public static function assert(bool $condition, ?Exception $exception = null): void
     {
         if ($condition) {
             return;

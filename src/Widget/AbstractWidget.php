@@ -176,17 +176,11 @@ abstract class AbstractWidget implements WidgetInterface
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getFilters(): iterable
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getParameters(): iterable
     {
         return [];

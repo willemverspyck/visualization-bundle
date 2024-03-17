@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Entity;
 
-use Spyck\VisualizationBundle\Repository\WidgetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use Spyck\VisualizationBundle\Repository\WidgetRepository;
 use Stringable;
 use Symfony\Component\Validator\Constraints as Validator;
 
@@ -61,7 +61,7 @@ class Widget implements Stringable, TimestampInterface
     private string $adapter;
 
     #[Doctrine\Column(name: 'charts', type: Types::JSON)]
-    #[Validator\Length(min: 1)]
+    #[Validator\Count(min: 1)]
     private array $charts;
 
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]

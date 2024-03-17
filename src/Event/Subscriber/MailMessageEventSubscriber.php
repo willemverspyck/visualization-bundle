@@ -7,8 +7,8 @@ namespace Spyck\VisualizationBundle\Event\Subscriber;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Log;
 use Spyck\VisualizationBundle\Message\MailMessageInterface;
-use Spyck\VisualizationBundle\Repository\LogRepository;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
+use Spyck\VisualizationBundle\Repository\LogRepository;
 use Spyck\VisualizationBundle\Repository\UserRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -20,9 +20,6 @@ final class MailMessageEventSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

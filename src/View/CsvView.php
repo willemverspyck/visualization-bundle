@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\View;
 
-use Spyck\VisualizationBundle\Model\Block;
-use Spyck\VisualizationBundle\Model\Config;
-use Spyck\VisualizationBundle\Model\Dashboard;
 use DateTimeInterface;
 use Exception;
 use SplFileObject;
+use Spyck\VisualizationBundle\Model\Block;
+use Spyck\VisualizationBundle\Model\Config;
+use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Model\Field;
 
 class CsvView extends AbstractView
@@ -69,9 +69,6 @@ class CsvView extends AbstractView
         return ViewInterface::CSV;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function isMerge(): ?bool
     {
         return false;

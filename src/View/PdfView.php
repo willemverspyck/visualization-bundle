@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\View;
 
-use Spyck\VisualizationBundle\Model\Dashboard;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Exception;
+use Spyck\VisualizationBundle\Model\Dashboard;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Twig\Environment;
 
@@ -22,7 +22,7 @@ final class PdfView extends AbstractView
      */
     public function getContent(Dashboard $dashboard): string
     {
-        if (false === class_exists(DomPdf::class)) {
+        if (false === class_exists(Dompdf::class)) {
             throw new Exception('Install DomPDF to use PDF');
         }
 

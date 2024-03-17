@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Entity;
 
-use Spyck\VisualizationBundle\Repository\LogRepository;
-use Spyck\VisualizationBundle\View\ViewInterface;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use Spyck\VisualizationBundle\Repository\LogRepository;
 use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: LogRepository::class)]

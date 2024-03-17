@@ -65,7 +65,7 @@ class Block implements Stringable, TimestampInterface
 
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
     private bool $active;
-    
+
     public function __construct()
     {
         $this->setFilter(true);

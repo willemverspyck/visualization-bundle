@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Service;
 
 use Countable;
+use DateTimeInterface;
 use Doctrine\ORM\NonUniqueResultException;
+use Exception;
 use IteratorAggregate;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -14,6 +16,8 @@ use Spyck\VisualizationBundle\Entity\Block;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Exception\ParameterException;
+use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
+use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\LimitFilter;
 use Spyck\VisualizationBundle\Filter\OffsetFilter;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
@@ -24,32 +28,25 @@ use Spyck\VisualizationBundle\Model\Field;
 use Spyck\VisualizationBundle\Model\RouteForDashboard;
 use Spyck\VisualizationBundle\Model\RouteInterface;
 use Spyck\VisualizationBundle\Model\Widget as WidgetAsModel;
-use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\DayEndParameter;
 use Spyck\VisualizationBundle\Parameter\DayParameter;
 use Spyck\VisualizationBundle\Parameter\DayStartParameter;
+use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\MonthEndParameter;
 use Spyck\VisualizationBundle\Parameter\MonthStartParameter;
+use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use Spyck\VisualizationBundle\Parameter\WeekEndParameter;
 use Spyck\VisualizationBundle\Parameter\WeekStartParameter;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
 use Spyck\VisualizationBundle\Repository\WidgetRepository;
+use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
+use Spyck\VisualizationBundle\Request\RequestInterface;
 use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Spyck\VisualizationBundle\Utility\CacheUtility;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
-use Spyck\VisualizationBundle\View\JsonView;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
-use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
-use Spyck\VisualizationBundle\Request\RequestInterface;
-use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
-use Spyck\VisualizationBundle\Filter\FilterInterface;
-use Spyck\VisualizationBundle\Filter\OptionFilter;
-use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
-use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use Stringable;
-use DateTimeInterface;
-use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
@@ -200,7 +197,7 @@ readonly class WidgetService
 
         if (null === $dashboard) {
             $this->logger->warning(sprintf('Dashboard not found (%s)', $route->getCode()));
-            
+
             return;
         }
 
@@ -392,7 +389,7 @@ readonly class WidgetService
             return null;
         }
 
-        return match(get_class($request)) {
+        return match (get_class($request)) {
             DayParameter::class => $this->request['dayParameter'],
             DayStartParameter::class => $this->request['dayStartParameter'],
             DayEndParameter::class => $this->request['dayEndParameter'],
@@ -569,7 +566,7 @@ readonly class WidgetService
         foreach ($filters as $filter) {
             if ($filter instanceof EntityFilterInterface) {
                 $data = $filter->getDataAsObject();
-                
+
                 if (null !== $data) {
                     $content[] = [
                         'name' => $this->translator->trans(id: sprintf('filter.%s.name', $filter->getName()), domain: 'SpyckVisualizationBundle'),
@@ -765,7 +762,7 @@ readonly class WidgetService
         if (null === $route->getName() || null === $route->getUrl()) {
             return null;
         }
-        
+
         $query = [];
 
         $parameters = $route->getParameters();

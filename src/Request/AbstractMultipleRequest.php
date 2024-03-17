@@ -17,9 +17,6 @@ abstract class AbstractMultipleRequest implements MultipleRequestInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getChildren(): array
     {
         return $this->children;

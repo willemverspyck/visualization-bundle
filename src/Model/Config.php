@@ -75,6 +75,7 @@ final class Config
     {
         return $this->formats;
     }
+
     public function addFormat(FormatInterface $format): static
     {
         $this->formats->add($format);

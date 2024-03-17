@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\View;
 
-use Spyck\ApiExtension\Model\Response;
+use DateTimeInterface;
+use Exception;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Model\Config;
 use Spyck\VisualizationBundle\Model\Dashboard;
-use DateTimeInterface;
-use Exception;
 use Spyck\VisualizationBundle\Model\Field;
-use Spyck\VisualizationBundle\Model\Widget;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractSerializerView extends AbstractView

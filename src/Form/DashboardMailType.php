@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Form;
 
-use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Service\ViewService;
 use Symfony\Component\Form\AbstractType;

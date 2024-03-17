@@ -5,22 +5,16 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Service;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 use Psr\Cache\InvalidArgumentException;
+use ReflectionClass;
 use Spyck\VisualizationBundle\Entity\Dashboard;
-use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Model\DashboardRoute;
-use Spyck\VisualizationBundle\Utility\BlockUtility;
-use Spyck\VisualizationBundle\View\ViewInterface;
-use Spyck\VisualizationBundle\Request\RequestInterface;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
-use Spyck\VisualizationBundle\Parameter\DayRangeParameter;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
-use Spyck\VisualizationBundle\Parameter\MonthRangeParameter;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
-use Spyck\VisualizationBundle\Parameter\WeekRangeParameter;
-use Exception;
-use ReflectionClass;
+use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -35,7 +29,7 @@ readonly class DashboardService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getDashboardAsModel(Dashboard $dashboard, array $variables = [], string $view = null, bool $preload = false): DashboardAsModel
+    public function getDashboardAsModel(Dashboard $dashboard, array $variables = [], ?string $view = null, bool $preload = false): DashboardAsModel
     {
         $user = $this->userService->getUser();
 
@@ -138,7 +132,7 @@ readonly class DashboardService
 
         $parameters = $this->getDashboardParameterData($dashboard, $variables);
 
-        array_walk ($parameters, function (ParameterInterface $parameter) use (&$data, &$multipleParameters, $slug): void {
+        array_walk($parameters, function (ParameterInterface $parameter) use (&$data, &$multipleParameters, $slug): void {
             $parent = $parameter->getParent();
 
             if (null === $parent) {

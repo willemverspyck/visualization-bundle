@@ -9,9 +9,9 @@ use Symfony\Component\Security\Core\User\UserInterface as BaseUserInterface;
 
 interface UserInterface extends BaseUserInterface
 {
-    public function getId(): int|null;
+    public function getId(): ?int;
 
-    public function getName(): string|null;
+    public function getName(): ?string;
 
     public function getEmail(): string;
 

@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\MessageHandler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\NonUniqueResultException;
+use Exception;
 use Psr\Cache\InvalidArgumentException;
+use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Log;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Message\MailMessageInterface;
-use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
-use Doctrine\ORM\NonUniqueResultException;
-use Exception;
-use Spyck\VisualizationBundle\Repository\LogRepository;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
+use Spyck\VisualizationBundle\Repository\LogRepository;
 use Spyck\VisualizationBundle\Repository\UserRepository;
 use Spyck\VisualizationBundle\Service\DashboardService;
 use Spyck\VisualizationBundle\Service\MailService;
@@ -146,7 +146,7 @@ final class MailMessageHandler
         });
     }
 
-    private function getAttachment(DashboardAsModel $dashboard, ViewInterface $view, string $name = null): DataPart
+    private function getAttachment(DashboardAsModel $dashboard, ViewInterface $view, ?string $name = null): DataPart
     {
         $content = $view->getContent($dashboard);
 

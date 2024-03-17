@@ -7,7 +7,6 @@ namespace Spyck\VisualizationBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Spyck\ApiExtension\Model\ConfigInterface;
 use Spyck\ApiExtension\Model\Response;
-use Spyck\VisualizationBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class Definition implements ConfigInterface

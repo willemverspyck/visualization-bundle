@@ -7,7 +7,6 @@ namespace Spyck\VisualizationBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Spyck\ApiExtension\Model\Response;
-use Spyck\VisualizationBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class Field
@@ -48,7 +47,7 @@ final class Field
      */
     private Collection $routes;
 
-    public function __construct(string $name, Callback|string $source, string $type, Config $config = new Config(), Callback $filter = null)
+    public function __construct(string $name, Callback|string $source, string $type, Config $config = new Config(), ?Callback $filter = null)
     {
         $this->children = new ArrayCollection();
         $this->routes = new ArrayCollection();
@@ -122,7 +121,7 @@ final class Field
         return $this;
     }
 
-    public function getFilter(): Callback|null
+    public function getFilter(): ?Callback
     {
         return $this->filter;
     }

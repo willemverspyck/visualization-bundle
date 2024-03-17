@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Controller;
 
+use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Menu;
 use Spyck\VisualizationBundle\Repository\CategoryRepository;
-use OpenApi\Attributes as OpenApi;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;

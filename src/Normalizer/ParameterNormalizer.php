@@ -9,10 +9,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer as BaseAbstractNo
 
 final class ParameterNormalizer extends AbstractNormalizer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $group = $object->getGroup();
 
@@ -23,17 +20,11 @@ final class ParameterNormalizer extends AbstractNormalizer
         return $this->normalizer->normalize($object->getDataAsObject(), $format, $context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof EntityParameterInterface;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getSupportedTypes(?string $format): array
     {
         return [

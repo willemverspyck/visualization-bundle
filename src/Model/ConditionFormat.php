@@ -41,6 +41,7 @@ final class ConditionFormat implements FormatInterface
 
         return $this;
     }
+
     public function getEnd(): ?float
     {
         return $this->end;

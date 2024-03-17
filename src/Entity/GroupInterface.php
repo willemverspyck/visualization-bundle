@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Entity;
 
 interface GroupInterface
 {
-    public function getId(): int|null;
+    public function getId(): ?int;
 
     public function isActive(): bool;
 }

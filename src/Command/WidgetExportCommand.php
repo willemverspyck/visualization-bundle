@@ -74,7 +74,7 @@ final class WidgetExportCommand extends Command
         $optionVariableValue = $input->getOption('variableValue');
 
         $widgets = $this->getWidgets();
-        
+
         if (false === array_key_exists($optionWidget, $widgets)) {
             $style->error(sprintf('Widget "%s" not found.', $optionWidget));
 

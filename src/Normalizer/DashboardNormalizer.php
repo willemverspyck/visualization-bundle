@@ -13,25 +13,16 @@ final class DashboardNormalizer extends AbstractNormalizer
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         return $this->dashboardService->getDashboardRoute($object)->toArray();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Dashboard;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getSupportedTypes(?string $format): array
     {
         return [

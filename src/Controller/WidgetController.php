@@ -7,15 +7,12 @@ namespace Spyck\VisualizationBundle\Controller;
 use Exception;
 use OpenApi\Attributes as OpenApi;
 use Psr\Cache\InvalidArgumentException;
-use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Exception\ParameterException;
-use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Service\ViewService;
 use Spyck\VisualizationBundle\Service\WidgetService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 

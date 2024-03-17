@@ -28,9 +28,6 @@ abstract class AbstractView implements ViewInterface
         return $slugger->slug(implode('-', $filename))->lower()->toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function isMerge(): ?bool
     {
         return null;

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Repository;
 
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;

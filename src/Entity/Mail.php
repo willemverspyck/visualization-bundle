@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Repository\MailRepository;
-use Spyck\VisualizationBundle\View\ViewInterface;
 use Stringable;
 use Symfony\Component\Validator\Constraints as Validator;
 

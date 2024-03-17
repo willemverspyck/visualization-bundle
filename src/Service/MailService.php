@@ -57,14 +57,14 @@ readonly class MailService
 
         $this->messageBus->dispatch($mailMessage);
     }
-    
+
     /**
      * @throws TransportExceptionInterface
      */
     public function sendMail(string $toEmail, ?string $toName, string $subject, string $template, array $data = [], array $attachments = []): void
     {
         $email = new TemplatedEmail();
-        
+
         $from = new Address($this->fromEmail, $this->fromName);
         $to = new Address($toEmail, null === $toName ? '' : $toName);
 

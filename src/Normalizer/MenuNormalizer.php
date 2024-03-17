@@ -13,10 +13,7 @@ final class MenuNormalizer extends AbstractNormalizer
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $this->setNormalized($object, $context);
 
@@ -32,10 +29,7 @@ final class MenuNormalizer extends AbstractNormalizer
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if ($this->hasNormalized($data, $context)) {
             return false;
@@ -44,9 +38,6 @@ final class MenuNormalizer extends AbstractNormalizer
         return $data instanceof Menu;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getSupportedTypes(?string $format): array
     {
         return [
