@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Menu;
 use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Utility\DataUtility;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class MenuRepository extends AbstractRepository
@@ -21,7 +22,7 @@ class MenuRepository extends AbstractRepository
     }
 
     /**
-     * Get menu data.
+     * Get menu items with the user group permissions.
      *
      * @return array<int, Menu>
      */
@@ -52,6 +53,40 @@ class MenuRepository extends AbstractRepository
         return $queryBuilder
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return array<int, Menu>
+     */
+    public function getMenuDataByParent(?Menu $parent): array
+    {
+        $queryBuilder = $this->createQueryBuilder('menu')
+            ->orderBy('menu.position');
+
+        if (null === $parent) {
+            $queryBuilder
+                ->where('menu.parent IS NULL');
+        } else {
+            $queryBuilder
+                ->where('menu.parent = :parent')
+                ->setParameter('parent', $parent);
+        }
+
+        return $queryBuilder
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function patchMenu(Menu $menu, array $fields, ?int $position = null): void
+    {
+        if (in_array('position', $fields, true)) {
+            DataUtility::assert(null !== $position);
+
+            $menu->setPosition($position);
+        }
+
+        $this->getEntityManager()->persist($menu);
+        $this->getEntityManager()->flush();
     }
 
     private function getMenuDashboardAsQueryBuilder(?UserInterface $user, string $index): QueryBuilder
