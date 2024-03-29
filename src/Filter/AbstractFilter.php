@@ -43,4 +43,9 @@ abstract class AbstractFilter implements FilterInterface
     {
         $this->data = $data;
     }
+
+    public function preload(): bool
+    {
+        return true;
+    }
 }

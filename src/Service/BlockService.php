@@ -9,9 +9,10 @@ use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Block;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
+use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
-use Spyck\VisualizationBundle\Model\Filter;
+use Spyck\VisualizationBundle\Model\Filter as FilterAsModel;
 use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
@@ -74,63 +75,72 @@ readonly class BlockService
     /**
      * Get filters of the widget.
      */
-    private function getBlockFilter(WidgetInterface $widgetInstance): array
+    private function getBlockFilter(WidgetInterface $widget): array
     {
         $data = [];
 
-        foreach ($widgetInstance->getFilterData() as $filter) {
+        foreach ($widget->getFilterData() as $filter) {
             $name = $filter->getName();
 
-            $returnEntityData = [];
+            $filterAsModel = new FilterAsModel();
+            $filterAsModel->setName($this->translator->trans(id: sprintf('filter.%s.description', $name), domain: 'SpyckVisualizationBundle'));
+            $filterAsModel->setField($filter->getField());
+            $filterAsModel->setConfig($filter->getConfig());
+            $filterAsModel->setData($this->getFilterData($filter, $widget));
 
-            if ($filter instanceof EntityFilterInterface) {
-                $items = $filter->getDataAsObject();
+            $data[] = $filterAsModel;
+        }
 
-                if (null === $items) {
-                    $items = [];
-                }
+        return $data;
+    }
 
-                $items = array_map(function (object $object): int {
-                    return $object->getId();
-                }, $items);
+    private function getFilterData(FilterInterface $filter, WidgetInterface $widget): array
+    {
+        $data = [];
 
-                $entityData = $this->repositoryService->getRepository($name)->getVisualizationEntityData($widgetInstance);
+        if (false === $filter->preload()) {
+            return $data;
+        }
 
-                foreach ($entityData as $entityRow) {
-                    $returnEntityData[] = [
-                        'id' => $entityRow->getId(),
-                        'parent' => null,
-                        'name' => $entityRow->getName(),
-                        'select' => in_array($entityRow->getId(), $items, true),
-                    ];
-                }
+        if ($filter instanceof EntityFilterInterface) {
+            $items = $filter->getDataAsObject();
+
+            if (null === $items) {
+                $items = [];
             }
 
-            if ($filter instanceof OptionFilterInterface) {
-                $items = $filter->getData();
+            $items = array_map(function (object $object): int {
+                return $object->getId();
+            }, $items);
 
-                if (null === $items) {
-                    $items = [];
-                }
+            $name = $filter->getName();
 
-                foreach ($filter->getOptions() as $optionId => $optionName) {
-                    $returnEntityData[] = [
-                        'id' => $optionId,
-                        'parent' => null,
-                        'name' => $optionName,
-                        'select' => in_array($optionId, $items, true),
-                    ];
-                }
+            $entityData = $this->repositoryService->getRepository($name)->getVisualizationEntityData($widget);
+
+            foreach ($entityData as $entityRow) {
+                $data[] = [
+                    'id' => $entityRow->getId(),
+                    'parent' => null,
+                    'name' => $entityRow->getName(),
+                    'select' => in_array($entityRow->getId(), $items, true),
+                ];
+            }
+        }
+
+        if ($filter instanceof OptionFilterInterface) {
+            $items = $filter->getData();
+
+            if (null === $items) {
+                $items = [];
             }
 
-            if (count($returnEntityData) > 0) {
-                $filterModel = new Filter();
-                $filterModel->setName($this->translator->trans(id: sprintf('filter.%s.description', $name), domain: 'SpyckVisualizationBundle'));
-                $filterModel->setField($filter->getField());
-                $filterModel->setConfig($filter->getConfig());
-                $filterModel->setData($returnEntityData);
-
-                $data[] = $filterModel;
+            foreach ($filter->getOptions() as $optionId => $optionName) {
+                $data[] = [
+                    'id' => $optionId,
+                    'parent' => null,
+                    'name' => $optionName,
+                    'select' => in_array($optionId, $items, true),
+                ];
             }
         }
 
