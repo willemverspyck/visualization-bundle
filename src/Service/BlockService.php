@@ -86,7 +86,9 @@ readonly class BlockService
             $filterAsModel->setName($this->translator->trans(id: sprintf('filter.%s.description', $name), domain: 'SpyckVisualizationBundle'));
             $filterAsModel->setField($filter->getField());
             $filterAsModel->setConfig($filter->getConfig());
-            $filterAsModel->setData($this->getFilterData($filter, $widget));
+            $filterAsModel->setData($filter->getData());
+            $filterAsModel->setOptions($this->getFilterOptions($filter, $widget));
+            $filterAsModel->setType($filter->getType());
 
             $data[] = $filterAsModel;
         }
@@ -94,7 +96,7 @@ readonly class BlockService
         return $data;
     }
 
-    private function getFilterData(FilterInterface $filter, WidgetInterface $widget): array
+    private function getFilterOptions(FilterInterface $filter, WidgetInterface $widget): array
     {
         $data = [];
 

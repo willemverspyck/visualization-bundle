@@ -8,13 +8,6 @@ use Spyck\VisualizationBundle\Request\RequestInterface;
 
 final class LimitFilter extends AbstractOptionFilter
 {
-    public function __construct()
-    {
-        $this->setConfig([
-            'type' => FilterInterface::TYPE_INPUT,
-        ]);
-    }
-
     public static function getField(): string
     {
         return RequestInterface::LIMIT;
@@ -23,5 +16,10 @@ final class LimitFilter extends AbstractOptionFilter
     public static function getName(): string
     {
         return RequestInterface::LIMIT;
+    }
+
+    public function getType(): string
+    {
+        return FilterInterface::TYPE_INPUT;
     }
 }

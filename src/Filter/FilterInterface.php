@@ -20,5 +20,7 @@ interface FilterInterface extends RequestInterface
 
     public function setData(array $data): void;
 
+    public function getType(): string;
+
     public function preload(): bool;
 }

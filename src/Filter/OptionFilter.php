@@ -10,9 +10,6 @@ final class OptionFilter extends AbstractOptionFilter
 {
     public function __construct(array $options = [])
     {
-        $this->setConfig([
-            'type' => FilterInterface::TYPE_CHECKBOX,
-        ]);
         $this->setOptions($options);
     }
 

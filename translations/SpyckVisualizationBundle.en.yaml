@@ -1,4 +1,10 @@
 filter:
+  limit:
+    name: Limit
+    description: Limit
+  offset:
+    name: Offset
+    description: Offset
   option:
     name: Options
     description: Filter by options

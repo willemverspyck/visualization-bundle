@@ -6,13 +6,6 @@ namespace Spyck\VisualizationBundle\Filter;
 
 abstract class AbstractEntityFilter extends AbstractFilter implements EntityFilterInterface
 {
-    public function __construct()
-    {
-        $this->setConfig([
-            'type' => FilterInterface::TYPE_CHECKBOX,
-        ]);
-    }
-
     private ?array $dataAsObject = null;
 
     public function getDataAsObject(): ?array

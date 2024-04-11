@@ -44,6 +44,11 @@ abstract class AbstractFilter implements FilterInterface
         $this->data = $data;
     }
 
+    public function getType(): string
+    {
+        return FilterInterface::TYPE_CHECKBOX;
+    }
+
     public function preload(): bool
     {
         return true;
