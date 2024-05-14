@@ -518,7 +518,7 @@ readonly class WidgetService
             serialize($widget->getTimestampUpdated()),
             serialize($widgetInstance->getParameterDataRequest()),
             serialize($widgetInstance->getFilterDataRequest()),
-            serialize($fields),
+            serialize(array_keys($fields)),
         ];
 
         return CacheUtility::getCacheKey(__CLASS__, $data);
