@@ -482,7 +482,7 @@ readonly class WidgetService
             return $this->getData($widget, $fields);
         }
 
-        $key = $this->getCacheKey($widget);
+        $key = $this->getCacheKey($widget, $fields);
 
         $data = $this->cache->get($key, function (ItemInterface $item) use ($widget, $fields): array {
             $item->expiresAfter($widget->getCache());
@@ -508,7 +508,7 @@ readonly class WidgetService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    private function getCacheKey(WidgetInterface $widgetInstance): string
+    private function getCacheKey(WidgetInterface $widgetInstance, array $fields): string
     {
         $widget = $widgetInstance->getWidget();
 
@@ -518,6 +518,7 @@ readonly class WidgetService
             serialize($widget->getTimestampUpdated()),
             serialize($widgetInstance->getParameterDataRequest()),
             serialize($widgetInstance->getFilterDataRequest()),
+            serialize($fields),
         ];
 
         return CacheUtility::getCacheKey(__CLASS__, $data);
