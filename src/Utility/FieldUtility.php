@@ -45,22 +45,39 @@ final class FieldUtility
     }
 
     /**
-     * Get the rate of the difference.
+     * @throws Exception
      */
-    public static function getSubtractRate(array $data, array $parameters): ?float
+    public static function getDecreaseRate(array $data, array $parameters): ?float
     {
-        ArrayUtility::hasKeysInArrayWithException(['value', 'subtract'], $parameters);
+        ArrayUtility::hasKeysInArrayWithException(['value', 'decrease'], $parameters);
 
         $dataValue = self::getValue($parameters['value'], $data);
-        $dataSubtract = self::getValue($parameters['subtract'], $data);
+        $dataDecrease = self::getValue($parameters['decrease'], $data);
 
-        if (null !== $dataValue && null !== $dataSubtract && $dataSubtract > 0) {
-            return ($dataValue / $dataSubtract) - 1;
+        if (null !== $dataValue && $dataValue > 0 && null !== $dataDecrease) {
+            return ($dataValue - $dataDecrease) / $dataValue;
         }
 
         return null;
     }
 
+    /**
+     * @throws Exception
+     */
+    public static function getIncreaseRate(array $data, array $parameters): ?float
+    {
+        ArrayUtility::hasKeysInArrayWithException(['value', 'increase'], $parameters);
+
+        $dataValue = self::getValue($parameters['value'], $data);
+        $dataIncrease = self::getValue($parameters['increase'], $data);
+
+        if (null !== $dataValue && null !== $dataIncrease && $dataIncrease > 0) {
+            return ($dataValue - $dataIncrease) / $dataIncrease;
+        }
+
+        return null;
+    }
+    
     public static function getValue(bool|Callback|DateTimeInterface|float|int|string|null $value, array $data): bool|DateTimeInterface|float|int|string|null
     {
         if ($value instanceof Callback) {
