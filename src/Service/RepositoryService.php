@@ -8,7 +8,7 @@ use Countable;
 use Exception;
 use IteratorAggregate;
 use Spyck\VisualizationBundle\Repository\RepositoryInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class RepositoryService
@@ -16,7 +16,7 @@ readonly class RepositoryService
     /**
      * @param Countable&IteratorAggregate $repositories
      */
-    public function __construct(#[TaggedIterator(tag: 'spyck.visualization.repository', defaultIndexMethod: 'getVisualizationName')] private iterable $repositories)
+    public function __construct(#[AutowireIterator(tag: 'spyck.visualization.repository', defaultIndexMethod: 'getVisualizationName')] private iterable $repositories)
     {
     }
 
