@@ -122,7 +122,7 @@ final class ExcelView extends AbstractView
 
         $widget = $block->getWidget();
 
-        $fields = $widget->getFields();
+        $fields = iterator_to_array($widget->getFields());
 
         foreach ($fields as $fieldIndex => $field) {
             $sheet->setCellValueExplicit([$fieldIndex + 1, 1], $field['name'], DataType::TYPE_STRING);
@@ -143,7 +143,9 @@ final class ExcelView extends AbstractView
         }
 
         foreach ($fields as $fieldIndex => $field) {
-            $sheet->getColumnDimensionByColumn($fieldIndex)->setAutoSize(true);
+            $sheet
+                ->getColumnDimensionByColumn($fieldIndex + 1)
+                ->setAutoSize(true);
 
             $style = $sheet->getStyle([$fieldIndex + 1, 2, $fieldIndex + 1, $count + 1]);
 
