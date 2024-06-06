@@ -152,9 +152,11 @@ readonly class WidgetService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getWidgetData(WidgetInterface $widgetInstance): WidgetAsModel
+    public function getWidgetData(WidgetInterface $widget): WidgetAsModel
     {
-        $fields = $this->filterFields($widgetInstance);
+        $data = $this->getDataWithCache($widget);
+
+        $fields = $this->filterFields($widget, $data);
 
         foreach ($fields as $field) {
             foreach ($field->getRoutes() as $route) {
@@ -162,25 +164,24 @@ readonly class WidgetService
             }
         }
 
-        $data = $this->getDataWithCache($widgetInstance, $fields);
-        $total = $widgetInstance->getTotal();
+        $total = $widget->getTotal();
         $totalIncluded = null === $total;
 
         if (null === $total) {
-            $total = iterator_count($data);
+            $total = count($data);
         }
 
-        $widgetModel = new WidgetAsModel();
-        $widgetModel->setFields($this->getFields($fields));
-        $widgetModel->setData($data);
-        $widgetModel->setTotal($total);
-        $widgetModel->setEvents($widgetInstance->getEvents());
-        $widgetModel->setProperties($widgetInstance->getProperties());
-        $widgetModel->setParameters($this->getParameters($widgetInstance));
-        $widgetModel->setFilters($this->getFilters($widgetInstance));
-        $widgetModel->setPagination($this->getPagination($widgetInstance, $total, $totalIncluded));
+        $widgetAsModel = new WidgetAsModel();
+        $widgetAsModel->setFields($this->getFields($fields));
+        $widgetAsModel->setData($this->getData($data, $fields));
+        $widgetAsModel->setTotal($total);
+        $widgetAsModel->setEvents($widget->getEvents());
+        $widgetAsModel->setProperties($widget->getProperties());
+        $widgetAsModel->setParameters($this->getParameters($widget));
+        $widgetAsModel->setFilters($this->getFilters($widget));
+        $widgetAsModel->setPagination($this->getPagination($widget, $total, $totalIncluded));
 
-        return $widgetModel;
+        return $widgetAsModel;
     }
 
     /**
@@ -451,11 +452,9 @@ readonly class WidgetService
     /**
      * @throws Exception
      */
-    private function getData(WidgetInterface $widget, array $fields): array
+    private function getData(array $data, array $fields): iterable
     {
-        $data = [];
-
-        foreach ($widget->getData() as $row) {
+        foreach ($data as $row) {
             $columnData = [];
 
             foreach ($fields as $field) {
@@ -466,32 +465,30 @@ readonly class WidgetService
                 ];
             }
 
-            $data[] = [
+            yield [
                 'fields' => $columnData,
             ];
         }
-
-        return $data;
     }
 
-    private function getDataWithCache(WidgetInterface $widget, array $fields): array
+    private function getDataWithCache(WidgetInterface $widget): array
     {
         if (false === $this->cacheActive || null === $widget->getCache()) {
             $this->logger->info('Cache disabled');
 
-            return $this->getData($widget, $fields);
+            return iterator_to_array($widget->getData());
         }
 
-        $key = $this->getCacheKey($widget, $fields);
+        $key = $this->getCacheKey($widget);
 
-        $data = $this->cache->get($key, function (ItemInterface $item) use ($widget, $fields): array {
+        $data = $this->cache->get($key, function (ItemInterface $item) use ($widget): array {
             $item->expiresAfter($widget->getCache());
 
             if ($this->cache instanceof TagAwareCacheInterface) {
                 $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
             }
 
-            return $this->getData($widget, $fields);
+            return iterator_to_array($widget->getData());
         }, null, $metadata);
 
         $this->logger->info('Cache', [
@@ -508,7 +505,7 @@ readonly class WidgetService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    private function getCacheKey(WidgetInterface $widgetInstance, array $fields): string
+    private function getCacheKey(WidgetInterface $widgetInstance): string
     {
         $widget = $widgetInstance->getWidget();
 
@@ -518,7 +515,6 @@ readonly class WidgetService
             serialize($widget->getTimestampUpdated()),
             serialize($widgetInstance->getParameterDataRequest()),
             serialize($widgetInstance->getFilterDataRequest()),
-            serialize(array_keys($fields)),
         ];
 
         return CacheUtility::getCacheKey(__CLASS__, $data);
@@ -597,18 +593,18 @@ readonly class WidgetService
         return $content;
     }
 
-    private function filterFields(WidgetInterface $widgetInstance): array
+    private function filterFields(WidgetInterface $widgetInstance, array $data): array
     {
         $fields = iterator_to_array($widgetInstance->getFields());
 
-        return array_filter($fields, function (Field $field) use ($widgetInstance): bool {
+        return array_filter($fields, function (Field $field) use ($widgetInstance, $data): bool {
             $filter = $field->getFilter();
 
             if (null === $filter) {
                 return true;
             }
 
-            return call_user_func($filter->getName(), $filter->getParameters(), $widgetInstance);
+            return call_user_func($filter->getName(), $widgetInstance, $data, $filter->getParameters());
         });
     }
 
