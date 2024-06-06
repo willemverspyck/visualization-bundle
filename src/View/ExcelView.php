@@ -126,8 +126,26 @@ final class ExcelView extends AbstractView
 
         foreach ($fields as $fieldIndex => $field) {
             $sheet->setCellValueExplicit([$fieldIndex + 1, 1], $field['name'], DataType::TYPE_STRING);
+        }
 
-            $style = $sheet->getStyle([$fieldIndex + 1, 2, $fieldIndex + 1, iterator_count($widget->getData()) + 1]);
+        $count = 0;
+
+        foreach ($widget->getData() as $rowIndex => $row) {
+            foreach ($row['fields'] as $fieldIndex => $field) {
+                $value = $this->getValue($fields[$fieldIndex]['type'], $fields[$fieldIndex]['config'], $field['value']);
+
+                $columnType = $this->getColumnType($fields[$fieldIndex]['type'], $value);
+
+                $sheet->setCellValueExplicit([$fieldIndex + 1, $rowIndex + 2], $value, $columnType);
+            }
+
+            ++$count;
+        }
+
+        foreach ($fields as $fieldIndex => $field) {
+            $sheet->getColumnDimensionByColumn($fieldIndex)->setAutoSize(true);
+
+            $style = $sheet->getStyle([$fieldIndex + 1, 2, $fieldIndex + 1, $count + 1]);
 
             $columnFormat = $this->getColumnFormat($field['type'], $field['config']);
 
@@ -142,20 +160,6 @@ final class ExcelView extends AbstractView
             if (null !== $columnConditional) {
                 $style->setConditionalStyles($columnConditional);
             }
-        }
-
-        foreach ($widget->getData() as $rowIndex => $row) {
-            foreach ($row['fields'] as $fieldIndex => $field) {
-                $value = $this->getValue($fields[$fieldIndex]['type'], $fields[$fieldIndex]['config'], $field['value']);
-
-                $columnType = $this->getColumnType($fields[$fieldIndex]['type'], $value);
-
-                $sheet->setCellValueExplicit([$fieldIndex + 1, $rowIndex + 2], $value, $columnType);
-            }
-        }
-
-        foreach ($sheet->getColumnIterator() as $column) {
-            $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
         }
 
         $sheet
