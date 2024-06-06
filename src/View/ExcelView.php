@@ -127,7 +127,7 @@ final class ExcelView extends AbstractView
         foreach ($fields as $fieldIndex => $field) {
             $sheet->setCellValueExplicit([$fieldIndex + 1, 1], $field['name'], DataType::TYPE_STRING);
 
-            $style = $sheet->getStyle([$fieldIndex + 1, 2, $fieldIndex + 1, count($widget->getData()) + 1]);
+            $style = $sheet->getStyle([$fieldIndex + 1, 2, $fieldIndex + 1, iterator_count($widget->getData()) + 1]);
 
             $columnFormat = $this->getColumnFormat($field['type'], $field['config']);
 
