@@ -158,8 +158,10 @@ final class ExcelView extends AbstractView
             $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
         }
 
-        $sheet->setAutoFilter($sheet->calculateWorksheetDimension());
-        $sheet->setSelectedCells([1, 1, 1, 1]);
+        $sheet
+            ->freezePane('A2')
+            ->setAutoFilter($sheet->calculateWorksheetDimension())
+            ->setSelectedCells([1, 1, 1, 1]);
     }
 
     /**
