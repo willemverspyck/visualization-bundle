@@ -452,8 +452,10 @@ readonly class WidgetService
     /**
      * @throws Exception
      */
-    private function getData(array $data, array $fields): iterable
+    private function getData(array $data, array $fields): array
     {
+        $content = [];
+
         foreach ($data as $row) {
             $columnData = [];
 
@@ -465,10 +467,12 @@ readonly class WidgetService
                 ];
             }
 
-            yield [
+            $content[] = [
                 'fields' => $columnData,
             ];
         }
+
+        return $content;
     }
 
     private function getDataWithCache(WidgetInterface $widget): array
