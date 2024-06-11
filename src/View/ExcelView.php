@@ -122,7 +122,7 @@ final class ExcelView extends AbstractView
 
         $widget = $block->getWidget();
 
-        $fields = iterator_to_array($widget->getFields());
+        $fields = $widget->getFields();
 
         foreach ($fields as $fieldIndex => $field) {
             $sheet->setCellValueExplicit([$fieldIndex + 1, 1], $field['name'], DataType::TYPE_STRING);
