@@ -12,8 +12,9 @@ final class Config
     private Field $field;
     private bool $abbreviation = false;
     private ?int $precision = null;
-    private Collection $formats;
+    private bool $merge = false;
     private ?array $chart = null;
+    private Collection $formats;
 
     public function __construct()
     {
@@ -55,6 +56,18 @@ final class Config
 
         return $this;
     }
+    
+    public function hasMerge(): bool
+    {
+        return $this->merge;
+    }
+    
+    public function setMerge(bool $merge): static
+    {
+        $this->merge = $merge;
+
+        return $this;
+    }
 
     public function getChart(): ?array
     {
@@ -86,6 +99,7 @@ final class Config
     public function toArray(): array
     {
         $data = [
+            'merge' => $this->hasMerge(),
             'chart' => $this->getChart(),
         ];
 
