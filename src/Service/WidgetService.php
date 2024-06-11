@@ -156,7 +156,7 @@ readonly class WidgetService
     {
         $data = $this->getDataWithCache($widget);
 
-        $fields = $this->filterFields($widget, $data);
+        $fields = $this->getFieldsWithFilter($widget, $data);
 
         foreach ($fields as $field) {
             foreach ($field->getRoutes() as $route) {
@@ -449,6 +449,21 @@ readonly class WidgetService
         return $columns;
     }
 
+    private function getFieldsWithFilter(WidgetInterface $widgetInstance, array $data): array
+    {
+        $fields = iterator_to_array($widgetInstance->getFields(), false);
+
+        return array_filter($fields, function (Field $field) use ($widgetInstance, $data): bool {
+            $filter = $field->getFilter();
+
+            if (null === $filter) {
+                return true;
+            }
+
+            return call_user_func($filter->getName(), $widgetInstance, $data, $filter->getParameters());
+        });
+    }
+
     /**
      * @throws Exception
      */
@@ -480,10 +495,10 @@ readonly class WidgetService
         if (false === $this->cacheActive || null === $widget->getCache()) {
             $this->logger->info('Cache disabled');
 
-            return iterator_to_array($widget->getData());
+            return iterator_to_array($widget->getData(), false);
         }
 
-        $key = $this->getCacheKey($widget);
+        $key = $this->getKeyForCache($widget);
 
         $data = $this->cache->get($key, function (ItemInterface $item) use ($widget): array {
             $item->expiresAfter($widget->getCache());
@@ -492,7 +507,7 @@ readonly class WidgetService
                 $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
             }
 
-            return iterator_to_array($widget->getData());
+            return iterator_to_array($widget->getData(), false);
         }, null, $metadata);
 
         $this->logger->info('Cache', [
@@ -509,7 +524,7 @@ readonly class WidgetService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    private function getCacheKey(WidgetInterface $widgetInstance): string
+    private function getKeyForCache(WidgetInterface $widgetInstance): string
     {
         $widget = $widgetInstance->getWidget();
 
@@ -595,21 +610,6 @@ readonly class WidgetService
         }
 
         return $content;
-    }
-
-    private function filterFields(WidgetInterface $widgetInstance, array $data): array
-    {
-        $fields = iterator_to_array($widgetInstance->getFields());
-
-        return array_filter($fields, function (Field $field) use ($widgetInstance, $data): bool {
-            $filter = $field->getFilter();
-
-            if (null === $filter) {
-                return true;
-            }
-
-            return call_user_func($filter->getName(), $widgetInstance, $data, $filter->getParameters());
-        });
     }
 
     /**

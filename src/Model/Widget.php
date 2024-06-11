@@ -8,21 +8,21 @@ use Spyck\ApiExtension\Model\Pagination;
 
 final class Widget
 {
-    private iterable $data;
+    private array $data;
     private int $total;
-    private iterable $fields;
+    private array $fields;
     private iterable $properties;
     private iterable $events;
-    private iterable $filters;
-    private iterable $parameters;
+    private array $filters;
+    private array $parameters;
     private ?Pagination $pagination = null;
 
-    public function getData(): iterable
+    public function getData(): array
     {
         return $this->data;
     }
 
-    public function setData(iterable $data): static
+    public function setData(array $data): static
     {
         $this->data = $data;
 
@@ -41,12 +41,12 @@ final class Widget
         return $this;
     }
 
-    public function getFields(): iterable
+    public function getFields(): array
     {
         return $this->fields;
     }
 
-    public function setFields(iterable $fields): static
+    public function setFields(array $fields): static
     {
         $this->fields = $fields;
 
@@ -77,24 +77,24 @@ final class Widget
         return $this;
     }
 
-    public function getFilters(): iterable
+    public function getFilters(): array
     {
         return $this->filters;
     }
 
-    public function setFilters(iterable $filters): static
+    public function setFilters(array $filters): static
     {
         $this->filters = $filters;
 
         return $this;
     }
 
-    public function getParameters(): iterable
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function setParameters(iterable $parameters): static
+    public function setParameters(array $parameters): static
     {
         $this->parameters = $parameters;
 
