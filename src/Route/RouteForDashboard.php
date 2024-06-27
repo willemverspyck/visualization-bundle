@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Spyck\VisualizationBundle\Model;
+namespace Spyck\VisualizationBundle\Route;
 
-final class Route implements RouteInterface
+final class RouteForDashboard implements RouteInterface
 {
     private ?string $name = null;
+    private string $code;
     private ?string $url = null;
     private array $parameters = [];
+    private array $data;
 
-    public function __construct(string $name, string $url, array $parameters = [])
+    public function __construct(string $code, array $data)
     {
-        $this->setName($name);
-        $this->setUrl($url);
-        $this->setParameters($parameters);
+        $this->setCode($code);
+        $this->setData($data);
     }
 
     public function getName(): ?string
@@ -25,6 +26,18 @@ final class Route implements RouteInterface
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
@@ -49,6 +62,18 @@ final class Route implements RouteInterface
     public function setParameters(array $parameters): static
     {
         $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function setData(array $data): static
+    {
+        $this->data = $data;
 
         return $this;
     }
