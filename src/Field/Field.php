@@ -2,54 +2,45 @@
 
 declare(strict_types=1);
 
-namespace Spyck\VisualizationBundle\Model;
+namespace Spyck\VisualizationBundle\Field;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Callback\Callback;
+use Spyck\VisualizationBundle\Config\Config;
+use Spyck\VisualizationBundle\Format\FormatInterface;
+use Spyck\VisualizationBundle\Route\RouteInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
-final class Field
+final class Field implements FieldInterface
 {
-    public const TYPE_IMAGE = 'image';
-    public const TYPE_BOOLEAN = 'boolean';
-    public const TYPE_NUMBER = 'number';
-    public const TYPE_CURRENCY = 'currency';
-    public const TYPE_POSITION = 'position';
-    public const TYPE_ARRAY = 'array';
-    public const TYPE_DATETIME = 'datetime';
-    public const TYPE_DATE = 'date';
-    public const TYPE_PERCENTAGE = 'percentage';
-    public const TYPE_TEXT = 'text';
-    public const TYPE_TIME = 'time';
-
-    private ?Field $parent = null;
+    private ?MultipleFieldInterface $parent = null;
 
     #[Serializer\Groups(groups: Response::GROUP)]
     private string $name;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
     private Callback|string $source;
 
     #[Serializer\Groups(groups: Response::GROUP)]
     private string $type;
 
     private Config $config;
+
     private ?Callback $filter = null;
 
-    /**
-     * @var Collection<int, Field>
-     */
-    private Collection $children;
+    #[Serializer\Groups(groups: Response::GROUP)]
+    private Collection $formats;
 
     /**
      * @var Collection<int, RouteInterface>
      */
+    #[Serializer\Groups(groups: Response::GROUP)]
     private Collection $routes;
 
     public function __construct(string $name, Callback|string $source, string $type, Config $config = new Config(), ?Callback $filter = null)
     {
-        $this->children = new ArrayCollection();
+        $this->formats = new ArrayCollection();
         $this->routes = new ArrayCollection();
 
         $this->setName($name);
@@ -59,12 +50,12 @@ final class Field
         $this->setFilter($filter);
     }
 
-    public function getParent(): ?Field
+    public function getParent(): ?MultipleFieldInterface
     {
         return $this->parent;
     }
 
-    public function setParent(?Field $parent): static
+    public function setParent(?MultipleFieldInterface $parent): static
     {
         $this->parent = $parent;
 
@@ -133,29 +124,19 @@ final class Field
         return $this;
     }
 
-    public function addChild(Field $child): static
+    public function addFormat(FormatInterface $format): static
     {
-        $this->children->add($child);
+        $this->formats->add($format);
 
         return $this;
     }
 
-    public function clearChildren(): void
-    {
-        $this->children->clear();
-    }
-
     /**
-     * @return Collection<int, Field>
+     * @return Collection<int, FormatInterface>
      */
-    public function getChildren(): Collection
+    public function getFormats(): Collection
     {
-        return $this->children;
-    }
-
-    public function removeChild(Field $child): void
-    {
-        $this->children->removeElement($child);
+        return $this->formats;
     }
 
     public function addRoute(RouteInterface $route): static
@@ -163,11 +144,6 @@ final class Field
         $this->routes->add($route);
 
         return $this;
-    }
-
-    public function clearRoutes(): void
-    {
-        $this->routes->clear();
     }
 
     /**
@@ -178,8 +154,10 @@ final class Field
         return $this->routes;
     }
 
-    public function removeRoute(RouteInterface $route): void
+    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\SerializedName('config')]
+    public function getConfigClass(): array
     {
-        $this->routes->removeElement($route);
+        return $this->getConfig()->toArray();
     }
 }
