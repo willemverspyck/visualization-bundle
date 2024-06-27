@@ -2,31 +2,32 @@
 
 declare(strict_types=1);
 
-namespace Spyck\VisualizationBundle\Model;
+namespace Spyck\VisualizationBundle\Config;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Field\FieldInterface;
 
 final class Config
 {
-    private Field $field;
+    private FieldInterface $field;
+    #[Serializer\Groups(groups: Response::GROUP)]
     private bool $abbreviation = false;
+    #[Serializer\Groups(groups: Response::GROUP)]
     private ?int $precision = null;
+    #[Serializer\Groups(groups: Response::GROUP)]
     private bool $merge = false;
+
+    #[Serializer\Groups(groups: Response::GROUP)]
     private ?array $chart = null;
-    private Collection $formats;
 
-    public function __construct()
-    {
-        $this->formats = new ArrayCollection();
-    }
-
-    public function getField(): Field
+    public function getField(): FieldInterface
     {
         return $this->field;
     }
 
-    public function setField(Field $field): static
+    public function setField(FieldInterface $field): static
     {
         $this->field = $field;
 
@@ -81,52 +82,30 @@ final class Config
         return $this;
     }
 
-    /**
-     * @return Collection<int, FormatInterface>
-     */
-    public function getFormats(): Collection
-    {
-        return $this->formats;
-    }
-
-    public function addFormat(FormatInterface $format): static
-    {
-        $this->formats->add($format);
-
-        return $this;
-    }
-
     public function toArray(): array
     {
         $data = [
-            'merge' => $this->hasMerge(),
             'chart' => $this->getChart(),
+            'merge' => $this->hasMerge(),
         ];
 
         switch ($this->getField()->getType()) {
-            case Field::TYPE_CURRENCY:
-            case Field::TYPE_NUMBER:
+            case FieldInterface::TYPE_CURRENCY:
+            case FieldInterface::TYPE_NUMBER:
                 $data['abbreviation'] = $this->hasAbbreviation();
 
                 break;
-            case Field::TYPE_PERCENTAGE:
-            case Field::TYPE_POSITION:
+            case FieldInterface::TYPE_PERCENTAGE:
+            case FieldInterface::TYPE_POSITION:
                 $data['abbreviation'] = false;
 
                 break;
         }
 
         switch ($this->getField()->getType()) {
-            case Field::TYPE_CURRENCY:
-            case Field::TYPE_NUMBER:
-            case Field::TYPE_PERCENTAGE:
-                $formats = [];
-
-                foreach ($this->getFormats() as $format) {
-                    $formats[] = $format->toArray();
-                }
-
-                $data['formats'] = $formats;
+            case FieldInterface::TYPE_CURRENCY:
+            case FieldInterface::TYPE_NUMBER:
+            case FieldInterface::TYPE_PERCENTAGE:
                 $data['precision'] = $this->getPrecision();
 
                 break;
