@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Service;
 
 use Countable;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use IteratorAggregate;
@@ -16,17 +17,19 @@ use Spyck\VisualizationBundle\Entity\Block;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Exception\ParameterException;
+use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
 use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\LimitFilter;
 use Spyck\VisualizationBundle\Filter\OffsetFilter;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
-use Spyck\VisualizationBundle\Model\Callback;
+use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
-use Spyck\VisualizationBundle\Model\Field;
-use Spyck\VisualizationBundle\Model\RouteForDashboard;
-use Spyck\VisualizationBundle\Model\RouteInterface;
+use Spyck\VisualizationBundle\Field\Field;
+use Spyck\VisualizationBundle\Route\RouteForDashboard;
+use Spyck\VisualizationBundle\Route\RouteInterface;
 use Spyck\VisualizationBundle\Model\Widget as WidgetAsModel;
 use Spyck\VisualizationBundle\Parameter\DayEndParameter;
 use Spyck\VisualizationBundle\Parameter\DayParameter;
@@ -44,6 +47,7 @@ use Spyck\VisualizationBundle\Request\RequestInterface;
 use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Spyck\VisualizationBundle\Utility\CacheUtility;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
+use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Stringable;
@@ -156,13 +160,13 @@ readonly class WidgetService
     {
         $data = $this->getDataWithCache($widget);
 
-        $fields = $this->getFieldsWithFilter($widget, $data);
+        $fields = iterator_to_array($widget->getFields());
 
-        foreach ($fields as $field) {
+        WidgetUtility::walkFields($fields, function (FieldInterface $field): void {
             foreach ($field->getRoutes() as $route) {
                 $this->setRoute($route);
             }
-        }
+        }, false);
 
         $total = $widget->getTotal();
         $totalIncluded = null === $total;
@@ -172,7 +176,7 @@ readonly class WidgetService
         }
 
         $widgetAsModel = new WidgetAsModel();
-        $widgetAsModel->setFields($this->getFields($fields));
+        $widgetAsModel->setFields($this->getFields($fields, $widget, $data));
         $widgetAsModel->setData($this->getData($data, $fields));
         $widgetAsModel->setTotal($total);
         $widgetAsModel->setEvents($widget->getEvents());
@@ -420,48 +424,32 @@ readonly class WidgetService
         return $entity;
     }
 
-    /**
-     * @param array<int, Field> $fields
-     */
-    private function getFields(array $fields): array
+    private function getFields(array $fields, WidgetInterface $widget, array $data): array
     {
-        $columns = [];
+        WidgetUtility::walkFields($fields, function (FieldInterface $field) use ($widget, $data): void {
+            $field->setActive($this->filterField($field, $widget, $data));
+        }, false);
 
-        foreach ($fields as $field) {
-            $children = [];
+        WidgetUtility::walkMultipleFields($fields, function (MultipleFieldInterface $field): void {
+            $children = $field->getChildren()->filter(function (FieldInterface $field): bool {
+                return $field->isActive();
+            });
 
-            foreach ($field->getChildren() as $child) {
-                $children[] = [
-                    'name' => $child->getName(),
-                    'type' => $child->getType(),
-                    'config' => $child->getConfig(),
-                ];
-            }
+            $field->setActive(false === $children->isEmpty());
+        }, false);
 
-            $columns[] = [
-                'name' => $field->getName(),
-                'type' => $field->getType(),
-                'config' => $field->getConfig(),
-                'children' => $children,
-            ];
-        }
-
-        return $columns;
+        return $fields;
     }
 
-    private function getFieldsWithFilter(WidgetInterface $widgetInstance, array $data): array
+    public function filterField(Field $field, WidgetInterface $widgetInstance, array $data): bool
     {
-        $fields = iterator_to_array($widgetInstance->getFields(), false);
+        $filter = $field->getFilter();
 
-        return array_filter($fields, function (Field $field) use ($widgetInstance, $data): bool {
-            $filter = $field->getFilter();
+        if (null === $filter) {
+            return true;
+        }
 
-            if (null === $filter) {
-                return true;
-            }
-
-            return call_user_func($filter->getName(), $widgetInstance, $data, $filter->getParameters());
-        });
+        return call_user_func($filter->getName(), $widgetInstance, $data, $filter->getParameters());
     }
 
     /**
@@ -472,19 +460,12 @@ readonly class WidgetService
         $content = [];
 
         foreach ($data as $row) {
-            $columnData = [];
-
-            foreach ($fields as $field) {
-                $columnData[] = [
+            $content[] = WidgetUtility::mapFields($fields, function (Field $field) use ($row): array {
+                return [
                     'value' => $this->getValue($field, $row),
                     'routes' => $this->getRoutes($field, $row),
-                    'children' => $this->getChildren($field, $row),
                 ];
-            }
-
-            $content[] = [
-                'fields' => $columnData,
-            ];
+            });
         }
 
         return $content;
@@ -729,15 +710,15 @@ readonly class WidgetService
         }
 
         return match ($field->getType()) {
-            Field::TYPE_CURRENCY, Field::TYPE_NUMBER, Field::TYPE_PERCENTAGE => (float) $value,
-            Field::TYPE_DATE => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateFromString($value),
-            Field::TYPE_DATETIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateTimeFromString($value),
-            Field::TYPE_TIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getTimeFromString($value),
+            FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER, FieldInterface::TYPE_PERCENTAGE => (float) $value,
+            FieldInterface::TYPE_DATE => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateFromString($value),
+            FieldInterface::TYPE_DATETIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateTimeFromString($value),
+            FieldInterface::TYPE_TIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getTimeFromString($value),
             default => $value,
         };
     }
 
-    private function getRoutes(Field $field, array $data = []): array
+    private function getRoutes(FieldInterface $field, array $data = []): array
     {
         $content = [];
 
@@ -793,23 +774,5 @@ readonly class WidgetService
         $url = $route->getUrl();
 
         return sprintf('%s?%s', $url, http_build_query($query));
-    }
-
-    /**
-     * Get the overlay data of the route.
-     *
-     * @throws Exception
-     */
-    private function getChildren(Field $field, array $data): array
-    {
-        $content = [];
-
-        foreach ($field->getChildren() as $child) {
-            $content[] = [
-                'value' => $this->getValue($child, $data),
-            ];
-        }
-
-        return $content;
     }
 }

@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Utility;
 
 use DateTimeInterface;
 use Exception;
-use Spyck\VisualizationBundle\Model\Callback;
+use Spyck\VisualizationBundle\Callback\Callback;
 
 final class FieldUtility
 {

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Model;
 
 use Spyck\ApiExtension\Model\Pagination;
+use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
+use Spyck\VisualizationBundle\Utility\WidgetUtility;
 
 final class Widget
 {
@@ -41,6 +44,9 @@ final class Widget
         return $this;
     }
 
+    /**
+     * @return array<int, FieldInterface|MultipleFieldInterface>
+     */
     public function getFields(): array
     {
         return $this->fields;

@@ -82,7 +82,7 @@ abstract class AbstractWidget implements WidgetInterface
     /**
      * @throws Exception
      */
-    public function getParameter(string $name): object
+    public function getParameter(string $name): object|null
     {
         if (false === array_key_exists($name, $this->parameters)) {
             throw new Exception(sprintf('Parameter "%s" not found', $name));

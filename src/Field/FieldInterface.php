@@ -10,7 +10,7 @@ use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Format\FormatInterface;
 use Spyck\VisualizationBundle\Route\RouteInterface;
 
-interface FieldInterface
+interface FieldInterface extends AbstractFieldInterface
 {
     public const TYPE_IMAGE = 'image';
     public const TYPE_BOOLEAN = 'boolean';
@@ -28,10 +28,6 @@ interface FieldInterface
 
     public function setParent(?MultipleFieldInterface $parent): static;
 
-    public function getName(): string;
-
-    public function setName(string $name): static;
-
     public function getSource(): Callback|string;
 
     public function setSource(Callback|string $source): static;
@@ -47,10 +43,6 @@ interface FieldInterface
     public function getFilter(): ?Callback;
 
     public function setFilter(Callback $callback): static;
-
-    public function addFormat(FormatInterface $route): static;
-
-    public function getFormats(): Collection;
 
     public function addRoute(RouteInterface $route): static;
 

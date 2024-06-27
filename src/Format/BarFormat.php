@@ -20,7 +20,7 @@ final class BarFormat implements FormatInterface
     #[Serializer\Groups(groups: Response::GROUP)]
     public function getName(): string
     {
-        return 'bar';
+        return 'databar';
     }
 
     public function getColor(): string

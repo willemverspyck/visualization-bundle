@@ -6,9 +6,11 @@ namespace Spyck\VisualizationBundle\Extension;
 
 use Exception;
 use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Service\ChartService;
 use Spyck\VisualizationBundle\Utility\NumberUtility;
+use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Twig\Extension\AbstractExtension;
@@ -31,6 +33,7 @@ final class ViewExtension extends AbstractExtension
             new TwigFunction('hasChart', [$this, 'hasChart']),
             new TwigFunction('getChart', [$this, 'getChart']),
             new TwigFunction('getDirectory', [$this, 'getDirectory']),
+            new TwigFunction('getFields', [$this, 'getFields']),
         ];
     }
 
@@ -71,5 +74,12 @@ final class ViewExtension extends AbstractExtension
     public function getDirectory(string $value): string
     {
         return sprintf('%s%s', $this->directory, $value);
+    }
+
+    public function getFields(array $fields): array
+    {
+        return WidgetUtility::mapFields($fields, function (FieldInterface $field): FieldInterface {
+            return $field;
+        });
     }
 }

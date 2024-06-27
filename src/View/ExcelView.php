@@ -5,23 +5,35 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\View;
 
 use DateTimeInterface;
+use Doctrine\Common\Collections\Collection;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Settings;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Conditional;
+use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalColorScale;
 use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalDataBar;
 use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalFormatValueObject;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Style;
 use Psr\Cache\CacheItemPoolInterface;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
+use Spyck\VisualizationBundle\Format\ScaleFormat;
 use Spyck\VisualizationBundle\Model\Block;
-use Spyck\VisualizationBundle\Model\ConditionFormat;
-use Spyck\VisualizationBundle\Model\Config;
+use Spyck\VisualizationBundle\Format\ConditionBackgroundFormat;
+use Spyck\VisualizationBundle\Format\ConditionFormat;
+use Spyck\VisualizationBundle\Format\ConditionFormatInterface;
+use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Model\Dashboard;
-use Spyck\VisualizationBundle\Model\DatabarFormat;
-use Spyck\VisualizationBundle\Model\Field;
+use Spyck\VisualizationBundle\Format\BarFormat;
+use Spyck\VisualizationBundle\Field\Field;
+use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Utility\WidgetUtility;
+use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Symfony\Component\Cache\Psr16Cache;
 
 final class ExcelView extends AbstractView
@@ -77,8 +89,8 @@ final class ExcelView extends AbstractView
         }
 
         return match ($type) {
-            Field::TYPE_ARRAY => implode(PHP_EOL, $value),
-            Field::TYPE_DATE, Field::TYPE_DATETIME, Field::TYPE_TIME => Date::dateTimeToExcel($value),
+            FieldInterface::TYPE_ARRAY => implode(PHP_EOL, $value),
+            FieldInterface::TYPE_DATE, FieldInterface::TYPE_DATETIME, FieldInterface::TYPE_TIME => Date::dateTimeToExcel($value),
             default => $value,
         };
     }
@@ -122,52 +134,63 @@ final class ExcelView extends AbstractView
 
         $widget = $block->getWidget();
 
-        $fields = $widget->getFields();
-
-        foreach ($fields as $fieldIndex => $field) {
-            $sheet->setCellValueExplicit([$fieldIndex + 1, 1], $field['name'], DataType::TYPE_STRING);
-        }
+        WidgetUtility::walkFields($widget->getFields(), function (FieldInterface $field, int $index) use ($sheet): void {
+            $sheet->setCellValueExplicit([$index + 1, 1], $field->getName(), DataType::TYPE_STRING);
+        });
 
         $count = 0;
 
         foreach ($widget->getData() as $rowIndex => $row) {
-            foreach ($row['fields'] as $fieldIndex => $field) {
-                $value = $this->getValue($fields[$fieldIndex]['type'], $fields[$fieldIndex]['config'], $field['value']);
+            WidgetUtility::walkFields($widget->getFields(), function (FieldInterface $field, int $index) use ($sheet, $row, $rowIndex): void {
+                $value = $this->getValue($field->getType(), $field->getConfig(), $row[$index]['value']);
 
-                $columnType = $this->getColumnType($fields[$fieldIndex]['type'], $value);
+                $columnType = $this->getColumnType($field->getType(), $value);
 
-                $sheet->setCellValueExplicit([$fieldIndex + 1, $rowIndex + 2], $value, $columnType);
-            }
+                $sheet->setCellValueExplicit([$index + 1, $rowIndex + 2], $value, $columnType);
+            });
 
             ++$count;
         }
 
-        foreach ($fields as $fieldIndex => $field) {
+        WidgetUtility::walkMultipleFields($widget->getFields(), function (MultipleFieldInterface $field, int $index) use ($sheet, $count): void {
+            $style = $sheet->getStyle([$index + 1, 2, $index + $field->getChildren()->count(), $count + 1]);
+
+            $this->setFieldStyle($style, $field);
+        });
+
+        WidgetUtility::walkFields($widget->getFields(), function (FieldInterface $field, int $index) use ($sheet, $count): void {
             $sheet
-                ->getColumnDimensionByColumn($fieldIndex + 1)
+                ->getColumnDimensionByColumn($index + 1)
                 ->setAutoSize(true);
 
-            $style = $sheet->getStyle([$fieldIndex + 1, 2, $fieldIndex + 1, $count + 1]);
+            $style = $sheet->getStyle([$index + 1, 2, $index + 1, $count + 1]);
 
-            $columnFormat = $this->getColumnFormat($field['type'], $field['config']);
+            $this->setFieldStyle($style, $field);
+        });
+
+        $sheet
+            ->freezePane('A2')
+            ->setAutoFilter($sheet->calculateWorksheetDimension())
+            ->setSelectedCells([1, 1, 1, 1]);
+    }
+
+    private function setFieldStyle(Style $style, FieldInterface|MultipleFieldInterface $field): void
+    {
+        if ($field instanceof FieldInterface) {
+            $columnFormat = $this->getColumnFormat($field->getType(), $field->getConfig());
 
             if (null !== $columnFormat) {
                 $style
                     ->getNumberFormat()
                     ->setFormatCode($columnFormat);
             }
-
-            $columnConditional = $this->getColumnFormats($field['type'], $field['config']);
-
-            if (null !== $columnConditional) {
-                $style->setConditionalStyles($columnConditional);
-            }
         }
 
-        $sheet
-            ->freezePane('A2')
-            ->setAutoFilter($sheet->calculateWorksheetDimension())
-            ->setSelectedCells([1, 1, 1, 1]);
+        $columnConditional = $this->getColumnFormats($field->getFormats());
+
+        if (null !== $columnConditional) {
+            $style->setConditionalStyles($columnConditional);
+        }
     }
 
     /**
@@ -176,12 +199,12 @@ final class ExcelView extends AbstractView
     private function getColumnFormat(string $type, Config $config): ?string
     {
         return match ($type) {
-            Field::TYPE_CURRENCY => sprintf('[$€ ] #,##0%s', null === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
-            Field::TYPE_DATE => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            Field::TYPE_DATETIME => sprintf('%s hh:mm:ss', NumberFormat::FORMAT_DATE_DDMMYYYY),
-            Field::TYPE_NUMBER => sprintf('#,##0%s', null === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
-            Field::TYPE_PERCENTAGE => sprintf('0%s%%', null === $config->getPrecision() ? '' : sprintf('.%s', str_repeat('0', $config->getPrecision()))),
-            Field::TYPE_TIME => 'hh:mm:ss',
+            FieldInterface::TYPE_CURRENCY => sprintf('[$€ ] #,##0%s', null === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
+            FieldInterface::TYPE_DATE => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            FieldInterface::TYPE_DATETIME => sprintf('%s hh:mm:ss', NumberFormat::FORMAT_DATE_DDMMYYYY),
+            FieldInterface::TYPE_NUMBER => sprintf('#,##0%s', null === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
+            FieldInterface::TYPE_PERCENTAGE => sprintf('0%s%%', null === $config->getPrecision() ? '' : sprintf('.%s', str_repeat('0', $config->getPrecision()))),
+            FieldInterface::TYPE_TIME => 'hh:mm:ss',
             default => null,
         };
     }
@@ -189,59 +212,84 @@ final class ExcelView extends AbstractView
     /**
      * Get the column conditional styles.
      */
-    private function getColumnFormats(string $type, Config $config): ?array
+    private function getColumnFormats(Collection $formats): ?array
     {
-        $content = null;
+        if ($formats->isEmpty()) {
+            return null;
+        }
 
-        switch ($type) {
-            case Field::TYPE_CURRENCY:
-            case Field::TYPE_PERCENTAGE:
-            case Field::TYPE_NUMBER:
-                $formats = $config->getFormats();
+            $content = [];
 
-                if (false === $formats->isEmpty()) {
-                    $content = [];
+            foreach ($formats as $format) {
+                if ($format instanceof ConditionFormat) {
+                    $conditional = new Conditional();
+                    $conditional->setConditionType(Conditional::CONDITION_CELLIS);
+                    $conditional->setOperatorType(match($format->getOperator()) {
+                        ConditionFormat::OPERATOR_EQUAL => Conditional::OPERATOR_EQUAL,
+                        ConditionFormat::OPERATOR_GREATER_THAN => Conditional::OPERATOR_GREATERTHAN,
+                        ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL => Conditional::OPERATOR_GREATERTHANOREQUAL,
+                        ConditionFormat::OPERATOR_LESS_THAN => Conditional::OPERATOR_LESSTHAN,
+                        ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL => Conditional::OPERATOR_LESSTHANOREQUAL,
+                        default => throw new Exception(sprintf('Operator "%s" not found', $format->getOperator())),
+                    });
+                    $conditional->addCondition($format->getValue() instanceof DateTimeInterface ? Date::dateTimeToExcel($format->getValue()) : $format->getValue());
 
-                    foreach ($formats as $format) {
-                        if ($format instanceof ConditionFormat) {
-                            $conditional = new Conditional();
-                            $conditional->setConditionType(Conditional::CONDITION_CELLIS);
+                    $color = new Color(substr($format->getColor(), 2, 6));
 
-                            if (null !== $format->getStart() && null !== $format->getEnd()) {
-                                $conditional->setOperatorType(Conditional::OPERATOR_BETWEEN);
-                                $conditional->addCondition($format->getStart());
-                                $conditional->addCondition($format->getEnd());
-                            } elseif (null !== $format->getStart()) {
-                                $conditional->setOperatorType(Conditional::OPERATOR_GREATERTHANOREQUAL);
-                                $conditional->addCondition($format->getStart());
-                            } elseif (null !== $format->getEnd()) {
-                                $conditional->setOperatorType(Conditional::OPERATOR_LESSTHAN);
-                                $conditional->addCondition($format->getEnd());
-                            } else {
-                                $conditional->setOperatorType(Conditional::OPERATOR_NONE);
-                            }
-
-                            $conditional->getStyle()->getFont()->getColor()->setRGB($format->getColor());
-
-                            $content[] = $conditional;
-                        }
-
-                        if ($format instanceof DatabarFormat) {
-                            $conditional = new Conditional();
-                            $conditional->setConditionType(Conditional::CONDITION_DATABAR);
-                            $conditional->setDataBar(new ConditionalDataBar());
-                            $conditional->getDataBar()
-                                ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
-                                ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
-                                ->setColor($format->getColor());
-
-                            $content[] = $conditional;
-                        }
+                    if ($format->isBackground()) {
+                        $conditional
+                            ->getStyle()
+                            ->getFill()
+                            ->setFillType(Fill::FILL_SOLID)
+                            ->setStartColor($color);
+                    } else {
+                        $conditional
+                            ->getStyle()
+                            ->getFont()
+                            ->setColor($color);
                     }
+
+
+                    $content[] = $conditional;
                 }
 
-                break;
-        }
+                if ($format instanceof BarFormat) {
+                    $color = substr($format->getColor(), 2, 6);
+
+                    $conditional = new Conditional();
+                    $conditional->setConditionType(Conditional::CONDITION_DATABAR);
+                    $conditional->setDataBar(new ConditionalDataBar());
+                    $conditional->getDataBar()
+                        ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
+                        ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
+                        ->setColor($color);
+
+                    $content[] = $conditional;
+                }
+
+                if ($format instanceof ScaleFormat) {
+                    $colorStart = new Color(substr($format->getColorMin(), 2, 6));
+                    $colorEnd = new Color(substr($format->getColorMax(), 2, 6));
+
+                    $conditional = new Conditional();
+                    $conditional->setConditionType(Conditional::CONDITION_COLORSCALE);
+                    $conditional->setColorScale(new ConditionalColorScale());
+                    $conditional->getColorScale()
+                        ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
+                        ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
+                        ->setMinimumColor($colorStart)
+                        ->setMaximumColor($colorEnd);
+
+                    if (null !== $format->getColor()) {
+                        $color = new Color(substr($format->getColor(), 2, 6));
+
+                        $conditional->getColorScale()
+                            ->setMidpointColor($color);
+                    }
+
+                    $content[] = $conditional;
+                }
+            }
 
         return $content;
     }
@@ -256,8 +304,8 @@ final class ExcelView extends AbstractView
         }
 
         return match ($type) {
-            Field::TYPE_ARRAY, Field::TYPE_IMAGE, Field::TYPE_TEXT => DataType::TYPE_STRING,
-            Field::TYPE_BOOLEAN => DataType::TYPE_BOOL,
+            FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_IMAGE, FieldInterface::TYPE_TEXT => DataType::TYPE_STRING,
+            FieldInterface::TYPE_BOOLEAN => DataType::TYPE_BOOL,
             default => DataType::TYPE_NUMERIC,
         };
     }

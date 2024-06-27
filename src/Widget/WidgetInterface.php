@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Widget;
 
 use Spyck\VisualizationBundle\Entity\Widget;
-use Spyck\VisualizationBundle\Model\Field;
+use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
 use Spyck\VisualizationBundle\Request\RequestInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -22,7 +23,7 @@ interface WidgetInterface
     public function getEvents(): iterable;
 
     /**
-     * @return iterable<int, Field>
+     * @return iterable<int, FieldInterface|MultipleFieldInterface>
      */
     public function getFields(): iterable;
 

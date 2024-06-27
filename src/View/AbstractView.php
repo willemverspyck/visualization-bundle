@@ -6,8 +6,9 @@ namespace Spyck\VisualizationBundle\View;
 
 use DateTimeInterface;
 use Exception;
-use Spyck\VisualizationBundle\Model\Config;
-use Spyck\VisualizationBundle\Model\Field;
+use Spyck\VisualizationBundle\Config\Config;
+use Spyck\VisualizationBundle\Field\Field;
+use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Utility\NumberUtility;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
@@ -43,10 +44,10 @@ abstract class AbstractView implements ViewInterface
         }
 
         return match ($type) {
-            Field::TYPE_ARRAY => implode(', ', $value),
-            Field::TYPE_DATE => $value->format('Y-m-d'),
-            Field::TYPE_DATETIME => $value->format('Y-m-d H:i:s'),
-            Field::TYPE_TIME => $value->format('H:i:s'),
+            FieldInterface::TYPE_ARRAY => implode(', ', $value),
+            FieldInterface::TYPE_DATE => $value->format('Y-m-d'),
+            FieldInterface::TYPE_DATETIME => $value->format('Y-m-d H:i:s'),
+            FieldInterface::TYPE_TIME => $value->format('H:i:s'),
             default => $value,
         };
     }

@@ -7,10 +7,12 @@ namespace Spyck\VisualizationBundle\View;
 use DateTimeInterface;
 use Exception;
 use SplFileObject;
+use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
-use Spyck\VisualizationBundle\Model\Config;
+use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Model\Dashboard;
-use Spyck\VisualizationBundle\Model\Field;
+use Spyck\VisualizationBundle\Field\Field;
+use Spyck\VisualizationBundle\Utility\WidgetUtility;
 
 class CsvView extends AbstractView
 {
@@ -31,22 +33,16 @@ class CsvView extends AbstractView
 
         $splFileObject = new SplFileObject('php://output', 'w');
 
-        $fields = $widget->getFields();
-
-        $data = [];
-
-        foreach ($fields as $field) {
-            $data[] = $field['name'];
-        }
+        $data = WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field): string {
+            return $field->getName();
+        });
 
         $splFileObject->fputcsv($data, $this->getSeparator());
 
         foreach ($widget->getData() as $row) {
-            $data = [];
-
-            foreach ($row['fields'] as $fieldIndex => $field) {
-                $data[] = $this->getValue($fields[$fieldIndex]['type'], $fields[$fieldIndex]['config'], $field['value']);
-            }
+            $data = WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field, int $index) use ($row): bool|float|int|string|null {
+                return $this->getValue($field->getType(), $field->getConfig(), $row[$index]['value']);
+            });
 
             $splFileObject->fputcsv($data, $this->getSeparator());
         }
@@ -81,7 +77,7 @@ class CsvView extends AbstractView
         }
 
         return match ($type) {
-            Field::TYPE_BOOLEAN => $value ? 'TRUE' : 'FALSE',
+            FieldInterface::TYPE_BOOLEAN => $value ? 'TRUE' : 'FALSE',
             default => parent::getValue($type, $config, $value),
         };
     }

@@ -6,10 +6,15 @@ namespace Spyck\VisualizationBundle\View;
 
 use DateTimeInterface;
 use Exception;
+use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
-use Spyck\VisualizationBundle\Model\Config;
+use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Model\Dashboard;
-use Spyck\VisualizationBundle\Model\Field;
+use Spyck\VisualizationBundle\Field\Field;
+use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Utility\WidgetUtility;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractSerializerView extends AbstractView
@@ -31,12 +36,16 @@ abstract class AbstractSerializerView extends AbstractView
 
         $widget = $block->getWidget();
 
+        $fields = WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field): FieldInterface {
+            return $field;
+        });
+
         $pagination = $widget->getPagination();
 
         $content = [
             'data' => [],
             'total' => $widget->getTotal(),
-            'fields' => [],
+            'fields' => $fields,
             'properties' => $widget->getProperties(),
             'events' => $widget->getEvents(),
             'parameters' => $widget->getParameters(),
@@ -47,35 +56,21 @@ abstract class AbstractSerializerView extends AbstractView
             ],
         ];
 
-        $fields = $widget->getFields();
-
-        foreach ($fields as $field) {
-            $content['fields'][] = [
-                'name' => $field['name'],
-                'type' => $field['type'],
-                'config' => $field['config']->toArray(),
-                'children' => $field['children'],
-            ];
-        }
-
         foreach ($widget->getData() as $row) {
-            $data = [];
-
-            foreach ($fields as $fieldIndex => $field) {
-                $cell = $row['fields'][$fieldIndex];
-
-                $data[] = [
-                    'value' => $this->getValue($field['type'], $field['config'], $cell['value']),
-                    'valueFormat' => $this->getValueFormat($field['type'], $field['config'], $cell['value']),
-                    'routes' => $cell['routes'],
-                    'overlays' => $cell['children'],
+            $content['data'][] = WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field, int $index) use ($row): array {
+                return [
+                    'value' => $this->getValue($field->getType(), $field->getConfig(), $row[$index]['value']),
+                    'valueFormat' => $this->getValueFormat($field->getType(), $field->getConfig(), $row[$index]['value']),
+                    'routes' => $row[$index]['routes'],
                 ];
-            }
-
-            $content['data'][] = $data;
+            });
         }
 
-        return $this->serializer->serialize($content, $this->getExtension());
+        return $this->serializer->serialize($content, $this->getExtension(), [
+            AbstractObjectNormalizer::GROUPS => [
+                Response::GROUP,
+            ],
+        ]);
     }
 
     public static function isMerge(): ?bool
@@ -93,10 +88,10 @@ abstract class AbstractSerializerView extends AbstractView
         }
 
         return match ($type) {
-            Field::TYPE_BOOLEAN => $value ? '✓' : '✕',
-            Field::TYPE_CURRENCY => sprintf('€ %s', $this->getValueOfNumber($config, $value)),
-            Field::TYPE_NUMBER => $this->getValueOfNumber($config, $value),
-            Field::TYPE_PERCENTAGE => sprintf('%s%%', $this->getValueOfNumber($config, $value * 100)),
+            FieldInterface::TYPE_BOOLEAN => $value ? '✓' : '✕',
+            FieldInterface::TYPE_CURRENCY => sprintf('€ %s', $this->getValueOfNumber($config, $value)),
+            FieldInterface::TYPE_NUMBER => $this->getValueOfNumber($config, $value),
+            FieldInterface::TYPE_PERCENTAGE => sprintf('%s%%', $this->getValueOfNumber($config, $value * 100)),
             default => parent::getValue($type, $config, $value),
         };
     }

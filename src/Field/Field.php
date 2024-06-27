@@ -13,12 +13,9 @@ use Spyck\VisualizationBundle\Format\FormatInterface;
 use Spyck\VisualizationBundle\Route\RouteInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
-final class Field implements FieldInterface
+final class Field extends AbstractField implements FieldInterface
 {
     private ?MultipleFieldInterface $parent = null;
-
-    #[Serializer\Groups(groups: Response::GROUP)]
-    private string $name;
 
     private Callback|string $source;
 
@@ -29,9 +26,6 @@ final class Field implements FieldInterface
 
     private ?Callback $filter = null;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
-    private Collection $formats;
-
     /**
      * @var Collection<int, RouteInterface>
      */
@@ -40,7 +34,8 @@ final class Field implements FieldInterface
 
     public function __construct(string $name, Callback|string $source, string $type, Config $config = new Config(), ?Callback $filter = null)
     {
-        $this->formats = new ArrayCollection();
+        parent::__construct();
+
         $this->routes = new ArrayCollection();
 
         $this->setName($name);
@@ -48,6 +43,7 @@ final class Field implements FieldInterface
         $this->setType($type);
         $this->setConfig($config);
         $this->setFilter($filter);
+        $this->setActive(true);
     }
 
     public function getParent(): ?MultipleFieldInterface
@@ -58,18 +54,6 @@ final class Field implements FieldInterface
     public function setParent(?MultipleFieldInterface $parent): static
     {
         $this->parent = $parent;
-
-        return $this;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
 
         return $this;
     }
@@ -122,21 +106,6 @@ final class Field implements FieldInterface
         $this->filter = $filter;
 
         return $this;
-    }
-
-    public function addFormat(FormatInterface $format): static
-    {
-        $this->formats->add($format);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, FormatInterface>
-     */
-    public function getFormats(): Collection
-    {
-        return $this->formats;
     }
 
     public function addRoute(RouteInterface $route): static
