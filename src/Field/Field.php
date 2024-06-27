@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\Collection;
 use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Config\Config;
-use Spyck\VisualizationBundle\Format\FormatInterface;
 use Spyck\VisualizationBundle\Route\RouteInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Format;
 
-use DateTimeImmutable;
 use Spyck\ApiExtension\Model\Response;
 use Symfony\Component\Serializer\Annotation as Serializer;
 

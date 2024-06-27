@@ -6,8 +6,6 @@ namespace Spyck\VisualizationBundle\Model;
 
 use Spyck\ApiExtension\Model\Pagination;
 use Spyck\VisualizationBundle\Field\FieldInterface;
-use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
-use Spyck\VisualizationBundle\Utility\WidgetUtility;
 
 final class Widget
 {

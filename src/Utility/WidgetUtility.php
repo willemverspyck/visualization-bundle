@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Utility;
 
-use Exception;
-use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 
 final class WidgetUtility
 {

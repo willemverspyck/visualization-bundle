@@ -77,7 +77,7 @@ final class FieldUtility
 
         return null;
     }
-    
+
     public static function getValue(bool|Callback|DateTimeInterface|float|int|string|null $value, array $data): bool|DateTimeInterface|float|int|string|null
     {
         if ($value instanceof Callback) {

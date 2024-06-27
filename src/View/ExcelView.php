@@ -21,19 +21,15 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use Psr\Cache\CacheItemPoolInterface;
+use Spyck\VisualizationBundle\Config\Config;
+use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
+use Spyck\VisualizationBundle\Format\BarFormat;
+use Spyck\VisualizationBundle\Format\ConditionFormat;
 use Spyck\VisualizationBundle\Format\ScaleFormat;
 use Spyck\VisualizationBundle\Model\Block;
-use Spyck\VisualizationBundle\Format\ConditionBackgroundFormat;
-use Spyck\VisualizationBundle\Format\ConditionFormat;
-use Spyck\VisualizationBundle\Format\ConditionFormatInterface;
-use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Model\Dashboard;
-use Spyck\VisualizationBundle\Format\BarFormat;
-use Spyck\VisualizationBundle\Field\Field;
-use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
-use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Symfony\Component\Cache\Psr16Cache;
 
 final class ExcelView extends AbstractView
@@ -218,78 +214,77 @@ final class ExcelView extends AbstractView
             return null;
         }
 
-            $content = [];
+        $content = [];
 
-            foreach ($formats as $format) {
-                if ($format instanceof ConditionFormat) {
-                    $conditional = new Conditional();
-                    $conditional->setConditionType(Conditional::CONDITION_CELLIS);
-                    $conditional->setOperatorType(match($format->getOperator()) {
-                        ConditionFormat::OPERATOR_EQUAL => Conditional::OPERATOR_EQUAL,
-                        ConditionFormat::OPERATOR_GREATER_THAN => Conditional::OPERATOR_GREATERTHAN,
-                        ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL => Conditional::OPERATOR_GREATERTHANOREQUAL,
-                        ConditionFormat::OPERATOR_LESS_THAN => Conditional::OPERATOR_LESSTHAN,
-                        ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL => Conditional::OPERATOR_LESSTHANOREQUAL,
-                        default => throw new Exception(sprintf('Operator "%s" not found', $format->getOperator())),
-                    });
-                    $conditional->addCondition($format->getValue() instanceof DateTimeInterface ? Date::dateTimeToExcel($format->getValue()) : $format->getValue());
+        foreach ($formats as $format) {
+            if ($format instanceof ConditionFormat) {
+                $conditional = new Conditional();
+                $conditional->setConditionType(Conditional::CONDITION_CELLIS);
+                $conditional->setOperatorType(match ($format->getOperator()) {
+                    ConditionFormat::OPERATOR_EQUAL => Conditional::OPERATOR_EQUAL,
+                    ConditionFormat::OPERATOR_GREATER_THAN => Conditional::OPERATOR_GREATERTHAN,
+                    ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL => Conditional::OPERATOR_GREATERTHANOREQUAL,
+                    ConditionFormat::OPERATOR_LESS_THAN => Conditional::OPERATOR_LESSTHAN,
+                    ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL => Conditional::OPERATOR_LESSTHANOREQUAL,
+                    default => throw new Exception(sprintf('Operator "%s" not found', $format->getOperator())),
+                });
+                $conditional->addCondition($format->getValue() instanceof DateTimeInterface ? Date::dateTimeToExcel($format->getValue()) : $format->getValue());
 
+                $color = new Color(substr($format->getColor(), 2, 6));
+
+                if ($format->isBackground()) {
+                    $conditional
+                        ->getStyle()
+                        ->getFill()
+                        ->setFillType(Fill::FILL_SOLID)
+                        ->setStartColor($color);
+                } else {
+                    $conditional
+                        ->getStyle()
+                        ->getFont()
+                        ->setColor($color);
+                }
+
+                $content[] = $conditional;
+            }
+
+            if ($format instanceof BarFormat) {
+                $color = substr($format->getColor(), 2, 6);
+
+                $conditional = new Conditional();
+                $conditional->setConditionType(Conditional::CONDITION_DATABAR);
+                $conditional->setDataBar(new ConditionalDataBar());
+                $conditional->getDataBar()
+                    ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
+                    ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
+                    ->setColor($color);
+
+                $content[] = $conditional;
+            }
+
+            if ($format instanceof ScaleFormat) {
+                $colorStart = new Color(substr($format->getColorMin(), 2, 6));
+                $colorEnd = new Color(substr($format->getColorMax(), 2, 6));
+
+                $conditional = new Conditional();
+                $conditional->setConditionType(Conditional::CONDITION_COLORSCALE);
+                $conditional->setColorScale(new ConditionalColorScale());
+                $conditional->getColorScale()
+                    ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
+                    ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
+                    ->setMinimumColor($colorStart)
+                    ->setMaximumColor($colorEnd);
+
+                if (null !== $format->getColor()) {
                     $color = new Color(substr($format->getColor(), 2, 6));
 
-                    if ($format->isBackground()) {
-                        $conditional
-                            ->getStyle()
-                            ->getFill()
-                            ->setFillType(Fill::FILL_SOLID)
-                            ->setStartColor($color);
-                    } else {
-                        $conditional
-                            ->getStyle()
-                            ->getFont()
-                            ->setColor($color);
-                    }
-
-
-                    $content[] = $conditional;
-                }
-
-                if ($format instanceof BarFormat) {
-                    $color = substr($format->getColor(), 2, 6);
-
-                    $conditional = new Conditional();
-                    $conditional->setConditionType(Conditional::CONDITION_DATABAR);
-                    $conditional->setDataBar(new ConditionalDataBar());
-                    $conditional->getDataBar()
-                        ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
-                        ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
-                        ->setColor($color);
-
-                    $content[] = $conditional;
-                }
-
-                if ($format instanceof ScaleFormat) {
-                    $colorStart = new Color(substr($format->getColorMin(), 2, 6));
-                    $colorEnd = new Color(substr($format->getColorMax(), 2, 6));
-
-                    $conditional = new Conditional();
-                    $conditional->setConditionType(Conditional::CONDITION_COLORSCALE);
-                    $conditional->setColorScale(new ConditionalColorScale());
                     $conditional->getColorScale()
-                        ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
-                        ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
-                        ->setMinimumColor($colorStart)
-                        ->setMaximumColor($colorEnd);
-
-                    if (null !== $format->getColor()) {
-                        $color = new Color(substr($format->getColor(), 2, 6));
-
-                        $conditional->getColorScale()
-                            ->setMidpointColor($color);
-                    }
-
-                    $content[] = $conditional;
+                        ->setMidpointColor($color);
                 }
+
+                $content[] = $conditional;
             }
+        }
 
         return $content;
     }

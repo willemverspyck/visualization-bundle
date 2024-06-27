@@ -7,11 +7,10 @@ namespace Spyck\VisualizationBundle\View;
 use DateTimeInterface;
 use Exception;
 use SplFileObject;
+use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
-use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Model\Dashboard;
-use Spyck\VisualizationBundle\Field\Field;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 
 class CsvView extends AbstractView

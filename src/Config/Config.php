@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Config;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 
 final class Config
@@ -52,12 +49,12 @@ final class Config
 
         return $this;
     }
-    
+
     public function hasMerge(): bool
     {
         return $this->merge;
     }
-    
+
     public function setMerge(bool $merge): static
     {
         $this->merge = $merge;

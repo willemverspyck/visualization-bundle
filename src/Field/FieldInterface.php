@@ -7,7 +7,6 @@ namespace Spyck\VisualizationBundle\Field;
 use Doctrine\Common\Collections\Collection;
 use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Config\Config;
-use Spyck\VisualizationBundle\Format\FormatInterface;
 use Spyck\VisualizationBundle\Route\RouteInterface;
 
 interface FieldInterface extends AbstractFieldInterface

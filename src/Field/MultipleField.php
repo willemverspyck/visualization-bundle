@@ -7,7 +7,6 @@ namespace Spyck\VisualizationBundle\Field;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Spyck\ApiExtension\Model\Response;
-use Spyck\VisualizationBundle\Format\FormatInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class MultipleField extends AbstractField implements MultipleFieldInterface
