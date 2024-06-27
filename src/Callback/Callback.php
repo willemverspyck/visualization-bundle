@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spyck\VisualizationBundle\Model;
+namespace Spyck\VisualizationBundle\Callback;
 
 final class Callback
 {
