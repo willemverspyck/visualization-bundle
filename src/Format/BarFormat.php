@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Spyck\VisualizationBundle\Model;
+namespace Spyck\VisualizationBundle\Format;
 
 use Spyck\ApiExtension\Model\Response;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
-final class DatabarFormat implements FormatInterface
+final class BarFormat implements FormatInterface
 {
     #[Serializer\Groups(groups: Response::GROUP)]
     private string $color;
@@ -17,9 +17,10 @@ final class DatabarFormat implements FormatInterface
         $this->setColor($color);
     }
 
+    #[Serializer\Groups(groups: Response::GROUP)]
     public function getName(): string
     {
-        return 'databar';
+        return 'bar';
     }
 
     public function getColor(): string
@@ -32,13 +33,5 @@ final class DatabarFormat implements FormatInterface
         $this->color = $color;
 
         return $this;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'name' => $this->getName(),
-            'color' => $this->getColor(),
-        ];
     }
 }
