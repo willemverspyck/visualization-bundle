@@ -12,14 +12,9 @@ use Spyck\VisualizationBundle\Field\FieldInterface;
 final class Config
 {
     private FieldInterface $field;
-    #[Serializer\Groups(groups: Response::GROUP)]
     private bool $abbreviation = false;
-    #[Serializer\Groups(groups: Response::GROUP)]
     private ?int $precision = null;
-    #[Serializer\Groups(groups: Response::GROUP)]
     private bool $merge = false;
-
-    #[Serializer\Groups(groups: Response::GROUP)]
     private ?array $chart = null;
 
     public function getField(): FieldInterface
