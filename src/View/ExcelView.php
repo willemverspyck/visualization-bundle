@@ -195,11 +195,11 @@ final class ExcelView extends AbstractView
     private function getColumnFormat(string $type, Config $config): ?string
     {
         return match ($type) {
-            FieldInterface::TYPE_CURRENCY => sprintf('[$€ ] #,##0%s', null === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
+            FieldInterface::TYPE_CURRENCY => sprintf('[$€ ] #,##0%s', null === $config->getPrecision() || 0 === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
             FieldInterface::TYPE_DATE => NumberFormat::FORMAT_DATE_DDMMYYYY,
             FieldInterface::TYPE_DATETIME => sprintf('%s hh:mm:ss', NumberFormat::FORMAT_DATE_DDMMYYYY),
-            FieldInterface::TYPE_NUMBER => sprintf('#,##0%s', null === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
-            FieldInterface::TYPE_PERCENTAGE => sprintf('0%s%%', null === $config->getPrecision() ? '' : sprintf('.%s', str_repeat('0', $config->getPrecision()))),
+            FieldInterface::TYPE_NUMBER => sprintf('#,##0%s', null === $config->getPrecision() || 0 === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
+            FieldInterface::TYPE_PERCENTAGE => sprintf('0%s%%', null === $config->getPrecision() || 0 === $config->getPrecision() ? '' : sprintf('.%s', str_repeat('0', $config->getPrecision()))),
             FieldInterface::TYPE_TIME => 'hh:mm:ss',
             default => null,
         };
