@@ -6,7 +6,6 @@ namespace Spyck\VisualizationBundle\Field;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Controller\WidgetController;

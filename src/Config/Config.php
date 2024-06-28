@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Config;
 
-use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;

@@ -6,11 +6,9 @@ namespace Spyck\VisualizationBundle\View;
 
 use DateTimeInterface;
 use Exception;
-use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
-use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;

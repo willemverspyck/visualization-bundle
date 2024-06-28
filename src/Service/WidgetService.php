@@ -44,7 +44,6 @@ use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
 use Spyck\VisualizationBundle\Request\RequestInterface;
 use Spyck\VisualizationBundle\Route\RouteForDashboard;
 use Spyck\VisualizationBundle\Route\RouteInterface;
-use Spyck\VisualizationBundle\Utility\ArrayUtility;
 use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Spyck\VisualizationBundle\Utility\CacheUtility;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
