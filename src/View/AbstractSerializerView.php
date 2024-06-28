@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\View;
 
 use DateTimeInterface;
 use Exception;
+use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
@@ -37,6 +38,7 @@ abstract class AbstractSerializerView extends AbstractView
 
         return $this->serializer->serialize($widget, $this->getExtension(), [
             AbstractObjectNormalizer::GROUPS => [
+                Response::GROUP,
                 WidgetController::GROUP_ITEM,
             ],
             AbstractNormalizer::CALLBACKS => [
