@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Format;
 
 use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class ScaleFormat implements FormatInterface
 {
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private ?string $color = null;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $colorMin;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $colorMax;
 
     public function __construct(?string $color, string $colorMin, string $colorMax)
@@ -25,7 +26,7 @@ final class ScaleFormat implements FormatInterface
         $this->setColorMax($colorMax);
     }
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     public function getName(): string
     {
         return 'scale';

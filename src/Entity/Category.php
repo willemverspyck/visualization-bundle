@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use Spyck\VisualizationBundle\Controller\CategoryController;
 use Spyck\VisualizationBundle\Repository\CategoryRepository;
 use Stringable;
 use Symfony\Component\Serializer\Annotation as Serializer;
@@ -22,11 +23,11 @@ class Category implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
-    #[Serializer\Groups(groups: ['spyck:visualization:menu:list'])]
+    #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
     private ?int $id = null;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
-    #[Serializer\Groups(groups: ['spyck:visualization:category:list'])]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_LIST])]
     #[Validator\NotNull]
     private string $name;
 
@@ -37,7 +38,7 @@ class Category implements Stringable, TimestampInterface
      * @var Collection<int, Dashboard>
      */
     #[Doctrine\OneToMany(mappedBy: 'category', targetEntity: Dashboard::class)]
-    #[Serializer\Groups(groups: ['spyck:visualization:category:list'])]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_LIST])]
     private Collection $dashboards;
 
     public function __construct()

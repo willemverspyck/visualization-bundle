@@ -10,7 +10,7 @@ use Psr\Cache\InvalidArgumentException;
 use ReflectionClass;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
-use Spyck\VisualizationBundle\Model\DashboardRoute;
+use Spyck\VisualizationBundle\Model\Route as RouteAsModel;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
@@ -189,13 +189,13 @@ readonly class DashboardService
         return $returnData;
     }
 
-    public function getDashboardRoute(Dashboard $dashboard, array $variables = []): DashboardRoute
+    public function getDashboardRoute(Dashboard $dashboard, array $variables = []): RouteAsModel
     {
         $variables['dashboardId'] = $dashboard->getId();
 
-        $dashboardRequest = new DashboardRoute();
+        $route = new RouteAsModel();
 
-        return $dashboardRequest
+        return $route
             ->setName($dashboard->getName())
             ->setUrl($this->router->generate('spyck_visualization_dashboard_show', $variables, UrlGeneratorInterface::ABSOLUTE_URL));
     }

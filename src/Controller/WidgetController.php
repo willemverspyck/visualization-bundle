@@ -20,6 +20,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 #[OpenApi\Tag(name: 'Widgets')]
 final class WidgetController extends AbstractController
 {
+    public const string GROUP_ITEM = 'spyck:visualization:widget:item';
+
     /**
      * @throws Exception
      * @throws InvalidArgumentException

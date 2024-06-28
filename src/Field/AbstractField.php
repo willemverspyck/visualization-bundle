@@ -7,17 +7,18 @@ namespace Spyck\VisualizationBundle\Field;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Format\FormatInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 abstract class AbstractField
 {
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $name;
 
     private bool $active;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private Collection $formats;
 
     public function __construct()

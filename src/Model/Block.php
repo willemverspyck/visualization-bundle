@@ -6,62 +6,63 @@ namespace Spyck\VisualizationBundle\Model;
 
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OpenApi;
+use Spyck\VisualizationBundle\Controller\DashboardController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class Block
 {
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private Dashboard $dashboard;
 
     private Widget $widget;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private string $name;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?string $description = null;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private string $descriptionEmpty;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?string $url = null;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?string $size = null;
 
     /**
      * @todo: Items can also be array
      */
     #[OpenApi\Property(type: 'array', items: new OpenApi\Items(type: 'string'))]
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $parameters = [];
 
     /**
      * @var array<int, Filter>
      */
     #[OpenApi\Property(type: 'array', items: new OpenApi\Items(ref: new Model(type: Filter::class)))]
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $filters = [];
 
     /**
      * @todo: Can be replaced with object
      */
     #[OpenApi\Property(type: 'string')]
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $downloads = [];
 
     /**
      * @todo: Can be replaced with object
      */
     #[OpenApi\Property(type: 'string')]
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $charts = [];
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?bool $filter = null;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?bool $filterView = null;
 
     public function getDashboard(): Dashboard

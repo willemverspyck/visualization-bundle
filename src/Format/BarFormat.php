@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Format;
 
 use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class BarFormat implements FormatInterface
 {
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $color;
 
     public function __construct(string $color)
@@ -17,10 +18,10 @@ final class BarFormat implements FormatInterface
         $this->setColor($color);
     }
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     public function getName(): string
     {
-        return 'databar';
+        return 'bar';
     }
 
     public function getColor(): string

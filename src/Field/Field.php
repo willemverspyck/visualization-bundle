@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Config\Config;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Route\RouteInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -18,9 +19,10 @@ final class Field extends AbstractField implements FieldInterface
 
     private Callback|string $source;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $type;
 
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private Config $config;
 
     private ?Callback $filter = null;
@@ -28,7 +30,7 @@ final class Field extends AbstractField implements FieldInterface
     /**
      * @var Collection<int, RouteInterface>
      */
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private Collection $routes;
 
     public function __construct(string $name, Callback|string $source, string $type, Config $config = new Config(), ?Callback $filter = null)
@@ -120,12 +122,5 @@ final class Field extends AbstractField implements FieldInterface
     public function getRoutes(): Collection
     {
         return $this->routes;
-    }
-
-    #[Serializer\Groups(groups: Response::GROUP)]
-    #[Serializer\SerializedName('config')]
-    public function getConfigClass(): array
-    {
-        return $this->getConfig()->toArray();
     }
 }

@@ -4,9 +4,17 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Model;
 
-final class DashboardRoute
+use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Controller\DashboardController;
+use Spyck\VisualizationBundle\Controller\MenuController;
+use Symfony\Component\Serializer\Annotation as Serializer;
+
+final class Route
 {
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM, MenuController::GROUP_LIST])]
     private string $name;
+
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM, MenuController::GROUP_LIST])]
     private string $url;
 
     public function getName(): string
@@ -31,13 +39,5 @@ final class DashboardRoute
         $this->url = $url;
 
         return $this;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'name' => $this->getName(),
-            'url' => $this->getUrl(),
-        ];
     }
 }

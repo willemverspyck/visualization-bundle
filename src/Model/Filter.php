@@ -5,31 +5,32 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Model;
 
 use OpenApi\Attributes as OpenApi;
+use Spyck\VisualizationBundle\Controller\DashboardController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class Filter
 {
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private string $name;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private string $field;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?array $config = null;
 
     /**
      * @todo: This must be an object with id, name, parent (array with id, field) and select
      */
     #[OpenApi\Property(type: 'array', items: new OpenApi\Items(type: 'string'))]
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?array $data = null;
 
     #[OpenApi\Property(type: 'array', items: new OpenApi\Items(type: 'string'))]
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $options;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private string $type;
 
     public function getName(): string

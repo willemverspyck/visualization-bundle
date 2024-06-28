@@ -8,10 +8,13 @@ use DateTimeInterface;
 use Exception;
 use Spyck\ApiExtension\Model\Response;
 use Spyck\VisualizationBundle\Config\Config;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -34,39 +37,29 @@ abstract class AbstractSerializerView extends AbstractView
 
         $widget = $block->getWidget();
 
-        $fields = WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field): FieldInterface {
-            return $field;
-        });
-
-        $pagination = $widget->getPagination();
-
-        $content = [
-            'data' => [],
-            'total' => $widget->getTotal(),
-            'fields' => $fields,
-            'properties' => $widget->getProperties(),
-            'events' => $widget->getEvents(),
-            'parameters' => $widget->getParameters(),
-            'filters' => $widget->getFilters(),
-            'pagination' => null === $pagination ? null : [
-                'previous' => $pagination->getPrevious(),
-                'next' => $pagination->getNext(),
-            ],
-        ];
-
-        foreach ($widget->getData() as $row) {
-            $content['data'][] = WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field, int $index) use ($row): array {
-                return [
-                    'value' => $this->getValue($field->getType(), $field->getConfig(), $row[$index]['value']),
-                    'valueFormat' => $this->getValueFormat($field->getType(), $field->getConfig(), $row[$index]['value']),
-                    'routes' => $row[$index]['routes'],
-                ];
-            });
-        }
-
-        return $this->serializer->serialize($content, $this->getExtension(), [
+        return $this->serializer->serialize($widget, $this->getExtension(), [
             AbstractObjectNormalizer::GROUPS => [
-                Response::GROUP,
+                WidgetController::GROUP_ITEM,
+            ],
+            AbstractNormalizer::CALLBACKS => [
+                'data' => function (array $data) use ($widget): iterable {
+                    foreach ($data as $row) {
+                        yield WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field, int $index) use ($row): array {
+                            return [
+                                'value' => $this->getValue($field->getType(), $field->getConfig(), $row[$index]['value']),
+                                'valueFormat' => $this->getValueFormat($field->getType(), $field->getConfig(), $row[$index]['value']),
+                                'routes' => $row[$index]['routes'],
+                            ];
+                        });
+                    }
+                },
+                'fields' => function (array $fields): iterable {
+                    foreach ($fields as $field) {
+                        if ($field->isActive()) {
+                            yield $field;
+                        }
+                    }
+                },
             ],
         ]);
     }

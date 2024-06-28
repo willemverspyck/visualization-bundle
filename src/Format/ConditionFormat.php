@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Format;
 
 use DateTimeImmutable;
 use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class ConditionFormat implements FormatInterface
@@ -16,16 +17,16 @@ final class ConditionFormat implements FormatInterface
     public const string OPERATOR_LESS_THAN = '<';
     public const string OPERATOR_LESS_THAN_OR_EQUAL = '<=';
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $color;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private bool $background;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $operator;
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private DateTimeImmutable|float|int|string|null $value = null;
 
     public function __construct(string $color, bool $background = false, string $operator = ConditionFormatInterface::OPERATOR_EQUAL, DateTimeImmutable|float|int|string|null $value = null)
@@ -36,7 +37,7 @@ final class ConditionFormat implements FormatInterface
         $this->setValue($value);
     }
 
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     public function getName(): string
     {
         return 'condition';

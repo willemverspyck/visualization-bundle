@@ -34,6 +34,8 @@ use Throwable;
 #[OpenApi\Tag(name: 'Dashboard')]
 final class DashboardController extends AbstractController
 {
+    public const string GROUP_ITEM = 'spyck:visualization:dashboard:item';
+
     /**
      * @throws Throwable
      * @throws NonUniqueResultException
@@ -63,7 +65,7 @@ final class DashboardController extends AbstractController
     #[Schema\BadRequest]
     #[Schema\Forbidden]
     #[Schema\NotFound]
-    #[Schema\ResponseForItem(type: DashboardAsModel::class, groups: ['spyck:visualization:dashboard:item'])]
+    #[Schema\ResponseForItem(type: DashboardAsModel::class, groups: [self::GROUP_ITEM])]
     public function item(DashboardRepository $dashboardRepository, DashboardService $dashboardService, LogRepository $logRepository, Request $request, ResponseService $responseService, TokenStorageInterface $tokenStorage, int $dashboardId): Response
     {
         $dashboard = $dashboardRepository->getDashboardById($dashboardId);
@@ -83,7 +85,7 @@ final class DashboardController extends AbstractController
 
             $logRepository->putLog(user: $user, dashboard: $dashboard, variables: $data->getVariables(), view: ViewInterface::JSON, type: Log::TYPE_API);
 
-            return $responseService->getResponseForItem(data: $data, groups: ['spyck:visualization:dashboard:item']);
+            return $responseService->getResponseForItem(data: $data, groups: [self::GROUP_ITEM]);
         }
 
         $data = [

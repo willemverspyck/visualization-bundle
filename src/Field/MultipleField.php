@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Field;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class MultipleField extends AbstractField implements MultipleFieldInterface
@@ -14,7 +15,7 @@ final class MultipleField extends AbstractField implements MultipleFieldInterfac
     /**
      * @var Collection<int, FieldInterface>
      */
-    #[Serializer\Groups(groups: Response::GROUP)]
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private Collection $children;
 
     public function __construct(string $name)

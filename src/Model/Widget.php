@@ -5,17 +5,35 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Model;
 
 use Spyck\ApiExtension\Model\Pagination;
+use Spyck\ApiExtension\Model\Response;
+use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
+use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class Widget
 {
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private array $data;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private int $total;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private array $fields;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private iterable $properties;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private iterable $events;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private array $filters;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private array $parameters;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private ?Pagination $pagination = null;
 
     public function getData(): array

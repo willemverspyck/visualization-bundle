@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use Spyck\VisualizationBundle\Controller\MenuController;
 use Spyck\VisualizationBundle\Repository\MenuRepository;
 use Stringable;
 use Symfony\Component\Serializer\Annotation as Serializer;
@@ -20,7 +21,7 @@ class Menu implements Stringable
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
-    #[Serializer\Groups(groups: ['spyck:visualization:menu:list'])]
+    #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
     private ?int $id = null;
 
     #[Doctrine\ManyToOne(targetEntity: Menu::class, inversedBy: 'children')]
@@ -32,7 +33,7 @@ class Menu implements Stringable
     private ?Dashboard $dashboard = null;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
-    #[Serializer\Groups(groups: ['spyck:visualization:menu:list'])]
+    #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
     #[Validator\NotNull]
     private string $name;
 
@@ -40,7 +41,7 @@ class Menu implements Stringable
      * @var array<string, string|int>
      */
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
-    #[Serializer\Groups(groups: ['spyck:visualization:menu:list'])]
+    #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
     private array $variables;
 
     #[Doctrine\Column(name: 'position', type: Types::SMALLINT, options: ['unsigned' => true])]
@@ -54,7 +55,7 @@ class Menu implements Stringable
      * @var Collection<int, Menu>
      */
     #[Doctrine\OneToMany(mappedBy: 'parent', targetEntity: Menu::class)]
-    #[Serializer\Groups(groups: ['spyck:visualization:menu:list'])]
+    #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
     private Collection $children;
 
     public function __construct()

@@ -18,15 +18,17 @@ use Symfony\Component\Routing\Annotation\Route;
 #[OpenApi\Tag(name: 'Menu')]
 final class MenuController extends AbstractController
 {
+    public const string GROUP_LIST = 'spyck:visualization:menu:list';
+
     #[Route(path: '/api/menus', name: 'spyck_visualization_menu_list', methods: [Request::METHOD_GET])]
     #[Schema\BadRequest]
     #[Schema\Forbidden]
     #[Schema\NotFound]
-    #[Schema\ResponseForList(type: Menu::class, groups: ['spyck:visualization:menu:list'])]
+    #[Schema\ResponseForList(type: Menu::class, groups: [self::GROUP_LIST])]
     public function list(MenuRepository $menuRepository, ResponseService $responseService): Response
     {
         $data = $menuRepository->getMenuData();
 
-        return $responseService->getResponseForList($data, null, null, ['spyck:visualization:menu:list']);
+        return $responseService->getResponseForList($data, null, null, [self::GROUP_LIST]);
     }
 }

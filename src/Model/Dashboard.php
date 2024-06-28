@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use OpenApi\Attributes as OpenApi;
+use Spyck\VisualizationBundle\Controller\DashboardController;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -13,21 +14,21 @@ final class Dashboard
 {
     private string $user;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
     private string $name;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
     private ?string $description = null;
 
     private ?string $copyright = null;
 
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
     private ?string $url = null;
 
     /**
      * @todo: How to handle this in OpenApi
      */
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
     #[OpenApi\Property(type: 'string')]
     private array $parameters = [];
 
@@ -39,7 +40,7 @@ final class Dashboard
      * @todo: How to handle this in OpenApi
      */
     #[OpenApi\Property(type: 'string')]
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
     private array $downloads = [];
 
     private array $variables = [];
@@ -47,7 +48,7 @@ final class Dashboard
     /**
      * @var ArrayCollection<int, Block>
      */
-    #[Serializer\Groups(['spyck:visualization:dashboard:item'])]
+    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
     private ArrayCollection $blocks;
 
     public function __construct()

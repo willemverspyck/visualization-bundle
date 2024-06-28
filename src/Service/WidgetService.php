@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Service;
 
+use App\Utility\DataUtility;
 use Countable;
 use DateTimeInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -43,6 +44,7 @@ use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
 use Spyck\VisualizationBundle\Request\RequestInterface;
 use Spyck\VisualizationBundle\Route\RouteForDashboard;
 use Spyck\VisualizationBundle\Route\RouteInterface;
+use Spyck\VisualizationBundle\Utility\ArrayUtility;
 use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Spyck\VisualizationBundle\Utility\CacheUtility;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
@@ -162,6 +164,28 @@ readonly class WidgetService
         $fields = iterator_to_array($widget->getFields());
 
         WidgetUtility::walkFields($fields, function (FieldInterface $field): void {
+            $config = $field->getConfig();
+
+            // Set defaults for abbreviation
+            if (null === $config->hasAbbreviation() && in_array($field->getType(), [FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER], true)) {
+                $config->setAbbreviation(false);
+            }
+
+            match ($field->getType()) {
+                FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER => DataUtility::assert(null !== $config->hasAbbreviation(), new Exception(sprintf('Abbreviation must be NULL for "%s"', $field->getType()))),
+                default => DataUtility::assert(null === $config->hasAbbreviation(), new Exception(sprintf('Abbreviation must not be NULL for "%s"', $field->getType()))),
+            };
+
+            // Set defaults for precision
+            if (null === $config->getPrecision() && in_array($field->getType(), [FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER, FieldInterface::TYPE_PERCENTAGE], true)) {
+                $config->setPrecision(0);
+            }
+
+            match ($field->getType()) {
+                FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER, FieldInterface::TYPE_PERCENTAGE => DataUtility::assert(null !== $config->getPrecision(), new Exception(sprintf('Precision must be NULL for "%s"', $field->getType()))),
+                default => DataUtility::assert(null === $config->getPrecision(), new Exception(sprintf('Precision must not be NULL for "%s"', $field->getType()))),
+            };
+
             foreach ($field->getRoutes() as $route) {
                 $this->setRoute($route);
             }
@@ -426,7 +450,15 @@ readonly class WidgetService
     private function getFields(array $fields, WidgetInterface $widget, array $data): array
     {
         WidgetUtility::walkFields($fields, function (FieldInterface $field) use ($widget, $data): void {
-            $field->setActive($this->filterField($field, $widget, $data));
+            $filter = $field->getFilter();
+
+            if (null === $filter) {
+                return;
+            }
+
+            $active = call_user_func($filter->getName(), $widget, $data, $filter->getParameters());
+
+            $field->setActive($active);
         }, false);
 
         WidgetUtility::walkMultipleFields($fields, function (MultipleFieldInterface $field): void {
@@ -438,17 +470,6 @@ readonly class WidgetService
         }, false);
 
         return $fields;
-    }
-
-    public function filterField(Field $field, WidgetInterface $widgetInstance, array $data): bool
-    {
-        $filter = $field->getFilter();
-
-        if (null === $filter) {
-            return true;
-        }
-
-        return call_user_func($filter->getName(), $widgetInstance, $data, $filter->getParameters());
     }
 
     /**

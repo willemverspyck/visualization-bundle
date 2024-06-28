@@ -18,15 +18,17 @@ use Symfony\Component\Routing\Annotation\Route;
 #[OpenApi\Tag(name: 'Category')]
 final class CategoryController extends AbstractController
 {
+    public const string GROUP_LIST = 'spyck:visualization:category:list';
+
     #[Route(path: '/api/categories', name: 'spyck_visualization_category_list', methods: [Request::METHOD_GET])]
     #[Schema\BadRequest]
     #[Schema\Forbidden]
     #[Schema\NotFound]
-    #[Schema\ResponseForList(type: Menu::class, groups: ['category:list'])]
+    #[Schema\ResponseForList(type: Menu::class, groups: [self::GROUP_LIST])]
     public function list(CategoryRepository $categoryRepository, ResponseService $responseService): Response
     {
         $categoryData = $categoryRepository->getCategoryData();
 
-        return $responseService->getResponseForList(data: $categoryData, groups: ['spyck:visualization:category:list']);
+        return $responseService->getResponseForList(data: $categoryData, groups: [self::GROUP_LIST]);
     }
 }

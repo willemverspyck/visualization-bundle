@@ -17,14 +17,20 @@ final class MenuNormalizer extends AbstractNormalizer
     {
         $this->setNormalized($object, $context);
 
-        $dashboard = null;
+        $data = $this->normalizer->normalize($object, $format, $context);
+        $data['dashboard'] = null;
 
-        if (null !== $object->getDashboard()) {
-            $dashboard = $this->dashboardService->getDashboardRoute($object->getDashboard(), $object->getVariables())->toArray();
+        if (null === $object->getDashboard()) {
+            return $data;
         }
 
-        $data = $this->normalizer->normalize($object, $format, $context);
-        $data['dashboard'] = $dashboard;
+        $route = $this->dashboardService->getDashboardRoute($object->getDashboard(), $object->getVariables());
+
+        if (null === $route) {
+            return $data;
+        }
+
+        $data['dashboard'] = $this->normalizer->normalize($route, $format, $context);
 
         return $data;
     }
