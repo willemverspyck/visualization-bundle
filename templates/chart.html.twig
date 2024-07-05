@@ -1,7 +1,7 @@
-{% macro getClass(type, config) %}
+{% macro getClass(type, formats) %}
     {% set classes = [type] %}
 
-    {% for format in config.formats %}
+    {% for format in formats %}
         {% set name = 'format' ~ format.name|capitalize %}
         {% if name not in classes %}
             {% set classes = classes|merge([name]) %}
@@ -11,31 +11,50 @@
     {{ classes|join(' ') }}
 {% endmacro %}
 
-{% macro getStyle(type, config, value) %}
-    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
-        {% for format in config.formats %}
+{% macro getStyle(type, formats, value) %}
+    {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
+        {% for format in formats %}
             {% set color = null %}
+            {% set backgroundColor = null %}
 
             {% if format.name is same as('condition') %}
+                {% set condition = false %}
+
+                {% if format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_EQUAL')) %}
+                    {% if format.value is iterable %}
+                        {% set condition = value in format.value %}
+                    {% else %}
+                        {% set condition = value == format.value %}
+                    {% endif %}
+                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN')) %}
+                    {% set condition = value > format.value %}
+                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL')) %}
+                    {% set condition = value >= format.value %}
+                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN')) %}
+                    {% set condition = value < format.value %}
+                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL')) %}
+                    {% set condition = value <= format.value %}
+                {% endif %}
+
                 {% if color is null %}
-                    {% if format.start is not null and format.end is not null %}
-                        {% if value >= format.start and value <= format.end %}
-                            {% set color = format.color %}
-                        {% endif %}
-                    {% elseif format.start is not null %}
-                        {% if value >= format.start %}
-                            {% set color = format.color %}
-                        {% endif %}
-                    {% elseif format.end is not null %}
-                        {% if value <= format.end %}
-                            {% set color = format.color %}
-                        {% endif %}
+                    {% if condition and format.background is same as(false) %}
+                        {% set color = format.color %}
+                    {% endif %}
+                {% endif %}
+
+                {% if backgroundColor is null %}
+                    {% if condition and format.background is same as(true) %}
+                        {% set color = format.color %}
                     {% endif %}
                 {% endif %}
             {% endif %}
 
             {% if color is not null %}
-                color: #{{ color }};
+                color: #{{ color|slice(2) }};
+            {% endif %}
+
+            {% if backgroundColor is not null %}
+                background-color: #{{ backgroundColor|slice(2) }};
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -45,7 +64,7 @@
     {% import _self as self %}
 
     {% if value is not null %}
-        {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_ARRAY')) %}
+        {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_ARRAY')) %}
             {% if value|length > 0 %}
                 <ul>
                     {% for val in value %}
@@ -55,7 +74,7 @@
             {% else %}
                 -
             {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_BOOLEAN')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_BOOLEAN')) %}
             {% if value is same as(true) %}
                 Yes
             {% elseif value is same as(false) %}
@@ -63,40 +82,31 @@
             {% else %}
                 -
             {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) %}
             &euro; {{ self.getValueOfNumber(config, value) }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_DATE')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATE')) %}
             {{ value|date('Y-m-d') }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_DATETIME')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATETIME')) %}
             {{ value|date('Y-m-d H:i:s') }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_IMAGE')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_IMAGE')) %}
             {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                 <img src="{{ getDirectory(value) }}" alt="" width="32" height="32" align="top">
             {% else %}
                 <img src="{{ absolute_url(value) }}" alt="" width="32" height="32" align="top">
             {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) %}
             {{ self.getValueOfNumber(config, value) }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
             {{ self.getValueOfNumber(config, value * 100) }}%
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_POSITION')) %}
-            {% if value is same as(0.0) %}
-                {% set image = '/images/position.png' %}
-            {% elseif value > 0 %}
-                {% set image = '/images/position_up.png' %}
-            {% else %}
-                {% set image = '/images/position_down.png' %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_POSITION')) %}
+            {% if value > 0 %}
+                <span class="up">🠉</span>
+                {{ value }}
+            {% elseif value < 0 %}
+                <span class="down">🠋</span>
+                {{ value|abs }}
             {% endif %}
-
-            {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                <img src="{{ getDirectory(image) }}" alt="" width="16" height="16" align="top">
-            {% else %}
-                <img src="{{ absolute_url(image) }}" alt="" width="16" height="16" align="top">
-            {% endif %}
-            {% if value is not same as(0.0) %}
-                <span>{{ value }}</span>
-            {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_TIME')) %}
+        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_TIME')) %}
             {{ value|date('H:i:s') }}
         {% else %}
             {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
@@ -122,15 +132,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getPreValue(type, config, value, view) %}
-    {% if type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Model\\Field::TYPE_PERCENTAGE')) %}
-        {% for format in config.formats %}
-            {% if format.name is same as('databar') %}
-                <span style="background-color: {{ '#' ~ format.color }};">
+{% macro getPreValue(type, formats, value, view) %}
+    {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
+        {% for format in formats %}
+            {% if format.name is same as('bar') %}
+                <span style="background-color: {{ '#' ~ format.color|slice(2) }};">
                     {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                        <img src="{{ getDirectory('/images/blank.png') }}" alt="" width="{{ value * 100|round }}" height="14">
+                        <img src="{{ getDirectory('/images/blank.png') }}" alt="" width="{{ value * 80|round }}" height="14">
                     {% else %}
-                        <img src="{{ absolute_url('/images/blank.png') }}" alt="" width="{{ value * 100|round }}" height="14">
+                        <img src="{{ absolute_url('/images/blank.png') }}" alt="" width="{{ value * 80|round }}" height="14">
                     {% endif %}
                 </span>
             {% endif %}
