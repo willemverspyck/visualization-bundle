@@ -26,6 +26,7 @@ use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\LimitFilter;
 use Spyck\VisualizationBundle\Filter\OffsetFilter;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
+use Spyck\VisualizationBundle\Model\Aggregate;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Model\Widget as WidgetAsModel;
@@ -200,6 +201,7 @@ readonly class WidgetService
         $widgetAsModel = new WidgetAsModel();
         $widgetAsModel->setFields($this->getFields($fields, $widget, $data));
         $widgetAsModel->setData($this->getData($data, $fields));
+        $widgetAsModel->setAggregates($this->getAggregate($data, $fields));
         $widgetAsModel->setTotal($total);
         $widgetAsModel->setEvents($widget->getEvents());
         $widgetAsModel->setProperties($widget->getProperties());
@@ -516,6 +518,33 @@ readonly class WidgetService
         ]);
 
         return $data;
+    }
+
+    private function getAggregate(array $data, array $fields): array
+    {
+        $content = WidgetUtility::mapFields($fields, function (FieldInterface $field, int $index) use ($data): ?Aggregate {
+            if (false === $field->isNumeric()) {
+                return null;
+            }
+
+            $values = [];
+
+            foreach ($data as $row) {
+                $value = $this->getValue($field, $row);
+
+                if (null !== $value) {
+                    $values[] = $value;
+                }
+            }
+
+            $aggregate = new Aggregate();
+            $aggregate->setMin(count($values) > 0 ? min($values) : null);
+            $aggregate->setMax(count($values) > 0 ? max($values) : null);
+
+            return $aggregate;
+        });
+
+        return $content;
     }
 
     /**

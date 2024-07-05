@@ -29,6 +29,7 @@ use Spyck\VisualizationBundle\Format\ConditionFormat;
 use Spyck\VisualizationBundle\Format\ScaleFormat;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Model\Dashboard;
+use Spyck\VisualizationBundle\Utility\DataUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Symfony\Component\Cache\Psr16Cache;
 
@@ -230,7 +231,7 @@ final class ExcelView extends AbstractView
                 });
                 $conditional->addCondition($format->getValue() instanceof DateTimeInterface ? Date::dateTimeToExcel($format->getValue()) : $format->getValue());
 
-                $color = new Color(substr($format->getColor(), 2, 6));
+                $color = $this->getColor($format->getColor());
 
                 if ($format->isBackground()) {
                     $conditional
@@ -255,38 +256,57 @@ final class ExcelView extends AbstractView
                 $conditional->setConditionType(Conditional::CONDITION_DATABAR);
                 $conditional->setDataBar(new ConditionalDataBar());
                 $conditional->getDataBar()
-                    ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
-                    ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
+                    ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
+                    ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
                     ->setColor($color);
 
                 $content[] = $conditional;
             }
 
             if ($format instanceof ScaleFormat) {
-                $colorStart = new Color(substr($format->getColorMin(), 2, 6));
-                $colorEnd = new Color(substr($format->getColorMax(), 2, 6));
-
                 $conditional = new Conditional();
                 $conditional->setConditionType(Conditional::CONDITION_COLORSCALE);
                 $conditional->setColorScale(new ConditionalColorScale());
                 $conditional->getColorScale()
-                    ->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject('min'))
-                    ->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject('max'))
-                    ->setMinimumColor($colorStart)
-                    ->setMaximumColor($colorEnd);
+                    ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
+                    ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
+                    ->setMinimumColor($this->getColor($format->getColorMin()))
+                    ->setMaximumColor($this->getColor($format->getColorMax()));
 
                 if (null !== $format->getColor()) {
-                    $color = new Color(substr($format->getColor(), 2, 6));
+                    if (null === $format->getValue()) {
+                        $midpointConditionalFormatValueObject = new ConditionalFormatValueObject(type: 'percent', value: 50);
+                    } else {
+                        $midpointConditionalFormatValueObject = $this->getConditionalFormatValueObject($format->getValue());
+                    }
 
                     $conditional->getColorScale()
-                        ->setMidpointColor($color);
+                        ->setMidpointColor($this->getColor($format->getColor()))
+                        ->setMidpointConditionalFormatValueObject($midpointConditionalFormatValueObject);
                 }
+
 
                 $content[] = $conditional;
             }
         }
 
         return $content;
+    }
+
+    private function getColor(string $color): Color
+    {
+        return new Color(substr($color, 2, 6));
+    }
+
+    private function getConditionalFormatValueObject(float|int|null $value, string $type = null): ConditionalFormatValueObject
+    {
+        if (null === $value) {
+            DataUtility::assert(null !== $type, new Exception('Type not found'));
+
+            return new ConditionalFormatValueObject(type: $type);
+        }
+
+        return new ConditionalFormatValueObject(type: 'num', value: $value);
     }
 
     /**
