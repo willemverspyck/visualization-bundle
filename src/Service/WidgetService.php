@@ -523,10 +523,6 @@ readonly class WidgetService
     private function getAggregate(array $data, array $fields): array
     {
         $content = WidgetUtility::mapFields($fields, function (FieldInterface $field, int $index) use ($data): ?Aggregate {
-            if (false === $field->isNumeric()) {
-                return null;
-            }
-
             $values = [];
 
             foreach ($data as $row) {
