@@ -161,7 +161,7 @@ readonly class WidgetService
     {
         $data = $this->getDataWithCache($widget);
 
-        $fields = iterator_to_array($widget->getFields());
+        $fields = iterator_to_array($widget->getFields(), false);
 
         WidgetUtility::walkFields($fields, function (FieldInterface $field): void {
             $config = $field->getConfig();
