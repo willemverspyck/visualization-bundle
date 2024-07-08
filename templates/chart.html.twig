@@ -100,10 +100,10 @@
             {{ self.getValueOfNumber(config, value * 100) }}%
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_POSITION')) %}
             {% if value > 0 %}
-                <span class="up">🠉</span>
+                <span class="up">&#11205;</span>
                 {{ value }}
             {% elseif value < 0 %}
-                <span class="down">🠋</span>
+                <span class="down">&#11206;</span>
                 {{ value|abs }}
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_TIME')) %}
