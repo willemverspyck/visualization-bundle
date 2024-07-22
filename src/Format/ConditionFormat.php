@@ -17,7 +17,7 @@ final class ConditionFormat implements FormatInterface
     public const string OPERATOR_LESS_THAN_OR_EQUAL = '<=';
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private string $color;
+    private Color $color;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private bool $background;
@@ -28,7 +28,7 @@ final class ConditionFormat implements FormatInterface
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private DateTimeImmutable|float|int|string|null $value = null;
 
-    public function __construct(string $color, bool $background = false, string $operator = ConditionFormatInterface::OPERATOR_EQUAL, DateTimeImmutable|float|int|string|null $value = null)
+    public function __construct(Color $color, bool $background = false, string $operator = ConditionFormat::OPERATOR_EQUAL, DateTimeImmutable|float|int|string|null $value = null)
     {
         $this->setColor($color);
         $this->setBackground($background);
@@ -42,12 +42,12 @@ final class ConditionFormat implements FormatInterface
         return 'condition';
     }
 
-    public function getColor(): string
+    public function getColor(): Color
     {
         return $this->color;
     }
 
-    public function setColor(string $color): static
+    public function setColor(Color $color): static
     {
         $this->color = $color;
 

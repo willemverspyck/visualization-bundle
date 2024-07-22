@@ -10,13 +10,13 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 final class ScaleFormat implements FormatInterface
 {
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private ?string $color = null;
+    private ?Color $color = null;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private string $colorMin;
+    private Color $colorMin;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private string $colorMax;
+    private Color $colorMax;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private float|int|null $value = null;
@@ -27,7 +27,7 @@ final class ScaleFormat implements FormatInterface
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private float|int|null $valueMax = null;
 
-    public function __construct(?string $color, string $colorMin, string $colorMax, float|int|null $value = null, float|int|null $valueMin = null, float|int|null $valueMax = null)
+    public function __construct(?Color $color, Color $colorMin, Color $colorMax, float|int|null $value = null, float|int|null $valueMin = null, float|int|null $valueMax = null)
     {
         $this->setColor($color);
         $this->setColorMin($colorMin);
@@ -43,36 +43,36 @@ final class ScaleFormat implements FormatInterface
         return 'scale';
     }
 
-    public function getColor(): ?string
+    public function getColor(): ?Color
     {
         return $this->color;
     }
 
-    public function setColor(?string $color): static
+    public function setColor(?Color $color): static
     {
         $this->color = $color;
 
         return $this;
     }
 
-    public function getColorMin(): string
+    public function getColorMin(): Color
     {
         return $this->colorMin;
     }
 
-    public function setColorMin(string $colorMin): static
+    public function setColorMin(Color $colorMin): static
     {
         $this->colorMin = $colorMin;
 
         return $this;
     }
 
-    public function getColorMax(): string
+    public function getColorMax(): Color
     {
         return $this->colorMax;
     }
 
-    public function setColorMax(string $colorMax): static
+    public function setColorMax(Color $colorMax): static
     {
         $this->colorMax = $colorMax;
 

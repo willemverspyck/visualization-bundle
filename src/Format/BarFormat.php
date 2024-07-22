@@ -10,7 +10,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 final class BarFormat implements FormatInterface
 {
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private string $color;
+    private Color $color;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private float|int|null $valueMin = null;
@@ -18,7 +18,7 @@ final class BarFormat implements FormatInterface
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private float|int|null $valueMax = null;
 
-    public function __construct(string $color, float|int|null $valueMin = null, float|int|null $valueMax = null)
+    public function __construct(Color $color, float|int|null $valueMin = null, float|int|null $valueMax = null)
     {
         $this->setColor($color);
         $this->setValueMin($valueMin);
@@ -31,12 +31,12 @@ final class BarFormat implements FormatInterface
         return 'bar';
     }
 
-    public function getColor(): string
+    public function getColor(): Color
     {
         return $this->color;
     }
 
-    public function setColor(string $color): static
+    public function setColor(Color $color): static
     {
         $this->color = $color;
 

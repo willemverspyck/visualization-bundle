@@ -50,11 +50,11 @@
             {% endif %}
 
             {% if color is not null %}
-                color: #{{ color|slice(2) }};
+                color: rgba({{ color.red }}, {{ color.green }}, {{ color.blue }}, {{ color.alpha }});
             {% endif %}
 
             {% if backgroundColor is not null %}
-                background-color: #{{ backgroundColor|slice(2) }};
+                background-color: rgba({{ backgroundColor.red }}, {{ backgroundColor.green }}, {{ backgroundColor.blue }}, {{ backgroundColor.alpha }});
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -136,7 +136,7 @@
     {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
         {% for format in formats %}
             {% if format.name is same as('bar') %}
-                <span style="background-color: {{ '#' ~ format.color|slice(2) }};">
+                <span style="background-color: rgba({{ format.color.red }}, {{ format.color.green }}, {{ format.color.blue }}, {{ format.color.alpha }});">
                     {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                         <img src="{{ getDirectory('/images/blank.png') }}" alt="" width="{{ value * 80|round }}" height="14">
                     {% else %}
