@@ -76,4 +76,9 @@ final class Color
 
         return $this;
     }
+
+    public function getHex(): string
+    {
+        return sprintf('%02x%02x%02x', $this->getRed(), $this->getGreen(), $this->getBlue());
+    }
 }

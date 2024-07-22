@@ -231,7 +231,7 @@ final class ExcelView extends AbstractView
                 });
                 $conditional->addCondition($format->getValue() instanceof DateTimeInterface ? Date::dateTimeToExcel($format->getValue()) : $format->getValue());
 
-                $color = $this->getColor($format->getColor());
+                $color = $this->getColor($format->getColor()->getHex());
 
                 if ($format->isBackground()) {
                     $conditional
@@ -270,8 +270,8 @@ final class ExcelView extends AbstractView
                 $conditional->getColorScale()
                     ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
                     ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
-                    ->setMinimumColor($this->getColor($format->getColorMin()))
-                    ->setMaximumColor($this->getColor($format->getColorMax()));
+                    ->setMinimumColor($this->getColor($format->getColorMin()->getHex()))
+                    ->setMaximumColor($this->getColor($format->getColorMax()->getHex()));
 
                 if (null !== $format->getColor()) {
                     if (null === $format->getValue()) {
@@ -281,7 +281,7 @@ final class ExcelView extends AbstractView
                     }
 
                     $conditional->getColorScale()
-                        ->setMidpointColor($this->getColor($format->getColor()))
+                        ->setMidpointColor($this->getColor($format->getColor()->getHex()))
                         ->setMidpointConditionalFormatValueObject($midpointConditionalFormatValueObject);
                 }
 
@@ -295,7 +295,7 @@ final class ExcelView extends AbstractView
 
     private function getColor(string $color): Color
     {
-        return new Color(substr($color, 2, 6));
+        return new Color($color);
     }
 
     private function getConditionalFormatValueObject(float|int|null $value, string $type = null): ConditionalFormatValueObject
