@@ -250,15 +250,13 @@ final class ExcelView extends AbstractView
             }
 
             if ($format instanceof BarFormat) {
-                $color = substr($format->getColor(), 2, 6);
-
                 $conditional = new Conditional();
                 $conditional->setConditionType(Conditional::CONDITION_DATABAR);
                 $conditional->setDataBar(new ConditionalDataBar());
                 $conditional->getDataBar()
                     ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
                     ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
-                    ->setColor($color);
+                    ->setColor($format->getColor()->getHex());
 
                 $content[] = $conditional;
             }
