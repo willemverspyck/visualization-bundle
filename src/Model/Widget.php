@@ -15,9 +15,6 @@ final class Widget
     private array $data;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private array $aggregates;
-
-    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private int $total;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
@@ -46,21 +43,6 @@ final class Widget
     public function setData(array $data): static
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * @return array<int, Aggregate>
-     */
-    public function getAggregates(): array
-    {
-        return $this->aggregates;
-    }
-
-    public function setAggregates(array $aggregates): static
-    {
-        $this->aggregates = $aggregates;
 
         return $this;
     }

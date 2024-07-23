@@ -11,31 +11,46 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 final class Aggregate
 {
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private array|bool|DateTimeInterface|float|int|string|null $min = null;
+    private DateTimeInterface|float|int|null $min = null;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private array|bool|DateTimeInterface|float|int|string|null $max = null;
+    private DateTimeInterface|float|int|null $max = null;
 
-    public function getMin(): array|bool|DateTimeInterface|float|int|string|null
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
+    private DateTimeInterface|float|int|null $median = null;
+
+    public function getMin(): DateTimeInterface|float|int|null
     {
         return $this->min;
     }
 
-    public function setMin(array|bool|DateTimeInterface|float|int|string|null $min): static
+    public function setMin(DateTimeInterface|float|int|null $min): static
     {
         $this->min = $min;
 
         return $this;
     }
 
-    public function getMax(): array|bool|DateTimeInterface|float|int|string|null
+    public function getMax(): DateTimeInterface|float|int|null
     {
         return $this->max;
     }
 
-    public function setMax(array|bool|DateTimeInterface|float|int|string|null $max): static
+    public function setMax(DateTimeInterface|float|int|null $max): static
     {
         $this->max = $max;
+
+        return $this;
+    }
+
+    public function getMedian(): DateTimeInterface|float|int|null
+    {
+        return $this->median;
+    }
+
+    public function setMedian(DateTimeInterface|float|int|null $median): static
+    {
+        $this->median = $median;
 
         return $this;
     }

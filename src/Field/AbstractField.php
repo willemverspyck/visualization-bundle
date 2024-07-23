@@ -8,12 +8,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Format\FormatInterface;
+use Spyck\VisualizationBundle\Model\Aggregate;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 abstract class AbstractField
 {
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $name;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
+    private ?Aggregate $aggregate = null;
 
     private bool $active;
 
@@ -35,6 +39,18 @@ abstract class AbstractField
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getAggregate(): ?Aggregate
+    {
+        return $this->aggregate;
+    }
+
+    public function setAggregate(?Aggregate $aggregate): static
+    {
+        $this->aggregate = $aggregate;
 
         return $this;
     }

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Service;
 
+use App\Entity\AggregateInterface;
 use App\Utility\DataUtility;
 use Countable;
+use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use IteratorAggregate;
@@ -18,6 +21,7 @@ use Spyck\VisualizationBundle\Entity\Block;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Exception\ParameterException;
+use Spyck\VisualizationBundle\Field\AbstractFieldInterface;
 use Spyck\VisualizationBundle\Field\Field;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
@@ -201,7 +205,6 @@ readonly class WidgetService
         $widgetAsModel = new WidgetAsModel();
         $widgetAsModel->setFields($this->getFields($fields, $widget, $data));
         $widgetAsModel->setData($this->getData($data, $fields));
-        $widgetAsModel->setAggregates($this->getAggregate($data, $fields));
         $widgetAsModel->setTotal($total);
         $widgetAsModel->setEvents($widget->getEvents());
         $widgetAsModel->setProperties($widget->getProperties());
@@ -451,6 +454,8 @@ readonly class WidgetService
     private function getFields(array $fields, WidgetInterface $widget, array $data): array
     {
         WidgetUtility::walkFields($fields, function (FieldInterface $field) use ($widget, $data): void {
+            $field->setAggregate($this->getAggregate($field, $data));
+
             $filter = $field->getFilter();
 
             if (null === $filter) {
@@ -462,12 +467,16 @@ readonly class WidgetService
             $field->setActive($active);
         }, false);
 
-        WidgetUtility::walkMultipleFields($fields, function (MultipleFieldInterface $field): void {
+        WidgetUtility::walkMultipleFields($fields, function (MultipleFieldInterface $field) use ($data): void {
+            $field->setAggregate($this->getAggregate($field, $data));
+
             $children = $field->getChildren()->filter(function (FieldInterface $field): bool {
                 return $field->isActive();
             });
 
-            $field->setActive(false === $children->isEmpty());
+            $active = false === $children->isEmpty();
+
+            $field->setActive($active);
         }, false);
 
         return $fields;
@@ -520,10 +529,24 @@ readonly class WidgetService
         return $data;
     }
 
-    private function getAggregate(array $data, array $fields): array
+    private function getAggregate(AbstractFieldInterface $field, array $data): Aggregate
     {
-        $content = WidgetUtility::mapFields($fields, function (FieldInterface $field, int $index) use ($data): ?Aggregate {
-            $values = [];
+        if ($field instanceof MultipleFieldInterface) {
+            $fields = $field->getChildren();
+        } else {
+            $fields = new ArrayCollection();
+            $fields->add($field);
+        }
+
+        $types = [];
+        $values = [];
+
+        foreach ($fields as $field) {
+            $type = $field->getType();
+
+            if (false === in_array($type, $types, true)) {
+                $types[] = $field->getType();
+            }
 
             foreach ($data as $row) {
                 $value = $this->getValue($field, $row);
@@ -532,15 +555,58 @@ readonly class WidgetService
                     $values[] = $value;
                 }
             }
+        }
 
-            $aggregate = new Aggregate();
-            $aggregate->setMin(count($values) > 0 ? min($values) : null);
-            $aggregate->setMax(count($values) > 0 ? max($values) : null);
+        $aggregate = new Aggregate();
 
+        if (1 !== count($types)) {
             return $aggregate;
-        });
+        }
 
-        return $content;
+        if (0 === count($values)) {
+            return $aggregate;
+        }
+
+        $type = array_shift($types);
+
+        if (in_array($type, [FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_BOOLEAN, FieldInterface::TYPE_IMAGE, FieldInterface::TYPE_TEXT], true)) {
+            return $aggregate;
+        }
+
+        $aggregate->setMin(min($values));
+        $aggregate->setMax(max($values));
+        $aggregate->setMedian($this->getMedian($type, $values));
+
+        return $aggregate;
+    }
+
+    private function getMedian(string $type, array $data): DateTimeInterface|float|int|null
+    {
+        $count = count($data);
+
+        if (0 === $count) {
+            return null;
+        }
+
+        sort($data);
+
+        $index = floor($count / 2);
+
+        if (0 === $count % 2) {
+            $value1 = $data[$index - 1];
+            $value2 = $data[$index];
+
+            if (in_array($type, [FieldInterface::TYPE_DATE, FieldInterface::TYPE_DATETIME, FieldInterface::TYPE_TIME], true)) {
+                $date = new DateTime();
+                $date->setTimestamp(($value1->getTimestamp() + $value2->getTimestamp()) / 2);
+
+                return $date;
+            }
+
+            return ($value1 + $value2) / 2;
+        }
+
+        return $data[$index];
     }
 
     /**
