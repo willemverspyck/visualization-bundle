@@ -9,6 +9,9 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class ScaleFormat implements FormatInterface
 {
+    public const TYPE_MEAN = 'mean';
+    public const TYPE_MEDIAN = 'median';
+
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private ?Color $color = null;
 
@@ -19,6 +22,9 @@ final class ScaleFormat implements FormatInterface
     private Color $colorMax;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
+    private string $type = self::TYPE_MEAN;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private float|int|null $value = null;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
@@ -27,11 +33,12 @@ final class ScaleFormat implements FormatInterface
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private float|int|null $valueMax = null;
 
-    public function __construct(?Color $color, Color $colorMin, Color $colorMax, float|int|null $value = null, float|int|null $valueMin = null, float|int|null $valueMax = null)
+    public function __construct(?Color $color, Color $colorMin, Color $colorMax, string $type = self::TYPE_MEAN, float|int|null $value = null, float|int|null $valueMin = null, float|int|null $valueMax = null)
     {
         $this->setColor($color);
         $this->setColorMin($colorMin);
         $this->setColorMax($colorMax);
+        $this->setType($type);
         $this->setValue($value);
         $this->setValueMin($valueMin);
         $this->setValueMax($valueMax);
@@ -75,6 +82,18 @@ final class ScaleFormat implements FormatInterface
     public function setColorMax(Color $colorMax): static
     {
         $this->colorMax = $colorMax;
+
+        return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

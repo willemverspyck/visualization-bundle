@@ -273,7 +273,13 @@ final class ExcelView extends AbstractView
 
                 if (null !== $format->getColor()) {
                     if (null === $format->getValue()) {
-                        $midpointConditionalFormatValueObject = new ConditionalFormatValueObject(type: 'percent', value: 50);
+                        $type = match($format->getType()) {
+                            ScaleFormat::TYPE_MEAN => 'percent',
+                            ScaleFormat::TYPE_MEDIAN => 'percentile',
+                            default => throw new Exception(sprintf('Type "%s" not found', $format->getType())),
+                        };
+
+                        $midpointConditionalFormatValueObject = new ConditionalFormatValueObject(type: $type, value: 50);
                     } else {
                         $midpointConditionalFormatValueObject = $this->getConditionalFormatValueObject($format->getValue());
                     }
