@@ -44,7 +44,7 @@
 
                 {% if backgroundColor is null %}
                     {% if condition and format.background is same as(true) %}
-                        {% set color = format.color %}
+                        {% set backgroundColor = format.color %}
                     {% endif %}
                 {% endif %}
             {% endif %}
