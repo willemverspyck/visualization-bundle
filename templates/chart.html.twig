@@ -50,11 +50,11 @@
             {% endif %}
 
             {% if color is not null %}
-                color: rgba({{ color.red }}, {{ color.green }}, {{ color.blue }}, {{ color.alpha }});
+                color: #{{ color.hex }};
             {% endif %}
 
             {% if backgroundColor is not null %}
-                background-color: rgba({{ backgroundColor.red }}, {{ backgroundColor.green }}, {{ backgroundColor.blue }}, {{ backgroundColor.alpha }});
+                background-color: #{{ backgroundColor.hex }};
             {% endif %}
         {% endfor %}
     {% endif %}
