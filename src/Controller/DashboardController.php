@@ -45,7 +45,7 @@ final class DashboardController extends AbstractController
     {
         $dashboard = $dashboardRepository->getDashboardById($dashboardId);
 
-        if (false === $dashboard instanceof Dashboard) {
+        if (null === $dashboard) {
             throw $this->createNotFoundException('The dashboard does not exist');
         }
 
