@@ -32,31 +32,31 @@ readonly class BlockService
      */
     public function getBlockAsModel(Block $block, array $variables = [], ?string $view = null, bool $preload = false): BlockAsModel
     {
-        $blockModel = new BlockAsModel();
+        $blockAsModel = new BlockAsModel();
 
         $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
         if ($preload) {
-            $blockModel->setWidget($this->widgetService->getWidgetAsModel($block, $parameterBag->all(), $view));
+            $blockAsModel->setWidget($this->widgetService->getWidgetAsModel($block, $parameterBag->all(), $view));
         }
 
         $widget = $block->getWidget();
 
         $widgetInstance = $this->widgetService->getWidgetInstance($widget->getAdapter(), $parameterBag->all(), true);
 
-        $blockModel->setName(null !== $block->getName() ? $block->getName() : $widget->getName());
-        $blockModel->setDescription(null !== $block->getDescription() ? $block->getDescription() : $widget->getDescription());
-        $blockModel->setDescriptionEmpty($widget->getDescriptionEmpty());
-        $blockModel->setSize($block->getSize());
-        $blockModel->setFilters($this->getBlockFilter($widgetInstance));
-        $blockModel->setParameters($this->getBlockParameters($widgetInstance));
-        $blockModel->setDownloads($this->getDownloads($block));
-        $blockModel->setUrl($this->getBlockUrl($block, ViewInterface::JSON));
-        $blockModel->setCharts($this->getCharts($block, $widget));
-        $blockModel->setFilter($block->hasFilter());
-        $blockModel->setFilterView($block->hasFilterView());
+        $blockAsModel->setName(null !== $block->getName() ? $block->getName() : $widget->getName());
+        $blockAsModel->setDescription(null !== $block->getDescription() ? $block->getDescription() : $widget->getDescription());
+        $blockAsModel->setDescriptionEmpty($widget->getDescriptionEmpty());
+        $blockAsModel->setSize($block->getSize());
+        $blockAsModel->setFilters($this->getBlockFilter($widgetInstance));
+        $blockAsModel->setParameters($this->getBlockParameters($widgetInstance));
+        $blockAsModel->setDownloads($this->getDownloads($block));
+        $blockAsModel->setUrl($this->getBlockUrl($block, ViewInterface::JSON));
+        $blockAsModel->setCharts($this->getCharts($block, $widget));
+        $blockAsModel->setFilter($block->hasFilter());
+        $blockAsModel->setFilterView($block->hasFilterView());
 
-        return $blockModel;
+        return $blockAsModel;
     }
 
     private function getCharts(Block $block, Widget $widget): array
