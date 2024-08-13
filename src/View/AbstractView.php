@@ -50,20 +50,4 @@ abstract class AbstractView implements ViewInterface
             default => $value,
         };
     }
-
-    /**
-     * @throws Exception
-     */
-    protected function getValueOfNumber(Config $config, float|int $value): string
-    {
-        $precision = null !== $config->getPrecision() ? $config->getPrecision() : 0;
-
-        if ($config->hasAbbreviation()) {
-            return NumberUtility::getAbbreviation($value, $precision);
-        }
-
-        $number = round($value, $precision);
-
-        return number_format($number, $precision, ',', '.');
-    }
 }
