@@ -23,7 +23,7 @@ final class Block
     private ?string $description = null;
 
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
-    private string $descriptionEmpty;
+    private ?string $descriptionEmpty = null;
 
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?string $url = null;
@@ -113,12 +113,12 @@ final class Block
         return $this;
     }
 
-    public function getDescriptionEmpty(): string
+    public function getDescriptionEmpty(): ?string
     {
         return $this->descriptionEmpty;
     }
 
-    public function setDescriptionEmpty(string $descriptionEmpty): static
+    public function setDescriptionEmpty(?string $descriptionEmpty): static
     {
         $this->descriptionEmpty = $descriptionEmpty;
 
