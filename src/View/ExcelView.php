@@ -128,7 +128,7 @@ final class ExcelView extends AbstractView
             $sheet = $this->spreadsheet->getActiveSheet();
         }
 
-        $sheet->setTitle(substr($block->getName(), 0, 24));
+        $sheet->setTitle(substr($block->getName(), 0, 31));
 
         $widget = $block->getWidget();
 
