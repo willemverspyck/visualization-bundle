@@ -12,52 +12,50 @@
 {% endmacro %}
 
 {% macro getStyle(type, formats, value) %}
-    {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
-        {% for format in formats %}
-            {% set color = null %}
-            {% set backgroundColor = null %}
+    {% for format in formats %}
+        {% set color = null %}
+        {% set backgroundColor = null %}
 
-            {% if format.name is same as('condition') %}
-                {% set condition = false %}
+        {% if format.name is same as('condition') %}
+            {% set condition = false %}
 
-                {% if format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_EQUAL')) %}
-                    {% if format.value is iterable %}
-                        {% set condition = value in format.value %}
-                    {% else %}
-                        {% set condition = value == format.value %}
-                    {% endif %}
-                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN')) %}
-                    {% set condition = value > format.value %}
-                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL')) %}
-                    {% set condition = value >= format.value %}
-                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN')) %}
-                    {% set condition = value < format.value %}
-                {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL')) %}
-                    {% set condition = value <= format.value %}
+            {% if format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_EQUAL')) %}
+                {% if format.value is iterable %}
+                    {% set condition = value in format.value %}
+                {% else %}
+                    {% set condition = value == format.value %}
                 {% endif %}
+            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN')) %}
+                {% set condition = value > format.value %}
+            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL')) %}
+                {% set condition = value >= format.value %}
+            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN')) %}
+                {% set condition = value < format.value %}
+            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL')) %}
+                {% set condition = value <= format.value %}
+            {% endif %}
 
-                {% if color is null %}
-                    {% if condition and format.background is same as(false) %}
-                        {% set color = format.color %}
-                    {% endif %}
-                {% endif %}
-
-                {% if backgroundColor is null %}
-                    {% if condition and format.background is same as(true) %}
-                        {% set backgroundColor = format.color %}
-                    {% endif %}
+            {% if color is null %}
+                {% if condition and format.background is same as(false) %}
+                    {% set color = format.color %}
                 {% endif %}
             {% endif %}
 
-            {% if color is not null %}
-                color: #{{ color.hex }};
+            {% if backgroundColor is null %}
+                {% if condition and format.background is same as(true) %}
+                    {% set backgroundColor = format.color %}
+                {% endif %}
             {% endif %}
+        {% endif %}
 
-            {% if backgroundColor is not null %}
-                background-color: #{{ backgroundColor.hex }};
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+        {% if color is not null %}
+            color: #{{ color.hex }};
+        {% endif %}
+
+        {% if backgroundColor is not null %}
+            background-color: #{{ backgroundColor.hex }};
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
 
 {% macro getValue(type, config, value, view) %}
@@ -135,9 +133,9 @@
 {% endmacro %}
 
 {% macro getPreValue(type, formats, value, view) %}
-    {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
-        {% for format in formats %}
-            {% if format.name is same as('bar') %}
+    {% for format in formats %}
+        {% if format.name is same as('bar') %}
+            {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
                 <span style="background-color: rgba({{ format.color.red }}, {{ format.color.green }}, {{ format.color.blue }}, {{ format.color.alpha }});">
                     {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                         <img src="{{ getDirectory('/images/blank.png') }}" alt="" width="{{ value * 80|round }}" height="14">
@@ -146,6 +144,6 @@
                     {% endif %}
                 </span>
             {% endif %}
-        {% endfor %}
-    {% endif %}
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
