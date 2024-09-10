@@ -597,8 +597,10 @@ readonly class WidgetService
             $value2 = $data[$index];
 
             if (in_array($type, [FieldInterface::TYPE_DATE, FieldInterface::TYPE_DATETIME, FieldInterface::TYPE_TIME], true)) {
+                $timestamp = intval(($value1->getTimestamp() + $value2->getTimestamp()) / 2);
+
                 $date = new DateTime();
-                $date->setTimestamp(($value1->getTimestamp() + $value2->getTimestamp()) / 2);
+                $date->setTimestamp($timestamp);
 
                 return $date;
             }
