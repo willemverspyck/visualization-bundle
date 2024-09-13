@@ -38,7 +38,6 @@
                                     <div class="scroll">
                                         {% set widget = block.widget %}
 
-                                        {% set fields = getFields(widget.fields) %}
                                         {% set data = widget.data %}
 
                                         {% if data|length > 0 %}
@@ -51,8 +50,22 @@
                                                             <img src="{{ email.image('@chart/' ~ chart|split('/')|last) }}" width="100%" alt="{{ block.name }}">
                                                         </p>
                                                     {% else %}
+                                                        {% set fields = getFields(widget.fields) %}
+
                                                         <table class="data" {% block dataTableAttribute %}width="100%" cellspacing="0" cellpadding="5" border="0" align="left"{% endblock %}>
                                                             <thead>
+                                                                {% if hasMultiple(widget.fields) %}
+                                                                    <tr>
+                                                                        {% for field in widget.fields %}
+                                                                            {% if isMultiple(field) %}
+                                                                                <th colspan="{{ field.children|length }}">{{ field.name }}</th>
+                                                                            {% else %}
+                                                                                <th>&nbsp;</th>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        <th>&nbsp;</th>
+                                                                    </tr>
+                                                                {% endif %}
                                                                 <tr>
                                                                     {% for field in fields %}
                                                                         <th class="{{ chart.getClass(field.type, field.formats)|spaceless }}">{{ field.name }}</th>

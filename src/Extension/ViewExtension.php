@@ -6,7 +6,9 @@ namespace Spyck\VisualizationBundle\Extension;
 
 use Exception;
 use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Field\AbstractFieldInterface;
 use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Service\ChartService;
 use Spyck\VisualizationBundle\Utility\NumberUtility;
@@ -30,10 +32,12 @@ final class ViewExtension extends AbstractExtension
     {
         return [
             new TwigFunction('getAbbreviation', [$this, 'getAbbreviation']),
-            new TwigFunction('hasChart', [$this, 'hasChart']),
             new TwigFunction('getChart', [$this, 'getChart']),
             new TwigFunction('getDirectory', [$this, 'getDirectory']),
             new TwigFunction('getFields', [$this, 'getFields']),
+            new TwigFunction('hasChart', [$this, 'hasChart']),
+            new TwigFunction('hasMultiple', [$this, 'hasMultiple']),
+            new TwigFunction('isMultiple', [$this, 'isMultiple']),
         ];
     }
 
@@ -43,21 +47,6 @@ final class ViewExtension extends AbstractExtension
     public function getAbbreviation(float|int $value, int $precision = 0): string
     {
         return NumberUtility::getAbbreviation($value, $precision);
-    }
-
-    public function hasChart(Block $block): bool
-    {
-        if (false === $this->chartService->hasChart()) {
-            return false;
-        }
-
-        $charts = $block->getCharts();
-
-        if (0 === count($charts)) {
-            return false;
-        }
-
-        return Widget::CHART_TABLE !== $charts[0];
     }
 
     /**
@@ -81,5 +70,36 @@ final class ViewExtension extends AbstractExtension
         return WidgetUtility::mapFields($fields, function (FieldInterface $field): FieldInterface {
             return $field;
         });
+    }
+
+    public function hasChart(Block $block): bool
+    {
+        if (false === $this->chartService->hasChart()) {
+            return false;
+        }
+
+        $charts = $block->getCharts();
+
+        if (0 === count($charts)) {
+            return false;
+        }
+
+        return Widget::CHART_TABLE !== $charts[0];
+    }
+
+    public function hasMultiple(array $fields): bool
+    {
+        foreach ($fields as $field) {
+            if ($field instanceof MultipleFieldInterface) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isMultiple(AbstractFieldInterface $field): bool
+    {
+        return $field instanceof MultipleFieldInterface;
     }
 }
