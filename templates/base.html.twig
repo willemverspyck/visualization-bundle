@@ -2,7 +2,6 @@
 
 {% trans_default_domain 'SpyckVisualizationBundle' %}
 
-{% apply spaceless %}
     <!DOCTYPE html>
     <html lang="en">
         <head>
@@ -68,7 +67,7 @@
                                                                 {% endif %}
                                                                 <tr>
                                                                     {% for field in fields %}
-                                                                        <th class="{{ chart.getClass(field.type, field.formats)|spaceless }}">{{ field.name }}</th>
+                                                                        <th class="{{ chart.getClass(field.type, field.formats) }}">{{ field.name }}</th>
                                                                     {% endfor %}
                                                                     <th>&nbsp;</th>
                                                                 </tr>
@@ -119,4 +118,3 @@
             {% endblock %}
         </body>
     </html>
-{% endapply %}
