@@ -2,119 +2,119 @@
 
 {% trans_default_domain 'SpyckVisualizationBundle' %}
 
-    <!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <title>{{ dashboard.name }}</title>
-            {% block head %}
-                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-            {% endblock %}
-        </head>
-        <body>
-            {% block body %}
-                <div class="header">
-                    {% block header %}
-                    {% endblock %}
-                </div>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{ dashboard.name }}</title>
+        {% block head %}
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            <div class="header">
+                {% block header %}
+                {% endblock %}
+            </div>
 
-                {% if mail.inline is same as(true) %}
-                    <div class="content">
-                        {% for block in dashboard.blocks %}
-                            <div class="widget">
-                                {% block widget %}
-                                    <h2>{{ block.name }}</h2>
-                                    {% if block.filterView is same as(true) and block.widget.filters|length > 0 %}
-                                        <div class="filter">
-                                            {% block filter %}
-                                                <h3>Active filters</h3>
-                                                {% for filter in block.widget.filters %}
-                                                    {{ filter.name|trans }}: {{ filter.data|join(', ') }}
-                                                    <br>
-                                                {% endfor %}
-                                            {% endblock %}
-                                        </div>
-                                    {% endif %}
-                                    <div class="scroll">
-                                        {% set widget = block.widget %}
+            {% if mail.inline is same as(true) %}
+                <div class="content">
+                    {% for block in dashboard.blocks %}
+                        <div class="widget">
+                            {% block widget %}
+                                <h2>{{ block.name }}</h2>
+                                {% if block.filterView is same as(true) and block.widget.filters|length > 0 %}
+                                    <div class="filter">
+                                        {% block filter %}
+                                            <h3>Active filters</h3>
+                                            {% for filter in block.widget.filters %}
+                                                {{ filter.name|trans }}: {{ filter.data|join(', ') }}
+                                                <br>
+                                            {% endfor %}
+                                        {% endblock %}
+                                    </div>
+                                {% endif %}
+                                <div class="scroll">
+                                    {% set widget = block.widget %}
 
-                                        {% set data = widget.data %}
+                                    {% set data = widget.data %}
 
-                                        {% if data|length > 0 %}
-                                            <div class="data">
-                                                {% block data %}
-                                                    {% if hasChart(block) %}
-                                                        {% set chart = getChart(block) %}
+                                    {% if data|length > 0 %}
+                                        <div class="data">
+                                            {% block data %}
+                                                {% if hasChart(block) %}
+                                                    {% set chart = getChart(block) %}
 
-                                                        <p>
-                                                            <img src="{{ email.image('@chart/' ~ chart|split('/')|last) }}" width="100%" alt="{{ block.name }}">
-                                                        </p>
-                                                    {% else %}
-                                                        {% set fields = getFields(widget.fields) %}
+                                                    <p>
+                                                        <img src="{{ email.image('@chart/' ~ chart|split('/')|last) }}" width="100%" alt="{{ block.name }}">
+                                                    </p>
+                                                {% else %}
+                                                    {% set fields = getFields(widget.fields) %}
 
-                                                        <table class="data" {% block dataTableAttribute %}width="100%" cellspacing="0" cellpadding="5" border="0" align="left"{% endblock %}>
-                                                            <thead>
-                                                                {% if hasMultiple(widget.fields) %}
-                                                                    <tr>
-                                                                        {% for field in widget.fields %}
-                                                                            {% if isMultiple(field) %}
-                                                                                <th colspan="{{ field.children|length }}">{{ field.name }}</th>
-                                                                            {% else %}
-                                                                                <th>&nbsp;</th>
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                        <th>&nbsp;</th>
-                                                                    </tr>
-                                                                {% endif %}
+                                                    <table class="data" {% block dataTableAttribute %}width="100%" cellspacing="0" cellpadding="5" border="0" align="left"{% endblock %}>
+                                                        <thead>
+                                                            {% if hasMultiple(widget.fields) %}
                                                                 <tr>
-                                                                    {% for field in fields %}
-                                                                        <th class="{{ chart.getClass(field.type, field.formats) }}">{{ field.name }}</th>
+                                                                    {% for field in widget.fields %}
+                                                                        {% if isMultiple(field) %}
+                                                                            <th colspan="{{ field.children|length }}">{{ field.name }}</th>
+                                                                        {% else %}
+                                                                            <th>&nbsp;</th>
+                                                                        {% endif %}
                                                                     {% endfor %}
                                                                     <th>&nbsp;</th>
                                                                 </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {% for row in data %}
-                                                                    <tr>
-                                                                        {% for fieldIndex, field in fields %}
-                                                                            {% set value = attribute(row, fieldIndex) %}
-
-                                                                            <td class="{{ chart.getClass(field.type, field.formats)|spaceless }}" style="{{ chart.getStyle(field.type, field.formats, value.value)|spaceless }}">
-                                                                                <span>{{ chart.getPreValue(field.type, field.formats, value.value, null)|spaceless }}</span>
-                                                                                <span>{{ chart.getValue(field.type, field.config, value.value, null)|spaceless }}</span>
-                                                                                {% if mail.route and field.routes|length > 0 %}
-                                                                                    <div class="route">
-                                                                                        {% block route %}
-                                                                                            {% for route in value.routes %}
-                                                                                                <a href="{{ absolute_url(route.url) }}" target="_blank" title="{{ route.name }}">{{ route.name }}</a>
-                                                                                                <span>&nbsp;</span>
-                                                                                            {% endfor %}
-                                                                                        {% endblock %}
-                                                                                    </div>
-                                                                                {% endif %}
-                                                                            </td>
-                                                                        {% endfor %}
-                                                                        <td>&nbsp;</td>
-                                                                    </tr>
+                                                            {% endif %}
+                                                            <tr>
+                                                                {% for field in fields %}
+                                                                    <th class="{{ chart.getClass(field.type, field.formats) }}">{{ field.name }}</th>
                                                                 {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                    {% endif %}
-                                                {% endblock %}
-                                            </div>
-                                        {% else %}
-                                            <p>{{ block.descriptionEmpty }}</p>
-                                        {% endif %}
-                                    </div>
-                                {% endblock %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                                                                <th>&nbsp;</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for row in data %}
+                                                                <tr>
+                                                                    {% for fieldIndex, field in fields %}
+                                                                        {% set value = attribute(row, fieldIndex) %}
 
-                <div class="footer">
-                    {% block footer %}
-                    {% endblock %}
+                                                                        <td class="{{ chart.getClass(field.type, field.formats)|spaceless }}" style="{{ chart.getStyle(field.type, field.formats, value.value)|spaceless }}">
+                                                                            <span>{{ chart.getPreValue(field.type, field.formats, value.value, null)|spaceless }}</span>
+                                                                            <span>{{ chart.getValue(field.type, field.config, value.value, null)|spaceless }}</span>
+                                                                            {% if mail.route and field.routes|length > 0 %}
+                                                                                <div class="route">
+                                                                                    {% block route %}
+                                                                                        {% for route in value.routes %}
+                                                                                            <a href="{{ absolute_url(route.url) }}" target="_blank" title="{{ route.name }}">{{ route.name }}</a>
+                                                                                            <span>&nbsp;</span>
+                                                                                        {% endfor %}
+                                                                                    {% endblock %}
+                                                                                </div>
+                                                                            {% endif %}
+                                                                        </td>
+                                                                    {% endfor %}
+                                                                    <td>&nbsp;</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                {% endif %}
+                                            {% endblock %}
+                                        </div>
+                                    {% else %}
+                                        <p>{{ block.descriptionEmpty }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endblock %}
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endblock %}
-        </body>
-    </html>
+            {% endif %}
+
+            <div class="footer">
+                {% block footer %}
+                {% endblock %}
+            </div>
+        {% endblock %}
+    </body>
+</html>
