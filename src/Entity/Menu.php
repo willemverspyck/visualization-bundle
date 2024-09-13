@@ -55,6 +55,7 @@ class Menu implements Stringable
      * @var Collection<int, Menu>
      */
     #[Doctrine\OneToMany(mappedBy: 'parent', targetEntity: Menu::class)]
+    #[Doctrine\OrderBy(value: ['position' => 'ASC'])]
     #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
     private Collection $children;
 

@@ -7,38 +7,42 @@ namespace Spyck\VisualizationBundle\Listener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
 use Spyck\VisualizationBundle\Entity\Menu;
-use Spyck\VisualizationBundle\Repository\MenuRepository;
 
-#[AsEntityListener(event: Events::postPersist, entity: Menu::class)]
-#[AsEntityListener(event: Events::postUpdate, entity: Menu::class)]
+#[AsEntityListener(event: Events::prePersist, entity: Menu::class)]
+#[AsEntityListener(event: Events::preUpdate, entity: Menu::class)]
 final class MenuListener
 {
-    public function __construct(private readonly MenuRepository $menuRepository)
+    public function prePersist(Menu $menu): void
     {
+        $this->patchPosition($menu);
     }
 
-    public function postPersist(Menu $menu): void
+    public function preUpdate(Menu $menu): void
     {
-        $this->patchPosition($menu->getParent());
+        $this->patchPosition($menu, true);
     }
 
-    public function postUpdate(Menu $menu): void
+    private function patchPosition(Menu $menu): void
     {
-        $this->patchPosition($menu->getParent());
-    }
+        $parent = $menu->getParent();
 
-    private function patchPosition(?Menu $parent): void
-    {
-        $position = 1;
+        if (null === $parent) {
+            return;
+        }
 
-        $menus = $this->menuRepository->getMenuDataByParent($parent);
+        // Reverse the array so that the position of the menu element replaces the existing element at that position.
+        $children = array_reverse($parent->getChildren()->toArray());
 
-        foreach ($menus as $menu) {
-            if ($position !== $menu->getPosition()) {
-                $this->menuRepository->patchMenu($menu, ['position'], $position);
+        usort($children, function(Menu $a, Menu $b): int {
+            if ($a->getPosition() === $b->getPosition()) {
+                return 0;
             }
 
-            ++$position;
+            return $a->getPosition() < $b->getPosition() ? -1 : 1;
+        });
+
+        foreach ($children as $position => $child) {
+            $child->setPosition($position + 1);
         }
     }
 }
