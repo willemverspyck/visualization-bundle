@@ -13,6 +13,7 @@ use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Utility\NumberUtility;
+use Spyck\VisualizationBundle\Utility\ViewUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -81,26 +82,10 @@ abstract class AbstractSerializerView extends AbstractView
 
         return match ($type) {
             FieldInterface::TYPE_BOOLEAN => $value ? '✓' : '✕',
-            FieldInterface::TYPE_CURRENCY => sprintf('€ %s', $this->getValueOfNumber($config, $value)),
-            FieldInterface::TYPE_NUMBER => $this->getValueOfNumber($config, $value),
-            FieldInterface::TYPE_PERCENTAGE => sprintf('%s%%', $this->getValueOfNumber($config, $value * 100)),
+            FieldInterface::TYPE_CURRENCY => sprintf('€ %s', ViewUtility::getNumber($config, $value)),
+            FieldInterface::TYPE_NUMBER => ViewUtility::getNumber($config, $value),
+            FieldInterface::TYPE_PERCENTAGE => sprintf('%s%%', ViewUtility::getNumber($config, $value * 100)),
             default => parent::getValue($type, $config, $value),
         };
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getValueOfNumber(Config $config, float|int $value): string
-    {
-        $precision = null !== $config->getPrecision() ? $config->getPrecision() : 0;
-
-        if ($config->hasAbbreviation()) {
-            return NumberUtility::getAbbreviation($value, $precision);
-        }
-
-        $number = round($value, $precision);
-
-        return number_format($number, $precision, ',', '.');
     }
 }

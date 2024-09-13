@@ -1,63 +1,3 @@
-{% macro getClass(type, formats) %}
-    {% set classes = [type] %}
-
-    {% for format in formats %}
-        {% set name = 'format' ~ format.name|capitalize %}
-        {% if name not in classes %}
-            {% set classes = classes|merge([name]) %}
-        {% endif %}
-    {% endfor %}
-
-    {{ classes|join(' ') }}
-{% endmacro %}
-
-{% macro getStyle(type, formats, value) %}
-    {% for format in formats %}
-        {% set color = null %}
-        {% set backgroundColor = null %}
-
-        {% if format.name is same as('condition') %}
-            {% set condition = false %}
-
-            {% if format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_EQUAL')) %}
-                {% if format.value is iterable %}
-                    {% set condition = value in format.value %}
-                {% else %}
-                    {% set condition = value == format.value %}
-                {% endif %}
-            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN')) %}
-                {% set condition = value > format.value %}
-            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL')) %}
-                {% set condition = value >= format.value %}
-            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN')) %}
-                {% set condition = value < format.value %}
-            {% elseif format.operator is same as(constant('Spyck\\VisualizationBundle\\Format\\ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL')) %}
-                {% set condition = value <= format.value %}
-            {% endif %}
-
-            {% if color is null %}
-                {% if condition and format.background is same as(false) %}
-                    {% set color = format.color %}
-                {% endif %}
-            {% endif %}
-
-            {% if backgroundColor is null %}
-                {% if condition and format.background is same as(true) %}
-                    {% set backgroundColor = format.color %}
-                {% endif %}
-            {% endif %}
-        {% endif %}
-
-        {% if color is not null %}
-            color: #{{ color.hex }};
-        {% endif %}
-
-        {% if backgroundColor is not null %}
-            background-color: #{{ backgroundColor.hex }};
-        {% endif %}
-    {% endfor %}
-{% endmacro %}
-
 {% macro getValue(type, config, value, view) %}
     {% import _self as self %}
 
@@ -81,7 +21,7 @@
                 -
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) %}
-            &euro; {{ self.getValueOfNumber(config, value) }}
+            &euro; {{ getNumber(config, value) }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATE')) %}
             {{ value|date('Y-m-d') }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATETIME')) %}
@@ -93,9 +33,9 @@
                 <img src="{{ absolute_url(value) }}" alt="" width="32" height="32" align="top">
             {% endif %}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) %}
-            {{ self.getValueOfNumber(config, value) }}
+            {{ getNumber(config, value) }}
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
-            {{ self.getValueOfNumber(config, value * 100) }}%
+            {{ getNumber(config, value * 100) }}%
         {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_POSITION')) %}
             {% if value > 0 %}
                 <span class="up">&#9650;</span>
@@ -115,20 +55,6 @@
                 {{ value }}
             {% endif %}
         {% endif %}
-    {% endif %}
-{% endmacro %}
-
-{% macro getValueOfNumber(config, value) %}
-    {% set precision = 0 %}
-
-    {% if config.precision is not null %}
-        {% set precision = config.precision %}
-    {% endif %}
-
-    {% if config.abbreviation is same as(true) %}
-        {{ getAbbreviation(value, precision) }}
-    {% else %}
-        {{ value|number_format(precision, ',', '.') }}
     {% endif %}
 {% endmacro %}
 

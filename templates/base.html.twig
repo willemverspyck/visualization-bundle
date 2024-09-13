@@ -53,10 +53,10 @@
 
                                                     <table class="data" {% block dataTableAttribute %}width="100%" cellspacing="0" cellpadding="5" border="0" align="left"{% endblock %}>
                                                         <thead>
-                                                            {% if hasMultiple(widget.fields) %}
+                                                            {% if hasMultipleFields(widget.fields) %}
                                                                 <tr>
                                                                     {% for field in widget.fields %}
-                                                                        {% if isMultiple(field) %}
+                                                                        {% if isMultipleField(field) %}
                                                                             <th colspan="{{ field.children|length }}">{{ field.name }}</th>
                                                                         {% else %}
                                                                             <th>&nbsp;</th>
@@ -67,7 +67,7 @@
                                                             {% endif %}
                                                             <tr>
                                                                 {% for field in fields %}
-                                                                    <th class="{{ chart.getClass(field.type, field.formats) }}">{{ field.name }}</th>
+                                                                    <th class="{{ getClasses(field)|join(' ') }}">{{ field.name }}</th>
                                                                 {% endfor %}
                                                                 <th>&nbsp;</th>
                                                             </tr>
@@ -76,15 +76,15 @@
                                                             {% for row in data %}
                                                                 <tr>
                                                                     {% for fieldIndex, field in fields %}
-                                                                        {% set value = attribute(row, fieldIndex) %}
+                                                                        {% set cell = attribute(row, fieldIndex) %}
 
-                                                                        <td class="{{ chart.getClass(field.type, field.formats)|spaceless }}" style="{{ chart.getStyle(field.type, field.formats, value.value)|spaceless }}">
-                                                                            <span>{{ chart.getPreValue(field.type, field.formats, value.value, null)|spaceless }}</span>
-                                                                            <span>{{ chart.getValue(field.type, field.config, value.value, null)|spaceless }}</span>
+                                                                        <td class="{{ getClasses(field)|join(' ') }}" style="{{ getStyles(field, cell.value)|map((value, key) => "#{key}: #{value}")|join('; ') }}">
+                                                                            <span>{{ chart.getPreValue(field.type, field.formats, cell.value, null) }}</span>
+                                                                            <span>{{ chart.getValue(field.type, field.config, cell.value, null) }}</span>
                                                                             {% if mail.route and field.routes|length > 0 %}
                                                                                 <div class="route">
                                                                                     {% block route %}
-                                                                                        {% for route in value.routes %}
+                                                                                        {% for route in cell.routes %}
                                                                                             <a href="{{ absolute_url(route.url) }}" target="_blank" title="{{ route.name }}">{{ route.name }}</a>
                                                                                             <span>&nbsp;</span>
                                                                                         {% endfor %}
