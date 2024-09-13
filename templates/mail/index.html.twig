@@ -18,7 +18,7 @@
         <a href="{{ absolute_url(dashboard.url) }}" target="_blank">Open dashboard</a>
     {% endif %}
     {% if mail.description is not null %}
-        <p class="description">{{ mail.description|spaceless }}</p>
+        <p class="description">{{ mail.description }}</p>
     {% endif %}
 {% endblock %}
 

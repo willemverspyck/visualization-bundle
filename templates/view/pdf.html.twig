@@ -1,51 +1,49 @@
 {% import '@SpyckVisualization/chart.html.twig' as chart %}
 
-{% apply spaceless %}
-    <!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <title>{{ dashboard.name }}</title>
-            {% block head %}
-                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-                <meta name="description" content="{{ dashboard.description|default('') }}">
-                <meta name="author" content="{{ dashboard.user }}">
-            {% endblock %}
-        </head>
-        <body>
-            {% block body %}
-                <div class="header">
-                    <div class="left">
-                        {% for parameter in dashboard.parametersAsString %}
-                            {{ parameter }}
-                            {% if loop.index > 0 %}
-                                <br>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    <div class="right">
-                        <div class="name">
-                            {{ dashboard.name }}
-                        </div>
-                        <div class="brand">
-                            <img src="{{ getDirectory('/images/icon.png') }}" width="24" height="24">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="footer">
-                    Page <span class="pagenum"></span>
-                </div>
-
-                <div id="content">
-                    {% for block in dashboard.blocks %}
-                        <div class="widget page-break-after-always">
-                            <h2>{{ block.name }}</h2>
-                            {{ chart.getFilters(block) }}
-                            {{ chart.getData(block, constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF'), false) }}
-                        </div>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{ dashboard.name }}</title>
+        {% block head %}
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <meta name="description" content="{{ dashboard.description|default('') }}">
+            <meta name="author" content="{{ dashboard.user }}">
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            <div class="header">
+                <div class="left">
+                    {% for parameter in dashboard.parametersAsString %}
+                        {{ parameter }}
+                        {% if loop.index > 0 %}
+                            <br>
+                        {% endif %}
                     {% endfor %}
                 </div>
-            {% endblock %}
-        </body>
-    </html>
-{% endapply %}
+                <div class="right">
+                    <div class="name">
+                        {{ dashboard.name }}
+                    </div>
+                    <div class="brand">
+                        <img src="{{ getDirectory('/images/icon.png') }}" width="24" height="24">
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                Page <span class="pagenum"></span>
+            </div>
+
+            <div id="content">
+                {% for block in dashboard.blocks %}
+                    <div class="widget page-break-after-always">
+                        <h2>{{ block.name }}</h2>
+                        {{ chart.getFilters(block) }}
+                        {{ chart.getData(block, constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF'), false) }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endblock %}
+    </body>
+</html>
