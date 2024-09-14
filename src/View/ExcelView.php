@@ -233,19 +233,25 @@ final class ExcelView extends AbstractView
                 });
                 $conditional->addCondition($format->getValue() instanceof DateTimeInterface ? Date::dateTimeToExcel($format->getValue()) : $format->getValue());
 
-                $color = $this->getColor($format->getColor()->getHex());
+                $style = $conditional->getStyle();
 
-                if ($format->isBackground()) {
-                    $conditional
-                        ->getStyle()
+                if (null !== $format->getColor()) {
+                    $style
+                        ->getFont()
+                        ->setColor(new Color($format->getColor()->getCodeAsHex()));
+                }
+
+                if (null !== $format->getColorBackground()) {
+                    $style
                         ->getFill()
                         ->setFillType(Fill::FILL_SOLID)
-                        ->setStartColor($color);
-                } else {
-                    $conditional
-                        ->getStyle()
+                        ->setStartColor(new Color($format->getColorBackground()->getCodeAsHex()));
+                }
+
+                if ($format->isBold()) {
+                    $style
                         ->getFont()
-                        ->setColor($color);
+                        ->setBold(true);
                 }
 
                 $content[] = $conditional;
@@ -258,7 +264,7 @@ final class ExcelView extends AbstractView
                 $conditional->getDataBar()
                     ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
                     ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
-                    ->setColor($format->getColor()->getHex());
+                    ->setColor($format->getColor()->getCodeAsHex());
 
                 $content[] = $conditional;
             }
@@ -270,8 +276,8 @@ final class ExcelView extends AbstractView
                 $conditional->getColorScale()
                     ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
                     ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
-                    ->setMinimumColor($this->getColor($format->getColorMin()->getHex()))
-                    ->setMaximumColor($this->getColor($format->getColorMax()->getHex()));
+                    ->setMinimumColor(new Color($format->getColorMin()->getCodeAsHex()))
+                    ->setMaximumColor(new Color($format->getColorMax()->getCodeAsHex()));
 
                 if (null !== $format->getColor()) {
                     if (null === $format->getValue()) {
@@ -287,7 +293,7 @@ final class ExcelView extends AbstractView
                     }
 
                     $conditional->getColorScale()
-                        ->setMidpointColor($this->getColor($format->getColor()->getHex()))
+                        ->setMidpointColor(new Color($format->getColor()->getCodeAsHex()))
                         ->setMidpointConditionalFormatValueObject($midpointConditionalFormatValueObject);
                 }
 
@@ -297,11 +303,6 @@ final class ExcelView extends AbstractView
         }
 
         return $content;
-    }
-
-    private function getColor(string $color): Color
-    {
-        return new Color($color);
     }
 
     private function getConditionalFormatValueObject(float|int|null $value, string $type = null): ConditionalFormatValueObject

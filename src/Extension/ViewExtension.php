@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Extension;
 
+use DateTimeInterface;
 use Exception;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Entity\Widget;
@@ -82,7 +83,7 @@ final class ViewExtension extends AbstractExtension
         return ViewUtility::getNumber($config, $value);
     }
 
-    public function getStyles(AbstractFieldInterface $field, $value): array
+    public function getStyles(AbstractFieldInterface $field, DateTimeInterface|float|int|string|null $value): array
     {
         $stylesForGroup = ViewUtility::getStyles($field, $value, true);
         $styles = ViewUtility::getStyles($field, $value, false);

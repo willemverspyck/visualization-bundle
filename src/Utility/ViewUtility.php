@@ -6,10 +6,12 @@ namespace Spyck\VisualizationBundle\Utility;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use DateTimeInterface;
 use Exception;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Field\AbstractFieldInterface;
 use Spyck\VisualizationBundle\Field\FieldInterface;
+use Spyck\VisualizationBundle\Format\Color;
 use Spyck\VisualizationBundle\Format\ConditionFormat;
 use Spyck\VisualizationBundle\Format\FormatInterface;
 use Spyck\VisualizationBundle\Format\ScaleFormat;
@@ -17,8 +19,9 @@ use Spyck\VisualizationBundle\Model\Aggregate;
 
 final class ViewUtility
 {
-    private const string STYLE_BACKGROUND_COLOR = 'background-color';
     private const string STYLE_COLOR = 'color';
+    private const string STYLE_COLOR_BACKGROUND = 'background-color';
+    private const string STYLE_BOLD = 'font-weight';
 
     public static function getNumber(Config $config, float|int $value): string
     {
@@ -54,32 +57,19 @@ final class ViewUtility
         return $data;
     }
 
-    public static function getStyles(AbstractFieldInterface $field, $value, bool $group): array
+    public static function getStyles(AbstractFieldInterface $field, DateTimeInterface|float|int|string|null $value, bool $group): array
     {
+        if (null === $value) {
+            return [];
+        }
+
         $formats = self::getFormats($field, $group);
 
         if ($formats->isEmpty()) {
             return [];
         }
 
-        if (null === $value) {
-            return [];
-        }
-
         $styles = [];
-
-        foreach ($formats as $format) {
-            if ($format instanceof ScaleFormat) {
-                if (false === array_key_exists(self::STYLE_BACKGROUND_COLOR, $styles)) {
-                    $aggregate = self::getAggregate($field, $group);
-                    $color = self::getColorPercentage($aggregate, $format, $value);
-
-                    if (null !== $color) {
-                        $styles[self::STYLE_BACKGROUND_COLOR] = $color;
-                    }
-                }
-            }
-        }
 
         foreach ($formats as $format) {
             if ($format instanceof ConditionFormat) {
@@ -89,15 +79,31 @@ final class ViewUtility
                     ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL => $value >= $format->getValue(),
                     ConditionFormat::OPERATOR_LESS_THAN => $value < $format->getValue(),
                     ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL => $value <= $format->getValue(),
-                    default => false,
+                    default => throw new Exception(sprintf('Operator "%s" not found', $format->getOperator())),
                 };
 
-                $name = $format->isBackground() ? self::STYLE_BACKGROUND_COLOR : self::STYLE_COLOR;
+                if ($condition) {
+                    if (null !== $format->getColor() && false === array_key_exists(self::STYLE_COLOR, $styles)) {
+                        $styles[self::STYLE_COLOR] = $format->getColor()->getCodeAsRgb();
+                    }
 
-                if ($condition && false === array_key_exists($name, $styles)) {
-                    $color = $format->getColor();
+                    if (null !== $format->getColorBackground() && false === array_key_exists(self::STYLE_COLOR_BACKGROUND, $styles)) {
+                        $styles[self::STYLE_COLOR_BACKGROUND] = $format->getColorBackground()->getCodeAsRgb();
+                    }
 
-                    $styles[$name] = $color->getHex();
+                    if ($format->isBold() && false === array_key_exists(self::STYLE_BOLD, $styles)) {
+                        $styles[self::STYLE_BOLD] = 'bold';
+                    }
+                }
+            }
+
+            if ($format instanceof ScaleFormat) {
+                if (false === array_key_exists(self::STYLE_COLOR_BACKGROUND, $styles)) {
+                    $color = self::getColorPercentage($field, $group, $format, $value);
+
+                    if (null !== $color) {
+                        $styles[self::STYLE_COLOR_BACKGROUND] = $color->getCodeAsRgb();
+                    }
                 }
             }
         }
@@ -158,14 +164,20 @@ final class ViewUtility
     private static function getPercentageOfMidpoint(?Aggregate $aggregate, ScaleFormat $format): float
     {
         if (null === $format->getValue()) {
-            return ScaleFormat::TYPE_MEDIAN === $format->getType() ? self::getPercentage($aggregate, $format, $aggregate->getMedian()) : 0.5;
+            if (ScaleFormat::TYPE_MEDIAN === $format->getType()) {
+                return self::getPercentage($aggregate, $format, $aggregate->getMedian());
+            }
+
+            return 0.5;
         }
 
         return self::getPercentage($aggregate, $format, $format->getValue());
     }
 
-    private static function getColorPercentage(?Aggregate $aggregate, ScaleFormat $format, float $value): ?string
+    private static function getColorPercentage(AbstractFieldInterface $field, bool $group, ScaleFormat $format, float $value): ?Color
     {
+        $aggregate = self::getAggregate($field, $group);
+
         $percentage = self::getPercentage($aggregate, $format, $value);
 
         if (null === $percentage) {
@@ -203,6 +215,6 @@ final class ViewUtility
         $green = self::getColorInterpolate($colorStart->getGreen(), $colorEnd->getGreen(), $step, $percentage);
         $blue = self::getColorInterpolate($colorStart->getBlue(), $colorEnd->getBlue(), $step, $percentage);
 
-        return sprintf('#%02x%02x%02x', $red, $green, $blue);
+        return new Color($red, $green, $blue);
     }
 }

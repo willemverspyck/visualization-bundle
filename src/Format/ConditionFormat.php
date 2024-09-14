@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Format;
 
-use DateTimeImmutable;
+use DateTimeInterface;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -17,21 +17,25 @@ final class ConditionFormat implements FormatInterface
     public const string OPERATOR_LESS_THAN_OR_EQUAL = '<=';
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private Color $color;
+    private ?Color $color;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private bool $background;
+    private ?Color $colorBackground;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
+    private bool $bold;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private string $operator;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private DateTimeImmutable|float|int|string|null $value = null;
+    private DateTimeInterface|float|int|string|null $value = null;
 
-    public function __construct(Color $color, bool $background = false, string $operator = ConditionFormat::OPERATOR_EQUAL, DateTimeImmutable|float|int|string|null $value = null)
+    public function __construct(?Color $color = null, ?Color $colorBackground = null, bool $bold = false, string $operator = ConditionFormat::OPERATOR_EQUAL, DateTimeInterface|float|int|string|null $value = null)
     {
         $this->setColor($color);
-        $this->setBackground($background);
+        $this->setColorBackground($colorBackground);
+        $this->setBold($bold);
         $this->setOperator($operator);
         $this->setValue($value);
     }
@@ -42,26 +46,38 @@ final class ConditionFormat implements FormatInterface
         return 'condition';
     }
 
-    public function getColor(): Color
+    public function getColor(): ?Color
     {
         return $this->color;
     }
 
-    public function setColor(Color $color): static
+    public function setColor(?Color $color): static
     {
         $this->color = $color;
 
         return $this;
     }
 
-    public function isBackground(): bool
+    public function getColorBackground(): ?Color
     {
-        return $this->background;
+        return $this->colorBackground;
     }
 
-    public function setBackground(bool $background): static
+    public function setColorBackground(?Color $colorBackground): static
     {
-        $this->background = $background;
+        $this->colorBackground = $colorBackground;
+
+        return $this;
+    }
+
+    public function isBold(): bool
+    {
+        return $this->bold;
+    }
+
+    public function setBold(bool $bold): static
+    {
+        $this->bold = $bold;
 
         return $this;
     }
@@ -78,12 +94,12 @@ final class ConditionFormat implements FormatInterface
         return $this;
     }
 
-    public function getValue(): DateTimeImmutable|float|int|string|null
+    public function getValue(): DateTimeInterface|float|int|string|null
     {
         return $this->value;
     }
 
-    public function setValue(DateTimeImmutable|float|int|string|null $value): static
+    public function setValue(DateTimeInterface|float|int|string|null $value): static
     {
         $this->value = $value;
 

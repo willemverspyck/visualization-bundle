@@ -9,6 +9,8 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 final class Color
 {
+    private const float ALPHA = 1;
+
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private int $red;
 
@@ -21,7 +23,7 @@ final class Color
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private float $alpha;
 
-    public function __construct(int $red, int $green, int $blue, float $alpha = 1)
+    public function __construct(int $red, int $green, int $blue, float $alpha = self::ALPHA)
     {
         $this->setRed($red);
         $this->setGreen($green);
@@ -77,8 +79,17 @@ final class Color
         return $this;
     }
 
-    public function getHex(): string
+    public function getCodeAsHex(bool $hash = false): string
     {
-        return sprintf('%02x%02x%02x', $this->getRed(), $this->getGreen(), $this->getBlue());
+        return sprintf('%s%02x%02x%02x', $hash ? '#' : '', $this->getRed(), $this->getGreen(), $this->getBlue());
+    }
+
+    public function getCodeAsRgb(): string
+    {
+        if (self::ALPHA === $this->getAlpha()) {
+            return sprintf('rgb(%d, %d, %d)', $this->getRed(), $this->getGreen(), $this->getBlue());
+        }
+
+        return sprintf('rgba(%d, %d, %d, %0.2f)', $this->getRed(), $this->getGreen(), $this->getBlue(), $this->getAlpha());
     }
 }
