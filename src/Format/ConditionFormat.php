@@ -29,9 +29,9 @@ final class ConditionFormat implements FormatInterface
     private string $operator;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
-    private DateTimeInterface|float|int|string|null $value = null;
+    private array|bool|DateTimeInterface|float|int|string|null $value = null;
 
-    public function __construct(?Color $color = null, ?Color $colorBackground = null, bool $bold = false, string $operator = ConditionFormat::OPERATOR_EQUAL, DateTimeInterface|float|int|string|null $value = null)
+    public function __construct(?Color $color = null, ?Color $colorBackground = null, bool $bold = false, string $operator = ConditionFormat::OPERATOR_EQUAL, array|bool|DateTimeInterface|float|int|string|null $value = null)
     {
         $this->setColor($color);
         $this->setColorBackground($colorBackground);
@@ -94,12 +94,12 @@ final class ConditionFormat implements FormatInterface
         return $this;
     }
 
-    public function getValue(): DateTimeInterface|float|int|string|null
+    public function getValue(): array|bool|DateTimeInterface|float|int|string|null
     {
         return $this->value;
     }
 
-    public function setValue(DateTimeInterface|float|int|string|null $value): static
+    public function setValue(array|bool|DateTimeInterface|float|int|string|null $value): static
     {
         $this->value = $value;
 

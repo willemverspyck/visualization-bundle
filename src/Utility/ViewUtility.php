@@ -57,7 +57,7 @@ final class ViewUtility
         return $data;
     }
 
-    public static function getStyles(AbstractFieldInterface $field, DateTimeInterface|float|int|string|null $value, bool $group): array
+    public static function getStyles(AbstractFieldInterface $field, array|bool|DateTimeInterface|float|int|string|null $value, bool $group): array
     {
         if (null === $value) {
             return [];

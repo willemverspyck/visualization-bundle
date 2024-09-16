@@ -83,7 +83,7 @@ final class ViewExtension extends AbstractExtension
         return ViewUtility::getNumber($config, $value);
     }
 
-    public function getStyles(AbstractFieldInterface $field, DateTimeInterface|float|int|string|null $value): array
+    public function getStyles(AbstractFieldInterface $field, array|bool|DateTimeInterface|float|int|string|null $value): array
     {
         $stylesForGroup = ViewUtility::getStyles($field, $value, true);
         $styles = ViewUtility::getStyles($field, $value, false);
