@@ -222,16 +222,17 @@ final class ExcelView extends AbstractView
         foreach ($formats as $format) {
             if ($format instanceof ConditionFormat) {
                 $conditional = new Conditional();
-                $conditional->setConditionType(Conditional::CONDITION_CELLIS);
-                $conditional->setOperatorType(match ($format->getOperator()) {
-                    ConditionFormat::OPERATOR_EQUAL => Conditional::OPERATOR_EQUAL,
-                    ConditionFormat::OPERATOR_GREATER_THAN => Conditional::OPERATOR_GREATERTHAN,
-                    ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL => Conditional::OPERATOR_GREATERTHANOREQUAL,
-                    ConditionFormat::OPERATOR_LESS_THAN => Conditional::OPERATOR_LESSTHAN,
-                    ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL => Conditional::OPERATOR_LESSTHANOREQUAL,
-                    default => throw new Exception(sprintf('Operator "%s" not found', $format->getOperator())),
-                });
-                $conditional->addCondition($format->getValue() instanceof DateTimeInterface ? Date::dateTimeToExcel($format->getValue()) : $format->getValue());
+                $conditional
+                    ->setConditionType(Conditional::CONDITION_CELLIS)
+                    ->setOperatorType(match ($format->getOperator()) {
+                        ConditionFormat::OPERATOR_EQUAL => Conditional::OPERATOR_EQUAL,
+                        ConditionFormat::OPERATOR_GREATER_THAN => Conditional::OPERATOR_GREATERTHAN,
+                        ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL => Conditional::OPERATOR_GREATERTHANOREQUAL,
+                        ConditionFormat::OPERATOR_LESS_THAN => Conditional::OPERATOR_LESSTHAN,
+                        ConditionFormat::OPERATOR_LESS_THAN_OR_EQUAL => Conditional::OPERATOR_LESSTHANOREQUAL,
+                        default => throw new Exception(sprintf('Operator "%s" not found', $format->getOperator())),
+                    })
+                    ->addCondition($this->getConditionFormatValue($format));
 
                 $style = $conditional->getStyle();
 
@@ -303,6 +304,17 @@ final class ExcelView extends AbstractView
         }
 
         return $content;
+    }
+
+    private function getConditionFormatValue(ConditionFormat $format): array|bool|float|int|string|null
+    {
+        $value = $format->getValue();
+
+        if ($value instanceof DateTimeInterface) {
+            return Date::dateTimeToExcel($value);
+        }
+
+        return $value;
     }
 
     private function getConditionalFormatValueObject(float|int|null $value, string $type = null): ConditionalFormatValueObject
