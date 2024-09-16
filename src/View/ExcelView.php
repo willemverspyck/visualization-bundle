@@ -222,6 +222,7 @@ final class ExcelView extends AbstractView
         foreach ($formats as $format) {
             if ($format instanceof ConditionFormat) {
                 $conditional = new Conditional();
+
                 $conditional
                     ->setConditionType(Conditional::CONDITION_CELLIS)
                     ->setOperatorType(match ($format->getOperator()) {
@@ -260,25 +261,29 @@ final class ExcelView extends AbstractView
 
             if ($format instanceof BarFormat) {
                 $conditional = new Conditional();
-                $conditional->setConditionType(Conditional::CONDITION_DATABAR);
-                $conditional->setDataBar(new ConditionalDataBar());
-                $conditional->getDataBar()
-                    ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
-                    ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
-                    ->setColor($format->getColor()->getCodeAsHex());
+
+                $conditional
+                    ->setConditionType(Conditional::CONDITION_DATABAR)
+                    ->setDataBar(new ConditionalDataBar())
+                    ->getDataBar()
+                        ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
+                        ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
+                        ->setColor($format->getColor()->getCodeAsHex());
 
                 $content[] = $conditional;
             }
 
             if ($format instanceof ScaleFormat) {
                 $conditional = new Conditional();
-                $conditional->setConditionType(Conditional::CONDITION_COLORSCALE);
-                $conditional->setColorScale(new ConditionalColorScale());
-                $conditional->getColorScale()
-                    ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
-                    ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
-                    ->setMinimumColor(new Color($format->getColorMin()->getCodeAsHex()))
-                    ->setMaximumColor(new Color($format->getColorMax()->getCodeAsHex()));
+
+                $conditional
+                    ->setConditionType(Conditional::CONDITION_COLORSCALE)
+                    ->setColorScale(new ConditionalColorScale())
+                    ->getColorScale()
+                        ->setMinimumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMin(), 'min'))
+                        ->setMaximumConditionalFormatValueObject($this->getConditionalFormatValueObject($format->getValueMax(), 'max'))
+                        ->setMinimumColor(new Color($format->getColorMin()->getCodeAsHex()))
+                        ->setMaximumColor(new Color($format->getColorMax()->getCodeAsHex()));
 
                 if (null !== $format->getColor()) {
                     if (null === $format->getValue()) {
