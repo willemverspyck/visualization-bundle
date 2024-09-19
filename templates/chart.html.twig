@@ -1,61 +1,65 @@
 {% macro getValue(type, config, value, view) %}
     {% import _self as self %}
 
-    {% if value is not null %}
-        {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_ARRAY')) %}
-            {% if value|length > 0 %}
-                <ul>
-                    {% for val in value %}
-                        <li>{{ val }}</li>
-                    {% endfor %}
-                </ul>
+    <span>
+        {% if value is not null %}
+            {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_ARRAY')) %}
+                {% if value|length > 0 %}
+                    <ul>
+                        {% for val in value %}
+                            <li>{{ val }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    -
+                {% endif %}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_BOOLEAN')) %}
+                {% if value is same as(true) %}
+                    Yes
+                {% elseif value is same as(false) %}
+                    No
+                {% else %}
+                    -
+                {% endif %}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) %}
+                &euro; {{ getNumber(config, value) }}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATE')) %}
+                {{ value|date('Y-m-d') }}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATETIME')) %}
+                {{ value|date('Y-m-d H:i:s') }}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_IMAGE')) %}
+                {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+                    <img src="{{ getDirectory(value) }}" alt="" width="32" height="32" align="top">
+                {% else %}
+                    <img src="{{ absolute_url(value) }}" alt="" width="32" height="32" align="top">
+                {% endif %}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) %}
+                {{ getNumber(config, value) }}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
+                {{ getNumber(config, value * 100) }}%
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_POSITION')) %}
+                {% if value > 0 %}
+                    <span class="up">&#9650;</span>
+                    <span>&nbsp;</span>
+                    <span>{{ value }}</span>
+                {% elseif value < 0 %}
+                    <span class="down">&#9660;</span>
+                    <span>&nbsp;</span>
+                    <span>{{ value|abs }}</span>
+                {% endif %}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_TIME')) %}
+                {{ value|date('H:i:s') }}
             {% else %}
-                -
+                {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
+                    {{ value|u.truncate(40, '...') }}
+                {% else %}
+                    {{ value }}
+                {% endif %}
             {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_BOOLEAN')) %}
-            {% if value is same as(true) %}
-                Yes
-            {% elseif value is same as(false) %}
-                No
-            {% else %}
-                -
-            {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) %}
-            &euro; {{ getNumber(config, value) }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATE')) %}
-            {{ value|date('Y-m-d') }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATETIME')) %}
-            {{ value|date('Y-m-d H:i:s') }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_IMAGE')) %}
-            {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                <img src="{{ getDirectory(value) }}" alt="" width="32" height="32" align="top">
-            {% else %}
-                <img src="{{ absolute_url(value) }}" alt="" width="32" height="32" align="top">
-            {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) %}
-            {{ getNumber(config, value) }}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
-            {{ getNumber(config, value * 100) }}%
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_POSITION')) %}
-            {% if value > 0 %}
-                <span class="up">&#9650;</span>
-                <span>&nbsp;</span>
-                <span>{{ value }}</span>
-            {% elseif value < 0 %}
-                <span class="down">&#9660;</span>
-                <span>&nbsp;</span>
-                <span>{{ value|abs }}</span>
-            {% endif %}
-        {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_TIME')) %}
-            {{ value|date('H:i:s') }}
         {% else %}
-            {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                {{ value|u.truncate(40, '...') }}
-            {% else %}
-                {{ value }}
-            {% endif %}
+            &nbsp;
         {% endif %}
-    {% endif %}
+    </span>
 {% endmacro %}
 
 {% macro getPreValue(type, formats, value, view) %}

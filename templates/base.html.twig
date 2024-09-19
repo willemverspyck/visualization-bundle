@@ -79,8 +79,8 @@
                                                                         {% set cell = attribute(row, fieldIndex) %}
 
                                                                         <td class="{{ getClasses(field)|join(' ') }}" style="{{ getStyles(field, cell.value)|map((value, key) => "#{key}: #{value}")|join('; ') }}">
-                                                                            <span>{{ chart.getPreValue(field.type, field.formats, cell.value, null) }}</span>
-                                                                            <span>{{ chart.getValue(field.type, field.config, cell.value, null) }}</span>
+                                                                            {{ chart.getPreValue(field.type, field.formats, cell.value, null) }}
+                                                                            {{ chart.getValue(field.type, field.config, cell.value, null) }}
                                                                             {% if mail.route and field.routes|length > 0 %}
                                                                                 <div class="route">
                                                                                     {% block route %}
