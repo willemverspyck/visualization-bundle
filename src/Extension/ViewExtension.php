@@ -13,8 +13,6 @@ use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Service\ChartService;
-use Spyck\VisualizationBundle\Utility\FormatUtility;
-use Spyck\VisualizationBundle\Utility\NumberUtility;
 use Spyck\VisualizationBundle\Utility\ViewUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;

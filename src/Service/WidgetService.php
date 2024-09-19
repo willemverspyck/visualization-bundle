@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Service;
 
-use App\Entity\AggregateInterface;
 use App\Utility\DataUtility;
 use Countable;
 use DateTime;

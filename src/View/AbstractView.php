@@ -8,7 +8,6 @@ use DateTimeInterface;
 use Exception;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Field\FieldInterface;
-use Spyck\VisualizationBundle\Utility\NumberUtility;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 abstract class AbstractView implements ViewInterface

@@ -12,7 +12,6 @@ use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Model\Dashboard;
-use Spyck\VisualizationBundle\Utility\NumberUtility;
 use Spyck\VisualizationBundle\Utility\ViewUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;

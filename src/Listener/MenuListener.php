@@ -33,7 +33,7 @@ final class MenuListener
         // Reverse the array so that the position of the menu element replaces the existing element at that position.
         $children = array_reverse($parent->getChildren()->toArray());
 
-        usort($children, function(Menu $a, Menu $b): int {
+        usort($children, function (Menu $a, Menu $b): int {
             if ($a->getPosition() === $b->getPosition()) {
                 return 0;
             }

@@ -20,7 +20,6 @@ use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\ConditionalFormatValueO
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Style;
-use Psr\Cache\CacheItemPoolInterface;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
@@ -31,15 +30,12 @@ use Spyck\VisualizationBundle\Model\Block;
 use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Utility\DataUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 
 final class ExcelView extends AbstractView
 {
     private Spreadsheet $spreadsheet;
-
-    public function __construct(private readonly CacheItemPoolInterface $cacheItemPool)
-    {
-    }
 
     /**
      * @throws Exception
@@ -95,9 +91,9 @@ final class ExcelView extends AbstractView
 
     private function setSpreadsheet(Dashboard $dashboard): void
     {
-        $psr16Cache = new Psr16Cache($this->cacheItemPool);
+        $cache = new Psr16Cache(new ArrayAdapter());
 
-        Settings::setCache($psr16Cache);
+        Settings::setCache($cache);
 
         $this->spreadsheet = new Spreadsheet();
 
@@ -287,7 +283,7 @@ final class ExcelView extends AbstractView
 
                 if (null !== $format->getColor()) {
                     if (null === $format->getValue()) {
-                        $type = match($format->getType()) {
+                        $type = match ($format->getType()) {
                             ScaleFormat::TYPE_MEAN => 'percent',
                             ScaleFormat::TYPE_MEDIAN => 'percentile',
                             default => throw new Exception(sprintf('Type "%s" not found', $format->getType())),
@@ -302,7 +298,6 @@ final class ExcelView extends AbstractView
                         ->setMidpointColor(new Color($format->getColor()->getCodeAsHex()))
                         ->setMidpointConditionalFormatValueObject($midpointConditionalFormatValueObject);
                 }
-
 
                 $content[] = $conditional;
             }
@@ -322,7 +317,7 @@ final class ExcelView extends AbstractView
         return $value;
     }
 
-    private function getConditionalFormatValueObject(float|int|null $value, string $type = null): ConditionalFormatValueObject
+    private function getConditionalFormatValueObject(float|int|null $value, ?string $type = null): ConditionalFormatValueObject
     {
         if (null === $value) {
             DataUtility::assert(null !== $type, new Exception('Type not found'));

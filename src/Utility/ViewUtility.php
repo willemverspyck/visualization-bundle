@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Utility;
 
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use DateTimeInterface;
 use Exception;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Field\AbstractFieldInterface;
@@ -73,7 +73,7 @@ final class ViewUtility
 
         foreach ($formats as $format) {
             if ($format instanceof ConditionFormat) {
-                $condition = match($format->getOperator()) {
+                $condition = match ($format->getOperator()) {
                     ConditionFormat::OPERATOR_EQUAL => $value === $format->getValue(),
                     ConditionFormat::OPERATOR_GREATER_THAN => $value > $format->getValue(),
                     ConditionFormat::OPERATOR_GREATER_THAN_OR_EQUAL => $value >= $format->getValue(),

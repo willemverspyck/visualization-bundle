@@ -10,7 +10,6 @@ use OpenApi\Attributes as OpenApi;
 use Psr\Cache\InvalidArgumentException;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
-use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Log;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Form\DashboardMailType;
