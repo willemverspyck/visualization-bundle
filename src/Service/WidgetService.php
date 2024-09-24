@@ -84,12 +84,12 @@ readonly class WidgetService
      * @throws Exception
      * @throws ParameterException
      */
-    public function getWidgetInstance(string $name, array $variables = [], bool $fill = false): WidgetInterface
+    public function getWidgetInstance(string $name, array $variables = [], bool $required = true): WidgetInterface
     {
         foreach ($this->widgets->getIterator() as $widget) {
             if (get_class($widget) === $name) {
-                $this->setParameters($widget, $variables, $fill);
-                $this->setFilters($widget, $variables, $fill);
+                $this->setParameters($widget, $variables, $required);
+                $this->setFilters($widget, $variables);
 
                 return $widget;
             }
@@ -275,7 +275,7 @@ readonly class WidgetService
         foreach ($dashboard->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
-            $widgetInstance = $this->getWidgetInstance($block->getWidget()->getAdapter(), $parameterBag->all(), true);
+            $widgetInstance = $this->getWidgetInstance($block->getWidget()->getAdapter(), $parameterBag->all(), false);
 
             foreach ($widgetInstance->getParameterData() as $parameter) {
                 $name = $parameter->getName();
@@ -330,13 +330,13 @@ readonly class WidgetService
      * @throws Exception
      * @throws ParameterException
      */
-    private function setParameters(WidgetInterface $widget, array $variables, bool $fill = false): void
+    private function setParameters(WidgetInterface $widget, array $variables, bool $required = true): void
     {
-        $parameters = $this->mapRequest($widget->getParameters(), function (ParameterInterface $parameter) use ($variables, $fill): void {
-            $data = $this->getRequestData($parameter, $variables, $fill);
+        $parameters = $this->mapRequest($widget->getParameters(), function (ParameterInterface $parameter) use ($variables, $required): void {
+            $data = $this->getRequestData($parameter, $variables);
 
             if (null === $data) {
-                if (false === $fill) {
+                if ($required) {
                     throw new ParameterException(sprintf('Parameter "%s" not found', $parameter->getName()));
                 }
 
@@ -367,10 +367,10 @@ readonly class WidgetService
     /**
      * Set the filters of a widget.
      */
-    private function setFilters(WidgetInterface $widget, array $variables, bool $fill = false): void
+    private function setFilters(WidgetInterface $widget, array $variables): void
     {
-        $filters = $this->mapRequest($widget->getFilters(), function (FilterInterface $filter) use ($variables, $fill): void {
-            $data = $this->getRequestData($filter, $variables, $fill);
+        $filters = $this->mapRequest($widget->getFilters(), function (FilterInterface $filter) use ($variables): void {
+            $data = $this->getRequestData($filter, $variables);
 
             if (null === $data) {
                 return;
@@ -397,7 +397,7 @@ readonly class WidgetService
     /**
      * @throws Exception
      */
-    private function getRequestData(RequestInterface $request, array $variables, bool $fill): ?string
+    private function getRequestData(RequestInterface $request, array $variables): ?string
     {
         $parameterBag = new ParameterBag();
         $parameterBag->add($variables);
@@ -414,10 +414,6 @@ readonly class WidgetService
             }
 
             return sprintf('%s', $variable);
-        }
-
-        if (false === $fill) {
-            return null;
         }
 
         return match (get_class($request)) {

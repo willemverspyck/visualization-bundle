@@ -42,7 +42,7 @@ readonly class BlockService
 
         $widget = $block->getWidget();
 
-        $widgetInstance = $this->widgetService->getWidgetInstance($widget->getAdapter(), $parameterBag->all(), true);
+        $widgetInstance = $this->widgetService->getWidgetInstance($widget->getAdapter(), $parameterBag->all());
 
         $blockAsModel->setName(null !== $block->getName() ? $block->getName() : $widget->getName());
         $blockAsModel->setDescription(null !== $block->getDescription() ? $block->getDescription() : $widget->getDescription());
