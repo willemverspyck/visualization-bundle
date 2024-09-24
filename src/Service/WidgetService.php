@@ -99,6 +99,22 @@ readonly class WidgetService
     }
 
     /**
+     * Get instance of widget by name.
+     *
+     * @throws Exception
+     * @throws ParameterException
+     */
+    public function getWidgetByBlock(BlockAsEntity $blockAsEntity, array $variables = [], bool $required = true): WidgetInterface
+    {
+        $parameterBag = new ParameterBag();
+        $parameterBag->add($blockAsEntity->getDashboard()->getVariables());
+        $parameterBag->add($blockAsEntity->getVariables());
+        $parameterBag->add($variables);
+
+        return $this->getWidget($blockAsEntity->getWidget()->getAdapter(), $parameterBag->all(), $required);
+    }
+
+    /**
      * @return array<string, WidgetInterface>
      */
     public function getWidgets(): array
@@ -223,7 +239,7 @@ readonly class WidgetService
         ], UrlGeneratorInterface::ABSOLUTE_URL));
 
         $parameters = [];
-        $parametersForDashboard = $this->getDashboardParameterData($dashboard);
+        $parametersForDashboard = $this->getParametersByDashboard($dashboard);
 
         $fields = $route->getData();
 
@@ -247,17 +263,13 @@ readonly class WidgetService
      *
      * @throws Exception
      * @throws ParameterException
-     *
-     * @todo: Duplicate in DashboardService
      */
-    public function getDashboardParameterData(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
+    public function getParametersByDashboard(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
     {
         $data = [];
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $parameterBag = BlockUtility::getParameterBag($block, $variables);
-
-            $widget = $this->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
+            $widget = $this->getWidgetByBlock($block, $variables, false);
 
             foreach ($widget->getParameterData() as $parameter) {
                 $name = $parameter->getName();

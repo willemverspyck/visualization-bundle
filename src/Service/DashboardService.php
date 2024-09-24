@@ -60,32 +60,6 @@ readonly class DashboardService
     }
 
     /**
-     * Get required parameters for dashboard.
-     *
-     * @return array<int, ParameterInterface>
-     *
-     * @throws Exception
-     */
-    public function getDashboardParameterData(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
-    {
-        $data = [];
-
-        foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $widget = $this->blockService->getWidget($block, $variables, false);
-
-            foreach ($widget->getParameterData() as $parameter) {
-                $name = $parameter->getName();
-
-                if (false === array_key_exists($name, $data)) {
-                    $data[$name] = $parameter;
-                }
-            }
-        }
-
-        return array_values($data);
-    }
-
-    /**
      * @return array<string, string>
      *
      * @throws Exception
@@ -94,7 +68,7 @@ readonly class DashboardService
     {
         $data = [];
 
-        foreach ($this->getDashboardParameterData($dashboardAsEntity, $variables) as $parameter) {
+        foreach ($this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables) as $parameter) {
             if ($field) {
                 $name = $parameter::getField();
             } else {
@@ -128,7 +102,7 @@ readonly class DashboardService
 
         $multipleParameters = new ArrayCollection();
 
-        $parameters = $this->getDashboardParameterData($dashboardAsEntity, $variables);
+        $parameters = $this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables);
 
         array_walk($parameters, function (ParameterInterface $parameter) use (&$data, &$multipleParameters, $slug): void {
             $parent = $parameter->getParent();
@@ -164,7 +138,7 @@ readonly class DashboardService
     {
         $returnData = [];
 
-        $parameters = $this->getDashboardParameterData($dashboardAsEntity, $variables);
+        $parameters = $this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables);
 
         foreach ($parameters as $parameter) {
             if ($parameter instanceof EntityParameterInterface) {
@@ -208,7 +182,7 @@ readonly class DashboardService
         $data = [];
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $widget = $this->getWidget($block, $variables);
+            $widget = $this->widgetService->getWidgetByBlock($block, $variables);
 
             $data = array_replace($data, $widget->getParameterDataRequest(), $widget->getFilterDataRequest());
         }

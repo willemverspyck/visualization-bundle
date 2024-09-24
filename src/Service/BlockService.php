@@ -28,25 +28,12 @@ readonly class BlockService
     }
 
     /**
-     * Get instance of widget by name.
-     *
-     * @throws Exception
-     * @throws ParameterException
-     */
-    public function getWidget(BlockAsEntity $blockAsEntity, array $variables = [], bool $required = true): WidgetInterface
-    {
-        $parameterBag = BlockUtility::getParameterBag($blockAsEntity, $variables);
-
-        return $this->widgetService->getWidget($blockAsEntity->getWidget()->getAdapter(), $parameterBag->all(), $required);
-    }
-
-    /**
      * @throws Exception
      * @throws InvalidArgumentException
      */
     public function getBlockAsModel(BlockAsEntity $blockAsEntity, array $variables = [], ?string $view = null, bool $preload = false): BlockAsModel
     {
-        $widget = $this->getWidget($blockAsEntity, $variables);
+        $widget = $this->widgetService->getWidgetByBlock($blockAsEntity, $variables);
         $widgetAsEntity = $blockAsEntity->getWidget();
 
         $blockAsModel = new BlockAsModel();
