@@ -18,7 +18,7 @@ use Spyck\ApiExtension\Model\Pagination;
 use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Entity\Block;
 use Spyck\VisualizationBundle\Entity\Dashboard;
-use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
 use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Field\AbstractFieldInterface;
 use Spyck\VisualizationBundle\Field\Field;
@@ -84,7 +84,7 @@ readonly class WidgetService
      * @throws Exception
      * @throws ParameterException
      */
-    public function getWidgetInstance(string $name, array $variables = [], bool $required = true): WidgetInterface
+    public function getWidget(string $name, array $variables = [], bool $required = true): WidgetInterface
     {
         foreach ($this->widgets->getIterator() as $widget) {
             if (get_class($widget) === $name) {
@@ -257,7 +257,7 @@ readonly class WidgetService
         foreach ($dashboard->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
-            $widgetInstance = $this->getWidgetInstance($block->getWidget()->getAdapter(), $parameterBag->all(), false);
+            $widgetInstance = $this->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
 
             foreach ($widgetInstance->getParameterData() as $parameter) {
                 $name = $parameter->getName();
@@ -278,29 +278,29 @@ readonly class WidgetService
      *
      * @todo: setParametersAsString and setParametersAsStringForSlug for unique naming when downloading
      */
-    private function getWidgetDataByWidget(?Widget $widget, array $variables = []): DashboardAsModel
+    private function getWidgetDataByWidget(?WidgetAsEntity $widgetAsEntity, array $variables = []): DashboardAsModel
     {
-        if (null === $widget) {
+        if (null === $widgetAsEntity) {
             throw new NotFoundHttpException('The widget does not exist');
         }
 
         $currentRequest = $this->requestStack->getCurrentRequest();
 
-        $widgetInstance = $this->getWidgetInstance($widget->getAdapter(), $variables);
-        $widgetInstance->setWidget($widget);
-        $widgetInstance->setView(null === $currentRequest ? ViewInterface::JSON : $currentRequest->getRequestFormat());
+        $widget = $this->getWidget($widgetAsEntity->getAdapter(), $variables);
+        $widget->setWidget($widgetAsEntity);
+        $widget->setView(null === $currentRequest ? ViewInterface::JSON : $currentRequest->getRequestFormat());
 
         $blockAsModel = new BlockAsModel();
-        $blockAsModel->setWidget($this->getWidgetAsModel($widgetInstance));
-        $blockAsModel->setName($widget->getName());
-        $blockAsModel->setDescriptionEmpty($widget->getDescriptionEmpty());
-        $blockAsModel->setCharts($widget->getCharts());
+        $blockAsModel->setWidget($this->getWidgetAsModel($widget));
+        $blockAsModel->setName($widgetAsEntity->getName());
+        $blockAsModel->setDescriptionEmpty($widgetAsEntity->getDescriptionEmpty());
+        $blockAsModel->setCharts($widgetAsEntity->getCharts());
 
         $user = $this->userService->getUser();
 
         $dashboardAsModel = new DashboardAsModel();
         $dashboardAsModel->setUser($user);
-        $dashboardAsModel->setName($widget->getName());
+        $dashboardAsModel->setName($widgetAsEntity->getName());
         $dashboardAsModel->addBlock($blockAsModel);
 
         return $dashboardAsModel;

@@ -38,7 +38,7 @@ readonly class BlockService
 
         $widget = $block->getWidget();
 
-        $widgetInstance = $this->widgetService->getWidgetInstance($widget->getAdapter(), $parameterBag->all());
+        $widgetInstance = $this->widgetService->getWidget($widget->getAdapter(), $parameterBag->all());
 
         if ($preload) {
             $widgetInstance->setWidget($widget);

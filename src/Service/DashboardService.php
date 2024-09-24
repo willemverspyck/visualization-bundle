@@ -73,7 +73,7 @@ readonly class DashboardService
         foreach ($dashboard->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
-            $widgetInstance = $this->widgetService->getWidgetInstance($block->getWidget()->getAdapter(), $parameterBag->all(), false);
+            $widgetInstance = $this->widgetService->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
 
             foreach ($widgetInstance->getParameterData() as $parameter) {
                 $name = $parameter->getName();
@@ -212,7 +212,7 @@ readonly class DashboardService
         foreach ($dashboard->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
-            $widgetInstance = $this->widgetService->getWidgetInstance($block->getWidget()->getAdapter(), $parameterBag->all());
+            $widgetInstance = $this->widgetService->getWidget($block->getWidget()->getAdapter(), $parameterBag->all());
 
             $data = array_replace($data, $widgetInstance->getParameterDataRequest(), $widgetInstance->getFilterDataRequest());
         }
