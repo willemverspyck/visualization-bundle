@@ -137,30 +137,12 @@ readonly class WidgetService
     }
 
     /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws ParameterException
-     */
-    public function getWidgetAsModel(Block $block, array $variables, ?string $view): WidgetAsModel
-    {
-        $parameterBag = BlockUtility::getParameterBag($block, $variables);
-
-        $widget = $block->getWidget();
-
-        $widgetInstance = $this->getWidgetInstance($widget->getAdapter(), $parameterBag->all());
-        $widgetInstance->setWidget($widget);
-        $widgetInstance->setView($view);
-
-        return $this->getWidgetData($widgetInstance);
-    }
-
-    /**
      * Get the data with a callback.
      *
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getWidgetData(WidgetInterface $widget): WidgetAsModel
+    public function getWidgetAsModel(WidgetInterface $widget): WidgetAsModel
     {
         $data = $this->getDataWithCache($widget);
 
@@ -308,20 +290,20 @@ readonly class WidgetService
         $widgetInstance->setWidget($widget);
         $widgetInstance->setView(null === $currentRequest ? ViewInterface::JSON : $currentRequest->getRequestFormat());
 
-        $block = new BlockAsModel();
-        $block->setWidget($this->getWidgetData($widgetInstance));
-        $block->setName($widget->getName());
-        $block->setDescriptionEmpty($widget->getDescriptionEmpty());
-        $block->setCharts($widget->getCharts());
+        $blockAsModel = new BlockAsModel();
+        $blockAsModel->setWidget($this->getWidgetAsModel($widgetInstance));
+        $blockAsModel->setName($widget->getName());
+        $blockAsModel->setDescriptionEmpty($widget->getDescriptionEmpty());
+        $blockAsModel->setCharts($widget->getCharts());
 
         $user = $this->userService->getUser();
 
-        $dashboard = new DashboardAsModel();
-        $dashboard->setUser($user);
-        $dashboard->setName($widget->getName());
-        $dashboard->addBlock($block);
+        $dashboardAsModel = new DashboardAsModel();
+        $dashboardAsModel->setUser($user);
+        $dashboardAsModel->setName($widget->getName());
+        $dashboardAsModel->addBlock($blockAsModel);
 
-        return $dashboard;
+        return $dashboardAsModel;
     }
 
     /**

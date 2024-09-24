@@ -36,13 +36,16 @@ readonly class BlockService
 
         $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
-        if ($preload) {
-            $blockAsModel->setWidget($this->widgetService->getWidgetAsModel($block, $parameterBag->all(), $view));
-        }
-
         $widget = $block->getWidget();
 
         $widgetInstance = $this->widgetService->getWidgetInstance($widget->getAdapter(), $parameterBag->all());
+
+        if ($preload) {
+            $widgetInstance->setWidget($widget);
+            $widgetInstance->setView($view);
+
+            $blockAsModel->setWidget($this->widgetService->getWidgetAsModel($widgetInstance));
+        }
 
         $blockAsModel->setName(null !== $block->getName() ? $block->getName() : $widget->getName());
         $blockAsModel->setDescription(null !== $block->getDescription() ? $block->getDescription() : $widget->getDescription());
