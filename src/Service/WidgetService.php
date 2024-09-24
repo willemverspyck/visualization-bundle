@@ -257,9 +257,9 @@ readonly class WidgetService
         foreach ($dashboardAsEntity->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
-            $widgetInstance = $this->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
+            $widget = $this->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
 
-            foreach ($widgetInstance->getParameterData() as $parameter) {
+            foreach ($widget->getParameterData() as $parameter) {
                 $name = $parameter->getName();
 
                 if (false === array_key_exists($name, $data)) {

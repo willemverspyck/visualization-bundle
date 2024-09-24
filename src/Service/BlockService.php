@@ -8,6 +8,7 @@ use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Block as BlockAsEntity;
 use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
+use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
 use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
@@ -27,18 +28,28 @@ readonly class BlockService
     }
 
     /**
+     * Get instance of widget by name.
+     *
+     * @throws Exception
+     * @throws ParameterException
+     */
+    public function getWidget(BlockAsEntity $blockAsEntity, array $variables = [], bool $required = true): WidgetInterface
+    {
+        $parameterBag = BlockUtility::getParameterBag($blockAsEntity, $variables);
+
+        return $this->widgetService->getWidget($blockAsEntity->getWidget()->getAdapter(), $parameterBag->all(), $required);
+    }
+
+    /**
      * @throws Exception
      * @throws InvalidArgumentException
      */
     public function getBlockAsModel(BlockAsEntity $blockAsEntity, array $variables = [], ?string $view = null, bool $preload = false): BlockAsModel
     {
-        $blockAsModel = new BlockAsModel();
-
-        $parameterBag = BlockUtility::getParameterBag($blockAsEntity, $variables);
-
+        $widget = $this->getWidget($blockAsEntity, $variables);
         $widgetAsEntity = $blockAsEntity->getWidget();
 
-        $widget = $this->widgetService->getWidget($widgetAsEntity->getAdapter(), $parameterBag->all());
+        $blockAsModel = new BlockAsModel();
 
         if ($preload) {
             $widget->setWidget($widgetAsEntity);

@@ -71,11 +71,9 @@ readonly class DashboardService
         $data = [];
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $parameterBag = BlockUtility::getParameterBag($block, $variables);
+            $widget = $this->blockService->getWidget($block, $variables, false);
 
-            $widgetInstance = $this->widgetService->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
-
-            foreach ($widgetInstance->getParameterData() as $parameter) {
+            foreach ($widget->getParameterData() as $parameter) {
                 $name = $parameter->getName();
 
                 if (false === array_key_exists($name, $data)) {
@@ -210,9 +208,7 @@ readonly class DashboardService
         $data = [];
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $parameterBag = BlockUtility::getParameterBag($block, $variables);
-
-            $widgetInstance = $this->widgetService->getWidget($block->getWidget()->getAdapter(), $parameterBag->all());
+            $widgetInstance = $this->getWidget($block, $variables);
 
             $data = array_replace($data, $widgetInstance->getParameterDataRequest(), $widgetInstance->getFilterDataRequest());
         }
