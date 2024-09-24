@@ -6,8 +6,8 @@ namespace Spyck\VisualizationBundle\Service;
 
 use Exception;
 use Psr\Cache\InvalidArgumentException;
-use Spyck\VisualizationBundle\Entity\Block;
-use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Entity\Block as BlockAsEntity;
+use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
 use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
@@ -30,46 +30,46 @@ readonly class BlockService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getBlockAsModel(Block $block, array $variables = [], ?string $view = null, bool $preload = false): BlockAsModel
+    public function getBlockAsModel(BlockAsEntity $blockAsEntity, array $variables = [], ?string $view = null, bool $preload = false): BlockAsModel
     {
         $blockAsModel = new BlockAsModel();
 
-        $parameterBag = BlockUtility::getParameterBag($block, $variables);
+        $parameterBag = BlockUtility::getParameterBag($blockAsEntity, $variables);
 
-        $widget = $block->getWidget();
+        $widgetAsEntity = $blockAsEntity->getWidget();
 
-        $widgetInstance = $this->widgetService->getWidget($widget->getAdapter(), $parameterBag->all());
+        $widget = $this->widgetService->getWidget($widgetAsEntity->getAdapter(), $parameterBag->all());
 
         if ($preload) {
-            $widgetInstance->setWidget($widget);
-            $widgetInstance->setView($view);
+            $widget->setWidget($widgetAsEntity);
+            $widget->setView($view);
 
-            $blockAsModel->setWidget($this->widgetService->getWidgetAsModel($widgetInstance));
+            $blockAsModel->setWidget($this->widgetService->getWidgetAsModel($widget));
         }
 
-        $blockAsModel->setName(null !== $block->getName() ? $block->getName() : $widget->getName());
-        $blockAsModel->setDescription(null !== $block->getDescription() ? $block->getDescription() : $widget->getDescription());
-        $blockAsModel->setDescriptionEmpty($widget->getDescriptionEmpty());
-        $blockAsModel->setSize($block->getSize());
-        $blockAsModel->setFilters($this->getBlockFilter($widgetInstance));
-        $blockAsModel->setParameters($this->getBlockParameters($widgetInstance));
-        $blockAsModel->setDownloads($this->getDownloads($block));
-        $blockAsModel->setUrl($this->getBlockUrl($block, ViewInterface::JSON));
-        $blockAsModel->setCharts($this->getCharts($block, $widget));
-        $blockAsModel->setFilter($block->hasFilter());
-        $blockAsModel->setFilterView($block->hasFilterView());
+        $blockAsModel->setName(null !== $blockAsEntity->getName() ? $blockAsEntity->getName() : $widgetAsEntity->getName());
+        $blockAsModel->setDescription(null !== $blockAsEntity->getDescription() ? $blockAsEntity->getDescription() : $widgetAsEntity->getDescription());
+        $blockAsModel->setDescriptionEmpty($widgetAsEntity->getDescriptionEmpty());
+        $blockAsModel->setSize($blockAsEntity->getSize());
+        $blockAsModel->setFilters($this->getBlockFilter($widget));
+        $blockAsModel->setParameters($this->getBlockParameters($widget));
+        $blockAsModel->setDownloads($this->getDownloads($blockAsEntity));
+        $blockAsModel->setUrl($this->getBlockUrl($blockAsEntity, ViewInterface::JSON));
+        $blockAsModel->setCharts($this->getCharts($blockAsEntity, $widgetAsEntity));
+        $blockAsModel->setFilter($blockAsEntity->hasFilter());
+        $blockAsModel->setFilterView($blockAsEntity->hasFilterView());
 
         return $blockAsModel;
     }
 
-    private function getCharts(Block $block, Widget $widget): array
+    private function getCharts(BlockAsEntity $blockAsEntity, WidgetAsEntity $widget): array
     {
-        if (null === $block->getChart()) {
+        if (null === $blockAsEntity->getChart()) {
             return $widget->getCharts();
         }
 
-        if (in_array($block->getChart(), $widget->getCharts(), true)) {
-            return array_values(array_unique(array_merge([$block->getChart()], $widget->getCharts())));
+        if (in_array($blockAsEntity->getChart(), $widget->getCharts(), true)) {
+            return array_values(array_unique(array_merge([$blockAsEntity->getChart()], $widget->getCharts())));
         }
 
         return $widget->getCharts();
@@ -155,9 +155,9 @@ readonly class BlockService
     /**
      * Get url of the widget.
      */
-    private function getBlockUrl(Block $block, string $format): string
+    private function getBlockUrl(BlockAsEntity $blockAsEntity, string $format): string
     {
-        $widget = $block->getWidget();
+        $widget = $blockAsEntity->getWidget();
 
         $parameters = [
             'widgetId' => $widget->getId(),
@@ -175,14 +175,14 @@ readonly class BlockService
         return array_merge($widgetInstance->getParameterDataRequest(), $widgetInstance->getFilterDataRequest());
     }
 
-    private function getDownloads(Block $block): array
+    private function getDownloads(BlockAsEntity $blockAsEntity): array
     {
         $data = [];
 
         foreach ($this->viewService->getViews() as $name => $view) {
             $data[] = [
                 'name' => $this->translator->trans(id: sprintf('view.%s.name', $name), domain: 'SpyckVisualizationBundle'),
-                'url' => $this->getBlockUrl($block, $name),
+                'url' => $this->getBlockUrl($blockAsEntity, $name),
             ];
         }
 

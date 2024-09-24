@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 use Psr\Cache\InvalidArgumentException;
 use ReflectionClass;
-use Spyck\VisualizationBundle\Entity\Dashboard;
+use Spyck\VisualizationBundle\Entity\Dashboard as DashboardAsEntity;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Model\Route as RouteAsModel;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
@@ -29,28 +29,28 @@ readonly class DashboardService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function getDashboardAsModel(Dashboard $dashboard, array $variables = [], ?string $view = null, bool $preload = false): DashboardAsModel
+    public function getDashboardAsModel(DashboardAsEntity $dashboardAsEntity, array $variables = [], ?string $view = null, bool $preload = false): DashboardAsModel
     {
         $user = $this->userService->getUser();
 
-        $variables = $this->filterVariables($dashboard, $variables);
+        $variables = $this->filterVariables($dashboardAsEntity, $variables);
 
-        $dashboardRoute = $this->getDashboardRoute($dashboard, $variables);
+        $dashboardRoute = $this->getDashboardRoute($dashboardAsEntity, $variables);
 
         $dashboardAsModel = new DashboardAsModel();
 
         $dashboardAsModel
             ->setUser($user)
-            ->setName($dashboard->getName())
-            ->setDescription($dashboard->getDescription())
+            ->setName($dashboardAsEntity->getName())
+            ->setDescription($dashboardAsEntity->getDescription())
             ->setUrl($dashboardRoute->getUrl())
-            ->setParameters($this->getDashboardParameters($dashboard, $variables))
-            ->setParametersAsString($this->getDashboardParametersAsString($dashboard, $variables))
-            ->setParametersAsStringForSlug($this->getDashboardParametersAsString($dashboard, $variables, true))
-            ->setDownloads($this->getDownloads($dashboard, $variables))
-            ->setVariables($this->getVariables($dashboard, $variables));
+            ->setParameters($this->getDashboardParameters($dashboardAsEntity, $variables))
+            ->setParametersAsString($this->getDashboardParametersAsString($dashboardAsEntity, $variables))
+            ->setParametersAsStringForSlug($this->getDashboardParametersAsString($dashboardAsEntity, $variables, true))
+            ->setDownloads($this->getDownloads($dashboardAsEntity, $variables))
+            ->setVariables($this->getVariables($dashboardAsEntity, $variables));
 
-        foreach ($dashboard->getBlocks() as $block) {
+        foreach ($dashboardAsEntity->getBlocks() as $block) {
             $blockAsModel = $this->blockService->getBlockAsModel($block, $variables, $view, $preload);
 
             $dashboardAsModel->addBlock($blockAsModel);
@@ -66,11 +66,11 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function getDashboardParameterData(Dashboard $dashboard, array $variables = []): array
+    public function getDashboardParameterData(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
     {
         $data = [];
 
-        foreach ($dashboard->getBlocks() as $block) {
+        foreach ($dashboardAsEntity->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
             $widgetInstance = $this->widgetService->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
@@ -92,11 +92,11 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function getDashboardParameters(Dashboard $dashboard, array $variables, bool $field = false): array
+    public function getDashboardParameters(DashboardAsEntity $dashboardAsEntity, array $variables, bool $field = false): array
     {
         $data = [];
 
-        foreach ($this->getDashboardParameterData($dashboard, $variables) as $parameter) {
+        foreach ($this->getDashboardParameterData($dashboardAsEntity, $variables) as $parameter) {
             if ($field) {
                 $name = $parameter::getField();
             } else {
@@ -124,13 +124,13 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function getDashboardParametersAsString(Dashboard $dashboard, array $variables, bool $slug = false): array
+    public function getDashboardParametersAsString(DashboardAsEntity $dashboardAsEntity, array $variables, bool $slug = false): array
     {
         $data = [];
 
         $multipleParameters = new ArrayCollection();
 
-        $parameters = $this->getDashboardParameterData($dashboard, $variables);
+        $parameters = $this->getDashboardParameterData($dashboardAsEntity, $variables);
 
         array_walk($parameters, function (ParameterInterface $parameter) use (&$data, &$multipleParameters, $slug): void {
             $parent = $parameter->getParent();
@@ -162,11 +162,11 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function checkDashboardParameterData(Dashboard $dashboard, array $variables = []): ?array
+    public function checkDashboardParameterData(DashboardAsEntity $dashboardAsEntity, array $variables = []): ?array
     {
         $returnData = [];
 
-        $parameters = $this->getDashboardParameterData($dashboard, $variables);
+        $parameters = $this->getDashboardParameterData($dashboardAsEntity, $variables);
 
         foreach ($parameters as $parameter) {
             if ($parameter instanceof EntityParameterInterface) {
@@ -189,14 +189,14 @@ readonly class DashboardService
         return $returnData;
     }
 
-    public function getDashboardRoute(Dashboard $dashboard, array $variables = []): RouteAsModel
+    public function getDashboardRoute(DashboardAsEntity $dashboardAsEntity, array $variables = []): RouteAsModel
     {
-        $variables['dashboardId'] = $dashboard->getId();
+        $variables['dashboardId'] = $dashboardAsEntity->getId();
 
-        $route = new RouteAsModel();
+        $routeAsModel = new RouteAsModel();
 
-        return $route
-            ->setName($dashboard->getName())
+        return $routeAsModel
+            ->setName($dashboardAsEntity->getName())
             ->setUrl($this->router->generate('spyck_visualization_dashboard_show', $variables, UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
@@ -205,11 +205,11 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    private function filterVariables(Dashboard $dashboard, array $variables = []): array
+    private function filterVariables(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
     {
         $data = [];
 
-        foreach ($dashboard->getBlocks() as $block) {
+        foreach ($dashboardAsEntity->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
             $widgetInstance = $this->widgetService->getWidget($block->getWidget()->getAdapter(), $parameterBag->all());
@@ -220,7 +220,7 @@ readonly class DashboardService
         return array_intersect_key($variables, $data);
     }
 
-    private function getDownloads(Dashboard $dashboard, array $variables): array
+    private function getDownloads(DashboardAsEntity $dashboardAsEntity, array $variables): array
     {
         $data = [];
 
@@ -233,7 +233,7 @@ readonly class DashboardService
 
         return [
             'url' => $this->router->generate('spyck_visualization_dashboard_mail', [
-                'dashboardId' => $dashboard->getId(),
+                'dashboardId' => $dashboardAsEntity->getId(),
             ], UrlGeneratorInterface::ABSOLUTE_URL),
             'fields' => [
                 'view' => [
@@ -246,9 +246,9 @@ readonly class DashboardService
         ];
     }
 
-    private function getVariables(Dashboard $dashboard, array $variables): array
+    private function getVariables(DashboardAsEntity $dashboardAsEntity, array $variables): array
     {
-        $data = $this->getDashboardParameters($dashboard, $variables, true);
+        $data = $this->getDashboardParameters($dashboardAsEntity, $variables, true);
 
         return array_merge($data, $variables);
     }

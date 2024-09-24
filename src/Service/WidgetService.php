@@ -16,8 +16,8 @@ use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Spyck\ApiExtension\Model\Pagination;
 use Spyck\VisualizationBundle\Callback\Callback;
-use Spyck\VisualizationBundle\Entity\Block;
-use Spyck\VisualizationBundle\Entity\Dashboard;
+use Spyck\VisualizationBundle\Entity\Block as BlockAsEntity;
+use Spyck\VisualizationBundle\Entity\Dashboard as DashboardAsEntity;
 use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
 use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Field\AbstractFieldInterface;
@@ -250,11 +250,11 @@ readonly class WidgetService
      *
      * @todo: Duplicate in DashboardService
      */
-    public function getDashboardParameterData(Dashboard $dashboard, array $variables = []): array
+    public function getDashboardParameterData(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
     {
         $data = [];
 
-        foreach ($dashboard->getBlocks() as $block) {
+        foreach ($dashboardAsEntity->getBlocks() as $block) {
             $parameterBag = BlockUtility::getParameterBag($block, $variables);
 
             $widgetInstance = $this->getWidget($block->getWidget()->getAdapter(), $parameterBag->all(), false);
