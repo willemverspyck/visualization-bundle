@@ -594,16 +594,16 @@ readonly class WidgetService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    private function getKeyForCache(WidgetInterface $widgetInstance): string
+    private function getKeyForCache(WidgetInterface $widget): string
     {
-        $widget = $widgetInstance->getWidget();
+        $widgetAsEntity = $widget->getWidget();
 
         $data = [
-            $widget->getAdapter(),
-            serialize($widget->getTimestampCreated()),
-            serialize($widget->getTimestampUpdated()),
-            serialize($widgetInstance->getParameterDataRequest()),
-            serialize($widgetInstance->getFilterDataRequest()),
+            $widgetAsEntity->getAdapter(),
+            serialize($widgetAsEntity->getTimestampCreated()),
+            serialize($widgetAsEntity->getTimestampUpdated()),
+            serialize($widget->getParameterDataRequest()),
+            serialize($widget->getFilterDataRequest()),
         ];
 
         return CacheUtility::getCacheKey(__CLASS__, $data);

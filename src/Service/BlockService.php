@@ -181,9 +181,9 @@ readonly class BlockService
     /**
      * Get url of the widget.
      */
-    private function getBlockParameters(WidgetInterface $widgetInstance): array
+    private function getBlockParameters(WidgetInterface $widget): array
     {
-        return array_merge($widgetInstance->getParameterDataRequest(), $widgetInstance->getFilterDataRequest());
+        return array_merge($widget->getParameterDataRequest(), $widget->getFilterDataRequest());
     }
 
     private function getDownloads(BlockAsEntity $blockAsEntity): array

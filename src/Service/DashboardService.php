@@ -208,9 +208,9 @@ readonly class DashboardService
         $data = [];
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $widgetInstance = $this->getWidget($block, $variables);
+            $widget = $this->getWidget($block, $variables);
 
-            $data = array_replace($data, $widgetInstance->getParameterDataRequest(), $widgetInstance->getFilterDataRequest());
+            $data = array_replace($data, $widget->getParameterDataRequest(), $widget->getFilterDataRequest());
         }
 
         return array_intersect_key($variables, $data);
