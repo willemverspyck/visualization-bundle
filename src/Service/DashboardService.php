@@ -68,7 +68,7 @@ readonly class DashboardService
     {
         $data = [];
 
-        foreach ($this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables) as $parameter) {
+        foreach ($this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables, true) as $parameter) {
             if ($field) {
                 $name = $parameter::getField();
             } else {
@@ -82,9 +82,7 @@ readonly class DashboardService
             }
 
             if ($parameter instanceof EntityParameterInterface) {
-                if ($parameter->isRequest()) {
-                    $data[$name] = $parameter;
-                }
+                $data[$name] = $parameter;
             }
         }
 
@@ -102,7 +100,7 @@ readonly class DashboardService
 
         $multipleParameters = new ArrayCollection();
 
-        $parameters = $this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables);
+        $parameters = $this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables, true);
 
         array_walk($parameters, function (ParameterInterface $parameter) use (&$data, &$multipleParameters, $slug): void {
             $parent = $parameter->getParent();

@@ -84,11 +84,11 @@ readonly class WidgetService
      * @throws Exception
      * @throws ParameterException
      */
-    public function getWidget(string $name, array $variables = [], bool $required = true): WidgetInterface
+    public function getWidget(string $name, array $variables = [], array $variablesForRequest = [], bool $required = true): WidgetInterface
     {
         foreach ($this->widgets->getIterator() as $widget) {
             if (get_class($widget) === $name) {
-                $this->setParameters($widget, $variables, $required);
+                $this->setParameters($widget, $variables, $variablesForRequest, $required);
                 $this->setFilters($widget, $variables);
 
                 return $widget;
@@ -111,7 +111,11 @@ readonly class WidgetService
         $parameterBag->add($blockAsEntity->getVariables());
         $parameterBag->add($variables);
 
-        return $this->getWidget($blockAsEntity->getWidget()->getAdapter(), $parameterBag->all(), $required);
+        $parameterBagForRequest = new ParameterBag();
+        $parameterBagForRequest->add($blockAsEntity->getDashboard()->getVariables());
+        $parameterBagForRequest->add($variables);
+
+        return $this->getWidget($blockAsEntity->getWidget()->getAdapter(), $parameterBag->all(), $parameterBagForRequest->all(), $required);
     }
 
     /**
@@ -220,7 +224,7 @@ readonly class WidgetService
      * @throws Exception
      * @throws ParameterException
      */
-    public function getParametersByDashboard(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
+    public function getParametersByDashboard(DashboardAsEntity $dashboardAsEntity, array $variables = [], bool $request = false): array
     {
         $data = [];
 
@@ -230,7 +234,7 @@ readonly class WidgetService
             foreach ($widget->getParameterData() as $parameter) {
                 $name = $parameter->getName();
 
-                if (false === array_key_exists($name, $data)) {
+                if (false === array_key_exists($name, $data) && $this->validateParameter($parameter, $request)) {
                     $data[$name] = $parameter;
                 }
             }
@@ -341,9 +345,9 @@ readonly class WidgetService
      * @throws Exception
      * @throws ParameterException
      */
-    private function setParameters(WidgetInterface $widget, array $variables, bool $required = true): void
+    private function setParameters(WidgetInterface $widget, array $variables, array $variablesForRequest, bool $required = true): void
     {
-        $parameters = $this->mapRequest($widget->getParameters(), function (ParameterInterface $parameter) use ($variables, $required): void {
+        $parameters = $this->mapRequest($widget->getParameters(), function (ParameterInterface $parameter) use ($variables, $variablesForRequest, $required): void {
             $data = $this->getDataForRequest($parameter, $variables);
 
             if (null === $data) {
@@ -357,18 +361,10 @@ readonly class WidgetService
             $parameter->setData($data);
 
             if ($parameter instanceof EntityParameterInterface) {
-                $queryBag = new ParameterBag();
-
-                $request = $this->requestStack->getCurrentRequest();
-
-                if (null !== $request) {
-                    $queryBag->add($request->query->all());
-                }
-
                 $dataAsObject = $this->getEntityById($parameter->getName(), $parameter->getData());
 
                 $parameter->setDataAsObject($dataAsObject);
-                $parameter->setRequest($queryBag->has($parameter->getField()));
+                $parameter->setRequest(in_array($parameter->getField(), array_keys($variablesForRequest), true));
             }
         });
 
@@ -864,5 +860,22 @@ readonly class WidgetService
         }
 
         return $data;
+    }
+
+    private function validateParameter(ParameterInterface $parameter, bool $request): bool
+    {
+        if (false === $request) {
+            return true;
+        }
+
+        if ($parameter instanceof DateParameterInterface) {
+            return true;
+        }
+
+        if ($parameter instanceof EntityParameterInterface) {
+            return $parameter->isRequest() === $request;
+        }
+
+        return true;
     }
 }
