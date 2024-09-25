@@ -96,7 +96,7 @@ final class WidgetExportCommand extends Command
         $variables = array_combine($optionVariableKey, $optionVariableValue);
 
         try {
-            $dashboard = $this->widgetService->getWidgetDataByAdapter($widgets[$optionWidget], $variables);
+            $dashboard = $this->widgetService->getDashboardAsModelByAdapter($widgets[$optionWidget], $variables);
         } catch (ParameterException $parameterException) {
             $style->error($parameterException->getMessage());
 

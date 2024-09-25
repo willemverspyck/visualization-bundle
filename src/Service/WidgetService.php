@@ -133,11 +133,11 @@ readonly class WidgetService
      * @throws InvalidArgumentException
      * @throws ParameterException
      */
-    public function getWidgetDataById(int $id, array $variables = []): DashboardAsModel
+    public function getDashboardAsModelById(int $id, array $variables = []): DashboardAsModel
     {
         $widget = $this->widgetRepository->getWidgetById($id);
 
-        return $this->getWidgetDataByWidget($widget, $variables);
+        return $this->getDashboardAsModel($widget, $variables);
     }
 
     /**
@@ -145,11 +145,11 @@ readonly class WidgetService
      * @throws InvalidArgumentException
      * @throws ParameterException
      */
-    public function getWidgetDataByAdapter(string $adapter, array $variables = []): DashboardAsModel
+    public function getDashboardAsModelByAdapter(string $adapter, array $variables = []): DashboardAsModel
     {
         $widget = $this->widgetRepository->getWidgetByAdapter($adapter);
 
-        return $this->getWidgetDataByWidget($widget, $variables);
+        return $this->getDashboardAsModel($widget, $variables);
     }
 
     /**
@@ -213,6 +213,169 @@ readonly class WidgetService
     }
 
     /**
+     * Get required parameters for dashboard.
+     *
+     * @return array<int, ParameterInterface>
+     *
+     * @throws Exception
+     * @throws ParameterException
+     */
+    public function getParametersByDashboard(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
+    {
+        $data = [];
+
+        foreach ($dashboardAsEntity->getBlocks() as $block) {
+            $widget = $this->getWidgetByBlock($block, $variables, false);
+
+            foreach ($widget->getParameterData() as $parameter) {
+                $name = $parameter->getName();
+
+                if (false === array_key_exists($name, $data)) {
+                    $data[$name] = $parameter;
+                }
+            }
+        }
+
+        return array_values($data);
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws ParameterException
+     *
+     * @todo: setParametersAsString and setParametersAsStringForSlug for unique naming when downloading
+     */
+    private function getDashboardAsModel(?WidgetAsEntity $widgetAsEntity, array $variables = []): DashboardAsModel
+    {
+        if (null === $widgetAsEntity) {
+            throw new NotFoundHttpException('The widget does not exist');
+        }
+
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
+        $widget = $this->getWidget($widgetAsEntity->getAdapter(), $variables);
+        $widget->setWidget($widgetAsEntity);
+        $widget->setView(null === $currentRequest ? ViewInterface::JSON : $currentRequest->getRequestFormat());
+
+        $blockAsModel = new BlockAsModel();
+        $blockAsModel->setWidget($this->getWidgetAsModel($widget));
+        $blockAsModel->setName($widgetAsEntity->getName());
+        $blockAsModel->setDescriptionEmpty($widgetAsEntity->getDescriptionEmpty());
+        $blockAsModel->setCharts($widgetAsEntity->getCharts());
+
+        $user = $this->userService->getUser();
+
+        $dashboardAsModel = new DashboardAsModel();
+        $dashboardAsModel->setUser($user);
+        $dashboardAsModel->setName($widgetAsEntity->getName());
+        $dashboardAsModel->addBlock($blockAsModel);
+
+        return $dashboardAsModel;
+    }
+
+    private function getFields(array $fields, WidgetInterface $widget, array $data): array
+    {
+        WidgetUtility::walkFields($fields, function (FieldInterface $field) use ($widget, $data): void {
+            $field->setAggregate($this->getAggregate($field, $data));
+
+            $filter = $field->getFilter();
+
+            if (null === $filter) {
+                return;
+            }
+
+            $active = call_user_func($filter->getName(), $widget, $data, $filter->getParameters());
+
+            $field->setActive($active);
+        }, false);
+
+        WidgetUtility::walkMultipleFields($fields, function (MultipleFieldInterface $field) use ($data): void {
+            $field->setAggregate($this->getAggregate($field, $data));
+
+            $children = $field->getChildren()->filter(function (FieldInterface $field): bool {
+                return $field->isActive();
+            });
+
+            $active = false === $children->isEmpty();
+
+            $field->setActive($active);
+        }, false);
+
+        return $fields;
+    }
+
+    /**
+     * Set the filters of a widget.
+     */
+    private function setFilters(WidgetInterface $widget, array $variables): void
+    {
+        $filters = $this->mapRequest($widget->getFilters(), function (FilterInterface $filter) use ($variables): void {
+            $data = $this->getDataForRequest($filter, $variables);
+
+            if (null === $data) {
+                return;
+            }
+
+            $filter->setData(explode(',', $data));
+
+            if ($filter instanceof EntityFilterInterface) {
+                $dataAsObject = [];
+
+                foreach ($filter->getData() as $entityId) {
+                    $entity = $this->getEntityById($filter->getName(), (int) $entityId);
+
+                    $dataAsObject[] = $entity;
+                }
+
+                $filter->setDataAsObject($dataAsObject);
+            }
+        });
+
+        $widget->setFilters($filters);
+    }
+
+    /**
+     * Set the parameters of a widget.
+     *
+     * @throws Exception
+     * @throws ParameterException
+     */
+    private function setParameters(WidgetInterface $widget, array $variables, bool $required = true): void
+    {
+        $parameters = $this->mapRequest($widget->getParameters(), function (ParameterInterface $parameter) use ($variables, $required): void {
+            $data = $this->getDataForRequest($parameter, $variables);
+
+            if (null === $data) {
+                if ($required) {
+                    throw new ParameterException(sprintf('Parameter "%s" not found', $parameter->getName()));
+                }
+
+                return;
+            }
+
+            $parameter->setData($data);
+
+            if ($parameter instanceof EntityParameterInterface) {
+                $queryBag = new ParameterBag();
+
+                $request = $this->requestStack->getCurrentRequest();
+
+                if (null !== $request) {
+                    $queryBag->add($request->query->all());
+                }
+
+                $dataAsObject = $this->getEntityById($parameter->getName(), $parameter->getData());
+
+                $parameter->setDataAsObject($dataAsObject);
+                $parameter->setRequest($queryBag->has($parameter->getField()));
+            }
+        });
+
+        $widget->setParameters($parameters);
+    }
+
+    /**
      * @throws Exception
      * @throws NonUniqueResultException
      */
@@ -257,174 +420,6 @@ readonly class WidgetService
     }
 
     /**
-     * Get required parameters for dashboard.
-     *
-     * @return array<int, ParameterInterface>
-     *
-     * @throws Exception
-     * @throws ParameterException
-     */
-    public function getParametersByDashboard(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
-    {
-        $data = [];
-
-        foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $widget = $this->getWidgetByBlock($block, $variables, false);
-
-            foreach ($widget->getParameterData() as $parameter) {
-                $name = $parameter->getName();
-
-                if (false === array_key_exists($name, $data)) {
-                    $data[$name] = $parameter;
-                }
-            }
-        }
-
-        return array_values($data);
-    }
-
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws ParameterException
-     *
-     * @todo: setParametersAsString and setParametersAsStringForSlug for unique naming when downloading
-     */
-    private function getWidgetDataByWidget(?WidgetAsEntity $widgetAsEntity, array $variables = []): DashboardAsModel
-    {
-        if (null === $widgetAsEntity) {
-            throw new NotFoundHttpException('The widget does not exist');
-        }
-
-        $currentRequest = $this->requestStack->getCurrentRequest();
-
-        $widget = $this->getWidget($widgetAsEntity->getAdapter(), $variables);
-        $widget->setWidget($widgetAsEntity);
-        $widget->setView(null === $currentRequest ? ViewInterface::JSON : $currentRequest->getRequestFormat());
-
-        $blockAsModel = new BlockAsModel();
-        $blockAsModel->setWidget($this->getWidgetAsModel($widget));
-        $blockAsModel->setName($widgetAsEntity->getName());
-        $blockAsModel->setDescriptionEmpty($widgetAsEntity->getDescriptionEmpty());
-        $blockAsModel->setCharts($widgetAsEntity->getCharts());
-
-        $user = $this->userService->getUser();
-
-        $dashboardAsModel = new DashboardAsModel();
-        $dashboardAsModel->setUser($user);
-        $dashboardAsModel->setName($widgetAsEntity->getName());
-        $dashboardAsModel->addBlock($blockAsModel);
-
-        return $dashboardAsModel;
-    }
-
-    /**
-     * Set the parameters of a widget.
-     *
-     * @throws Exception
-     * @throws ParameterException
-     */
-    private function setParameters(WidgetInterface $widget, array $variables, bool $required = true): void
-    {
-        $parameters = $this->mapRequest($widget->getParameters(), function (ParameterInterface $parameter) use ($variables, $required): void {
-            $data = $this->getRequestData($parameter, $variables);
-
-            if (null === $data) {
-                if ($required) {
-                    throw new ParameterException(sprintf('Parameter "%s" not found', $parameter->getName()));
-                }
-
-                return;
-            }
-
-            $parameter->setData($data);
-
-            if ($parameter instanceof EntityParameterInterface) {
-                $queryBag = new ParameterBag();
-
-                $request = $this->requestStack->getCurrentRequest();
-
-                if (null !== $request) {
-                    $queryBag->add($request->query->all());
-                }
-
-                $dataAsObject = $this->getEntityById($parameter->getName(), $parameter->getData());
-
-                $parameter->setDataAsObject($dataAsObject);
-                $parameter->setRequest($queryBag->has($parameter->getField()));
-            }
-        });
-
-        $widget->setParameters($parameters);
-    }
-
-    /**
-     * Set the filters of a widget.
-     */
-    private function setFilters(WidgetInterface $widget, array $variables): void
-    {
-        $filters = $this->mapRequest($widget->getFilters(), function (FilterInterface $filter) use ($variables): void {
-            $data = $this->getRequestData($filter, $variables);
-
-            if (null === $data) {
-                return;
-            }
-
-            $filter->setData(explode(',', $data));
-
-            if ($filter instanceof EntityFilterInterface) {
-                $dataAsObject = [];
-
-                foreach ($filter->getData() as $entityId) {
-                    $entity = $this->getEntityById($filter->getName(), (int) $entityId);
-
-                    $dataAsObject[] = $entity;
-                }
-
-                $filter->setDataAsObject($dataAsObject);
-            }
-        });
-
-        $widget->setFilters($filters);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getRequestData(RequestInterface $request, array $variables): ?string
-    {
-        $parameterBag = new ParameterBag();
-        $parameterBag->add($variables);
-
-        $field = $request->getField();
-
-        if ($parameterBag->has($field)) {
-            $variable = $parameterBag->get($field);
-
-            $type = gettype($variable);
-
-            if (false === in_array($type, ['integer', 'string'], true)) {
-                throw new Exception(sprintf('Request data of field "%s" must be "integer" or "string", not "%s"', $field, $type));
-            }
-
-            return sprintf('%s', $variable);
-        }
-
-        return match (get_class($request)) {
-            DayParameter::class => $this->request['dayParameter'],
-            DayStartParameter::class => $this->request['dayStartParameter'],
-            DayEndParameter::class => $this->request['dayEndParameter'],
-            WeekStartParameter::class => $this->request['weekStartParameter'],
-            WeekEndParameter::class => $this->request['weekEndParameter'],
-            MonthStartParameter::class => $this->request['monthStartParameter'],
-            MonthEndParameter::class => $this->request['monthEndParameter'],
-            LimitFilter::class => sprintf('%d', $this->request['limitFilter']),
-            OffsetFilter::class => sprintf('%d', $this->request['offsetFilter']),
-            default => null,
-        };
-    }
-
-    /**
      * Get the entity by id.
      *
      * @throws NotFoundHttpException
@@ -438,84 +433,6 @@ readonly class WidgetService
         }
 
         return $entity;
-    }
-
-    private function getFields(array $fields, WidgetInterface $widget, array $data): array
-    {
-        WidgetUtility::walkFields($fields, function (FieldInterface $field) use ($widget, $data): void {
-            $field->setAggregate($this->getAggregate($field, $data));
-
-            $filter = $field->getFilter();
-
-            if (null === $filter) {
-                return;
-            }
-
-            $active = call_user_func($filter->getName(), $widget, $data, $filter->getParameters());
-
-            $field->setActive($active);
-        }, false);
-
-        WidgetUtility::walkMultipleFields($fields, function (MultipleFieldInterface $field) use ($data): void {
-            $field->setAggregate($this->getAggregate($field, $data));
-
-            $children = $field->getChildren()->filter(function (FieldInterface $field): bool {
-                return $field->isActive();
-            });
-
-            $active = false === $children->isEmpty();
-
-            $field->setActive($active);
-        }, false);
-
-        return $fields;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getData(array $data, array $fields): array
-    {
-        $content = [];
-
-        foreach ($data as $row) {
-            $content[] = WidgetUtility::mapFields($fields, function (Field $field) use ($row): array {
-                return [
-                    'value' => $this->getValue($field, $row),
-                    'routes' => $this->getRoutes($field, $row),
-                ];
-            });
-        }
-
-        return $content;
-    }
-
-    private function getDataWithCache(WidgetInterface $widget): array
-    {
-        if (false === $this->cacheActive || null === $widget->getCache()) {
-            $this->logger->info('Cache disabled');
-
-            return iterator_to_array($widget->getData(), false);
-        }
-
-        $key = $this->getKeyForCache($widget);
-
-        $data = $this->cache->get($key, function (ItemInterface $item) use ($widget): array {
-            $item->expiresAfter($widget->getCache());
-
-            if ($this->cache instanceof TagAwareCacheInterface) {
-                $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
-            }
-
-            return iterator_to_array($widget->getData(), false);
-        }, null, $metadata);
-
-        $this->logger->info('Cache', [
-            'cache' => $widget->getCache(),
-            'metadata' => $metadata,
-        ]);
-
-        return $data;
     }
 
     private function getAggregate(AbstractFieldInterface $field, array $data): Aggregate
@@ -569,35 +486,87 @@ readonly class WidgetService
         return $aggregate;
     }
 
-    private function getMedian(string $type, array $data): DateTimeInterface|float|int|null
+    /**
+     * @throws Exception
+     */
+    private function getData(array $data, array $fields): array
     {
-        $count = count($data);
+        $content = [];
 
-        if (0 === $count) {
-            return null;
+        foreach ($data as $row) {
+            $content[] = WidgetUtility::mapFields($fields, function (Field $field) use ($row): array {
+                return [
+                    'value' => $this->getValue($field, $row),
+                    'routes' => $this->getRoutes($field, $row),
+                ];
+            });
         }
 
-        sort($data);
+        return $content;
+    }
 
-        $index = floor($count / 2);
+    private function getDataWithCache(WidgetInterface $widget): array
+    {
+        if (false === $this->cacheActive || null === $widget->getCache()) {
+            $this->logger->info('Cache disabled');
 
-        if (0 === $count % 2) {
-            $value1 = $data[$index - 1];
-            $value2 = $data[$index];
+            return iterator_to_array($widget->getData(), false);
+        }
 
-            if (in_array($type, [FieldInterface::TYPE_DATE, FieldInterface::TYPE_DATETIME, FieldInterface::TYPE_TIME], true)) {
-                $timestamp = ($value1->getTimestamp() + $value2->getTimestamp()) / 2;
+        $key = $this->getKey($widget);
 
-                $date = new DateTime();
-                $date->setTimestamp((int) $timestamp);
+        $data = $this->cache->get($key, function (ItemInterface $item) use ($widget): array {
+            $item->expiresAfter($widget->getCache());
 
-                return $date;
+            if ($this->cache instanceof TagAwareCacheInterface) {
+                $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
             }
 
-            return ($value1 + $value2) / 2;
+            return iterator_to_array($widget->getData(), false);
+        }, null, $metadata);
+
+        $this->logger->info('Cache', [
+            'cache' => $widget->getCache(),
+            'metadata' => $metadata,
+        ]);
+
+        return $data;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getDataForRequest(RequestInterface $request, array $variables): ?string
+    {
+        $parameterBag = new ParameterBag();
+        $parameterBag->add($variables);
+
+        $field = $request->getField();
+
+        if ($parameterBag->has($field)) {
+            $variable = $parameterBag->get($field);
+
+            $type = gettype($variable);
+
+            if (false === in_array($type, ['integer', 'string'], true)) {
+                throw new Exception(sprintf('Request data of field "%s" must be "integer" or "string", not "%s"', $field, $type));
+            }
+
+            return sprintf('%s', $variable);
         }
 
-        return $data[$index];
+        return match (get_class($request)) {
+            DayParameter::class => $this->request['dayParameter'],
+            DayStartParameter::class => $this->request['dayStartParameter'],
+            DayEndParameter::class => $this->request['dayEndParameter'],
+            WeekStartParameter::class => $this->request['weekStartParameter'],
+            WeekEndParameter::class => $this->request['weekEndParameter'],
+            MonthStartParameter::class => $this->request['monthStartParameter'],
+            MonthEndParameter::class => $this->request['monthEndParameter'],
+            LimitFilter::class => sprintf('%d', $this->request['limitFilter']),
+            OffsetFilter::class => sprintf('%d', $this->request['offsetFilter']),
+            default => null,
+        };
     }
 
     /**
@@ -606,7 +575,7 @@ readonly class WidgetService
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    private function getKeyForCache(WidgetInterface $widget): string
+    private function getKey(WidgetInterface $widget): string
     {
         $widgetAsEntity = $widget->getWidget();
 
@@ -619,37 +588,6 @@ readonly class WidgetService
         ];
 
         return CacheUtility::getCacheKey(__CLASS__, $data);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getParameters(WidgetInterface $widget): array
-    {
-        $content = [];
-
-        $parameters = $widget->getParameterData();
-
-        foreach ($parameters as $parameter) {
-            if ($parameter instanceof EntityParameterInterface) {
-                $data = $parameter->getDataAsObject();
-
-                if (null !== $data) {
-                    if (false === $data instanceof Stringable) {
-                        throw new Exception(sprintf('Object "%s" must be instance of "%s"', get_class($data), Stringable::class));
-                    }
-
-                    $content[] = [
-                        'name' => $parameter->getName(),
-                        'data' => [
-                            $data->__toString(),
-                        ],
-                    ];
-                }
-            }
-        }
-
-        return $content;
     }
 
     /**
@@ -694,28 +632,66 @@ readonly class WidgetService
         return $content;
     }
 
-    /**
-     * @return array<int, RequestInterface>
-     */
-    private function mapRequest(iterable $parameters, callable $callback): array
+    private function getMedian(string $type, array $data): DateTimeInterface|float|int|null
     {
-        $data = [];
+        $count = count($data);
+
+        if (0 === $count) {
+            return null;
+        }
+
+        sort($data);
+
+        $index = floor($count / 2);
+
+        if (0 === $count % 2) {
+            $value1 = $data[$index - 1];
+            $value2 = $data[$index];
+
+            if (in_array($type, [FieldInterface::TYPE_DATE, FieldInterface::TYPE_DATETIME, FieldInterface::TYPE_TIME], true)) {
+                $timestamp = ($value1->getTimestamp() + $value2->getTimestamp()) / 2;
+
+                $date = new DateTime();
+                $date->setTimestamp((int) $timestamp);
+
+                return $date;
+            }
+
+            return ($value1 + $value2) / 2;
+        }
+
+        return $data[$index];
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getParameters(WidgetInterface $widget): array
+    {
+        $content = [];
+
+        $parameters = $widget->getParameterData();
 
         foreach ($parameters as $parameter) {
-            if ($parameter instanceof MultipleRequestInterface) {
-                foreach ($parameter->getChildren() as $child) {
-                    $callback($child);
+            if ($parameter instanceof EntityParameterInterface) {
+                $data = $parameter->getDataAsObject();
 
-                    $data[get_class($child)] = $child;
+                if (null !== $data) {
+                    if (false === $data instanceof Stringable) {
+                        throw new Exception(sprintf('Object "%s" must be instance of "%s"', get_class($data), Stringable::class));
+                    }
+
+                    $content[] = [
+                        'name' => $parameter->getName(),
+                        'data' => [
+                            $data->__toString(),
+                        ],
+                    ];
                 }
-            } else {
-                $callback($parameter);
-
-                $data[get_class($parameter)] = $parameter;
             }
         }
 
-        return $data;
+        return $content;
     }
 
     /**
@@ -731,9 +707,25 @@ readonly class WidgetService
 
         $name = 'spyck_visualization_widget_item';
 
-        $parameters = $this->getPaginationParameters($name);
+        $request = $this->requestStack->getCurrentRequest();
 
-        if (null === $parameters) {
+        if (null === $request) {
+            return null;
+        }
+
+        $routeCollection = $this->router->getRouteCollection();
+
+        $route = $routeCollection->get($name);
+
+        if (null === $route) {
+            return null;
+        }
+
+        $parameters = array_merge($request->query->all(), $request->attributes->get('_route_params', []));
+
+        $variables = $route->compile()->getVariables();
+
+        if (count(array_diff($variables, array_keys($parameters))) > 0) {
             return null;
         }
 
@@ -762,69 +754,12 @@ readonly class WidgetService
         return $pagination;
     }
 
-    private function getPaginationParameters(string $name): ?array
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (null === $request) {
-            return null;
-        }
-
-        $routeCollection = $this->router->getRouteCollection();
-
-        $route = $routeCollection->get($name);
-
-        if (null === $route) {
-            return null;
-        }
-
-        $parameters = array_merge($request->query->all(), $request->attributes->get('_route_params', []));
-
-        $variables = $route->compile()->getVariables();
-
-        if (count(array_diff($variables, array_keys($parameters))) > 0) {
-            return null;
-        }
-
-        return $parameters;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getValue(Field $field, array $data): array|bool|DateTimeInterface|float|int|string|null
-    {
-        $source = $field->getSource();
-
-        if ($source instanceof Callback) {
-            return call_user_func($source->getName(), $data, $source->getParameters());
-        }
-
-        if (false === array_key_exists($source, $data)) {
-            return null;
-        }
-
-        $value = $data[$source];
-
-        if (null === $value) {
-            return null;
-        }
-
-        return match ($field->getType()) {
-            FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER, FieldInterface::TYPE_PERCENTAGE => (float) $value,
-            FieldInterface::TYPE_DATE => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateFromString($value),
-            FieldInterface::TYPE_DATETIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateTimeFromString($value),
-            FieldInterface::TYPE_TIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getTimeFromString($value),
-            default => $value,
-        };
-    }
-
     private function getRoutes(FieldInterface $field, array $data = []): array
     {
         $content = [];
 
         foreach ($field->getRoutes() as $route) {
-            $url = $this->getRouteUrl($route, $data);
+            $url = $this->getUrl($route, $data);
 
             if (null !== $url) {
                 $content[] = [
@@ -840,7 +775,7 @@ readonly class WidgetService
     /**
      * @throws Exception
      */
-    private function getRouteUrl(RouteInterface $route, array $data): ?string
+    private function getUrl(RouteInterface $route, array $data): ?string
     {
         if (null === $route->getName() || null === $route->getUrl()) {
             return null;
@@ -875,5 +810,59 @@ readonly class WidgetService
         $url = $route->getUrl();
 
         return sprintf('%s?%s', $url, http_build_query($query));
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getValue(Field $field, array $data): array|bool|DateTimeInterface|float|int|string|null
+    {
+        $source = $field->getSource();
+
+        if ($source instanceof Callback) {
+            return call_user_func($source->getName(), $data, $source->getParameters());
+        }
+
+        if (false === array_key_exists($source, $data)) {
+            return null;
+        }
+
+        $value = $data[$source];
+
+        if (null === $value) {
+            return null;
+        }
+
+        return match ($field->getType()) {
+            FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER, FieldInterface::TYPE_PERCENTAGE => (float) $value,
+            FieldInterface::TYPE_DATE => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateFromString($value),
+            FieldInterface::TYPE_DATETIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateTimeFromString($value),
+            FieldInterface::TYPE_TIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getTimeFromString($value),
+            default => $value,
+        };
+    }
+
+    /**
+     * @return array<int, RequestInterface>
+     */
+    private function mapRequest(iterable $parameters, callable $callback): array
+    {
+        $data = [];
+
+        foreach ($parameters as $parameter) {
+            if ($parameter instanceof MultipleRequestInterface) {
+                foreach ($parameter->getChildren() as $child) {
+                    $callback($child);
+
+                    $data[get_class($child)] = $child;
+                }
+            } else {
+                $callback($parameter);
+
+                $data[get_class($parameter)] = $parameter;
+            }
+        }
+
+        return $data;
     }
 }

@@ -33,9 +33,9 @@ readonly class DashboardService
     {
         $user = $this->userService->getUser();
 
-        $variables = $this->filterVariables($dashboardAsEntity, $variables);
+        $variables = $this->validateVariables($dashboardAsEntity, $variables);
 
-        $dashboardRoute = $this->getDashboardRoute($dashboardAsEntity, $variables);
+        $dashboardRoute = $this->getRoute($dashboardAsEntity, $variables);
 
         $dashboardAsModel = new DashboardAsModel();
 
@@ -44,9 +44,9 @@ readonly class DashboardService
             ->setName($dashboardAsEntity->getName())
             ->setDescription($dashboardAsEntity->getDescription())
             ->setUrl($dashboardRoute->getUrl())
-            ->setParameters($this->getDashboardParameters($dashboardAsEntity, $variables))
-            ->setParametersAsString($this->getDashboardParametersAsString($dashboardAsEntity, $variables))
-            ->setParametersAsStringForSlug($this->getDashboardParametersAsString($dashboardAsEntity, $variables, true))
+            ->setParameters($this->getParameters($dashboardAsEntity, $variables))
+            ->setParametersAsString($this->getParametersAsString($dashboardAsEntity, $variables))
+            ->setParametersAsStringForSlug($this->getParametersAsString($dashboardAsEntity, $variables, true))
             ->setDownloads($this->getDownloads($dashboardAsEntity, $variables))
             ->setVariables($this->getVariables($dashboardAsEntity, $variables));
 
@@ -64,7 +64,7 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function getDashboardParameters(DashboardAsEntity $dashboardAsEntity, array $variables, bool $field = false): array
+    public function getParameters(DashboardAsEntity $dashboardAsEntity, array $variables, bool $field = false): array
     {
         $data = [];
 
@@ -96,7 +96,7 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function getDashboardParametersAsString(DashboardAsEntity $dashboardAsEntity, array $variables, bool $slug = false): array
+    public function getParametersAsString(DashboardAsEntity $dashboardAsEntity, array $variables, bool $slug = false): array
     {
         $data = [];
 
@@ -134,7 +134,7 @@ readonly class DashboardService
      *
      * @throws Exception
      */
-    public function checkDashboardParameterData(DashboardAsEntity $dashboardAsEntity, array $variables = []): ?array
+    public function validateParameters(DashboardAsEntity $dashboardAsEntity, array $variables = []): ?array
     {
         $returnData = [];
 
@@ -159,35 +159,6 @@ readonly class DashboardService
         }
 
         return $returnData;
-    }
-
-    public function getDashboardRoute(DashboardAsEntity $dashboardAsEntity, array $variables = []): RouteAsModel
-    {
-        $variables['dashboardId'] = $dashboardAsEntity->getId();
-
-        $routeAsModel = new RouteAsModel();
-
-        return $routeAsModel
-            ->setName($dashboardAsEntity->getName())
-            ->setUrl($this->router->generate('spyck_visualization_dashboard_show', $variables, UrlGeneratorInterface::ABSOLUTE_URL));
-    }
-
-    /**
-     * Remove variables that are not part of the dashboard.
-     *
-     * @throws Exception
-     */
-    private function filterVariables(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
-    {
-        $data = [];
-
-        foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $widget = $this->widgetService->getWidgetByBlock($block, $variables);
-
-            $data = array_replace($data, $widget->getParameterDataRequest(), $widget->getFilterDataRequest());
-        }
-
-        return array_intersect_key($variables, $data);
     }
 
     private function getDownloads(DashboardAsEntity $dashboardAsEntity, array $variables): array
@@ -216,10 +187,39 @@ readonly class DashboardService
         ];
     }
 
+    public function getRoute(DashboardAsEntity $dashboardAsEntity, array $variables = []): RouteAsModel
+    {
+        $variables['dashboardId'] = $dashboardAsEntity->getId();
+
+        $routeAsModel = new RouteAsModel();
+
+        return $routeAsModel
+            ->setName($dashboardAsEntity->getName())
+            ->setUrl($this->router->generate('spyck_visualization_dashboard_show', $variables, UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
     private function getVariables(DashboardAsEntity $dashboardAsEntity, array $variables): array
     {
-        $data = $this->getDashboardParameters($dashboardAsEntity, $variables, true);
+        $data = $this->getParameters($dashboardAsEntity, $variables, true);
 
         return array_merge($data, $variables);
+    }
+
+    /**
+     * Remove variables that are not part of the dashboard.
+     *
+     * @throws Exception
+     */
+    private function validateVariables(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
+    {
+        $data = [];
+
+        foreach ($dashboardAsEntity->getBlocks() as $block) {
+            $widget = $this->widgetService->getWidgetByBlock($block, $variables);
+
+            $data = array_replace($data, $widget->getParameterDataRequest(), $widget->getFilterDataRequest());
+        }
+
+        return array_intersect_key($variables, $data);
     }
 }

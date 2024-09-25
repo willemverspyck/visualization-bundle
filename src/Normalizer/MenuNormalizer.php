@@ -24,7 +24,7 @@ final class MenuNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        $route = $this->dashboardService->getDashboardRoute($object->getDashboard(), $object->getVariables());
+        $route = $this->dashboardService->getRoute($object->getDashboard(), $object->getVariables());
 
         if (null === $route) {
             return $data;

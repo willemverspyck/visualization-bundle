@@ -75,7 +75,7 @@ final class DashboardController extends AbstractController
 
         $variables = $request->query->all();
 
-        $requests = $dashboardService->checkDashboardParameterData($dashboard, $variables);
+        $requests = $dashboardService->validateParameters($dashboard, $variables);
 
         if (null === $requests) {
             $data = $dashboardService->getDashboardAsModel($dashboard, $variables);
@@ -114,7 +114,7 @@ final class DashboardController extends AbstractController
             return new JsonResponse(null, Response::HTTP_BAD_REQUEST);
         }
 
-        $requests = $dashboardService->checkDashboardParameterData($dashboard, $data['variables']);
+        $requests = $dashboardService->validateParameters($dashboard, $data['variables']);
 
         if (null !== $requests) {
             return new JsonResponse(null, Response::HTTP_BAD_REQUEST);

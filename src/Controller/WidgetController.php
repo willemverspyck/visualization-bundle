@@ -32,7 +32,7 @@ final class WidgetController extends AbstractController
         try {
             $variables = $request->query->all();
 
-            $widget = $widgetService->getWidgetDataById($widgetId, $variables);
+            $widget = $widgetService->getDashboardAsModelById($widgetId, $variables);
 
             $view = $viewService->getView($request->getRequestFormat());
 
