@@ -16,7 +16,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Part\DataPart;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class MailService
 {
