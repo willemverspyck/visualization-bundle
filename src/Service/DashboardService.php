@@ -14,7 +14,6 @@ use Spyck\VisualizationBundle\Model\Route as RouteAsModel;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
-use Spyck\VisualizationBundle\Utility\BlockUtility;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;

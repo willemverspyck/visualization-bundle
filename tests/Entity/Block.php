@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Spyck\VisualizationBundle\Tests\Entity;
+
 use PHPUnit\Framework\TestCase;
 use Spyck\VisualizationBundle\Entity\Block;
 use Spyck\VisualizationBundle\Entity\Dashboard;

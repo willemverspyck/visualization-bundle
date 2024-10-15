@@ -16,7 +16,7 @@ class CategoryRepository extends AbstractRepository
         parent::__construct($managerRegistry, Category::class);
     }
 
-    public function getCategoryData(): array
+    public function getCategories(): array
     {
         $queryBuilder = $this->createQueryBuilder('category')
             ->addSelect('dashboard')

@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Event\Subscriber;
 
 use Exception;
 use Psr\Log\LoggerInterface;
-use Spyck\VisualizationBundle\Event\WidgetCacheEvent;
+use Spyck\VisualizationBundle\Event\CacheEvent;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,7 +14,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
-final class WidgetCacheEventSubscriber implements EventSubscriberInterface
+final class CacheEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private readonly CacheInterface $cache, private readonly LoggerInterface $logger)
     {
@@ -23,8 +23,8 @@ final class WidgetCacheEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WidgetCacheEvent::class => [
-                'onWidgetCache',
+            CacheEvent::class => [
+                'onCache',
             ],
         ];
     }
@@ -32,7 +32,7 @@ final class WidgetCacheEventSubscriber implements EventSubscriberInterface
     /**
      * @throws Exception
      */
-    public function onWidgetCache(WidgetCacheEvent $event): void
+    public function onCache(CacheEvent $event): void
     {
         if (false === $this->cache instanceof TagAwareCacheInterface) {
             $this->logger->error(sprintf('Cache is not instance of "%s"', TagAwareCacheInterface::class));

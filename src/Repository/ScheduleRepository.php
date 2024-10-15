@@ -14,12 +14,23 @@ class ScheduleRepository extends AbstractRepository
         parent::__construct($managerRegistry, Schedule::class);
     }
 
+    public function getScheduleByCode(string $code): ?Schedule
+    {
+        return $this->createQueryBuilder('schedule')
+            ->where('schedule.code = :code')
+            ->andWhere('schedule.active = TRUE')
+            ->setParameter('code', $code)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * @return array<int, Schedule>
      */
-    public function getScheduleData(): array
+    public function getSchedules(): array
     {
         return $this->createQueryBuilder('schedule')
+            ->where('schedule.active = TRUE')
             ->getQuery()
             ->getResult();
     }

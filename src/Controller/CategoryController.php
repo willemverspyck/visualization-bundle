@@ -27,8 +27,8 @@ final class CategoryController extends AbstractController
     #[Schema\ResponseForList(type: Menu::class, groups: [self::GROUP_LIST])]
     public function list(CategoryRepository $categoryRepository, ResponseService $responseService): Response
     {
-        $categoryData = $categoryRepository->getCategoryData();
+        $categories = $categoryRepository->getCategories();
 
-        return $responseService->getResponseForList(data: $categoryData, groups: [self::GROUP_LIST]);
+        return $responseService->getResponseForList(data: $categories, groups: [self::GROUP_LIST]);
     }
 }

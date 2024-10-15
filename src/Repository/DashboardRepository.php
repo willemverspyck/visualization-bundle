@@ -10,6 +10,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Dashboard;
+use Spyck\VisualizationBundle\Entity\Schedule;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
@@ -53,7 +54,7 @@ class DashboardRepository extends AbstractRepository
      *
      * @throws AuthenticationException
      */
-    public function getDashboardDataByUser(): array
+    public function getDashboardsByUser(): array
     {
         $user = $this->getUserByToken($this->tokenStorage->getToken());
 

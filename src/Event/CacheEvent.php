@@ -7,7 +7,7 @@ namespace Spyck\VisualizationBundle\Event;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class WidgetCacheEvent extends Event
+final class CacheEvent extends Event
 {
     public function __construct(private readonly Widget $widget)
     {

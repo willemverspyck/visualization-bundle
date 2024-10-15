@@ -33,9 +33,6 @@ class Mail implements Stringable
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description;
 
-    #[Doctrine\Column(name: 'code', type: Types::STRING, length: 128, nullable: true)]
-    private ?string $code;
-
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
 
@@ -117,18 +114,6 @@ class Mail implements Stringable
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getCode(): ?string
-    {
-        return $this->code;
-    }
-
-    public function setCode(?string $code): static
-    {
-        $this->code = $code;
 
         return $this;
     }

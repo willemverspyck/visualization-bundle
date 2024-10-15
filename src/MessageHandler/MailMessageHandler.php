@@ -54,7 +54,7 @@ final class MailMessageHandler
 
         $dashboard = $this->getDashboardById($mailMessage->getId());
 
-        $this->sendMailWithMessage($mailMessage, $user, $dashboard);
+        $this->executeMailWithMessage($mailMessage, $user, $dashboard);
 
         $this->tokenStorage->setToken($token);
 
@@ -98,7 +98,7 @@ final class MailMessageHandler
      * @throws InvalidArgumentException
      * @throws TransportExceptionInterface
      */
-    private function sendMailWithMessage(MailMessageInterface $mailMessage, UserInterface $user, Dashboard $dashboard): void
+    private function executeMailWithMessage(MailMessageInterface $mailMessage, UserInterface $user, Dashboard $dashboard): void
     {
         $dashboardAsModel = $this->dashboardService->getDashboardAsModel($dashboard, $mailMessage->getVariables(), $mailMessage->getView(), true);
 

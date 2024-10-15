@@ -24,38 +24,33 @@ readonly class MailService
     {
     }
 
-    public function executeMailMessageByMail(Mail $mail, array $parameters = []): void
-    {
-        foreach ($mail->getUsers() as $user) {
-            $this->executeMailMessage($mail, $user, $parameters);
-        }
-    }
-
     public function executeMailMessageBySchedule(Schedule $schedule, array $parameters = []): void
     {
-        $mails = $this->mailRepository->getMailDataBySchedule($schedule);
+        $mails = $this->mailRepository->getMailsBySchedule($schedule);
 
         foreach ($mails as $mail) {
-            $this->executeMailMessageByMail($mail, $parameters);
+            $this->executeMailMessage($mail, $parameters);
         }
     }
 
-    public function executeMailMessage(Mail $mail, UserInterface $user, array $parameters = []): void
+    public function executeMailMessage(Mail $mail, array $parameters = []): void
     {
         $dashboard = $mail->getDashboard();
 
-        $mailMessage = new MailMessage();
-        $mailMessage->setId($dashboard->getId());
-        $mailMessage->setUser($user->getId());
-        $mailMessage->setName($mail->getName());
-        $mailMessage->setDescription($mail->getDescription());
-        $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
-        $mailMessage->setView($mail->getView());
-        $mailMessage->setInline($mail->isInline());
-        $mailMessage->setRoute($mail->hasRoute());
-        $mailMessage->setMerge($mail->isMerge());
+        foreach ($mail->getUsers() as $user) {
+            $mailMessage = new MailMessage();
+            $mailMessage->setId($dashboard->getId());
+            $mailMessage->setUser($user->getId());
+            $mailMessage->setName($mail->getName());
+            $mailMessage->setDescription($mail->getDescription());
+            $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
+            $mailMessage->setView($mail->getView());
+            $mailMessage->setInline($mail->isInline());
+            $mailMessage->setRoute($mail->hasRoute());
+            $mailMessage->setMerge($mail->isMerge());
 
-        $this->messageBus->dispatch($mailMessage);
+            $this->messageBus->dispatch($mailMessage);
+        }
     }
 
     /**

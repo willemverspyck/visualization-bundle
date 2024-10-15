@@ -22,17 +22,23 @@ class Schedule implements Stringable
     #[Validator\NotNull]
     private string $name;
 
-    #[Doctrine\Column(name: 'hours', type: Types::JSON)]
-    private array $hours;
+    #[Doctrine\Column(name: 'code', type: Types::STRING, length: 128, nullable: true)]
+    private ?string $code;
 
-    #[Doctrine\Column(name: 'days', type: Types::JSON)]
-    private array $days;
+    #[Doctrine\Column(name: 'match_hours', type: Types::JSON)]
+    private array $matchHours;
 
-    #[Doctrine\Column(name: 'weeks', type: Types::JSON)]
-    private array $weeks;
+    #[Doctrine\Column(name: 'match_days', type: Types::JSON)]
+    private array $matchDays;
 
-    #[Doctrine\Column(name: 'weekdays', type: Types::JSON)]
-    private array $weekdays;
+    #[Doctrine\Column(name: 'match_weeks', type: Types::JSON)]
+    private array $matchWeeks;
+
+    #[Doctrine\Column(name: 'match_weekdays', type: Types::JSON)]
+    private array $matchWeekdays;
+
+    #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
+    private bool $active;
 
     public function __construct()
     {
@@ -55,50 +61,74 @@ class Schedule implements Stringable
         return $this;
     }
 
-    public function getHours(): array
+    public function getCode(): ?string
     {
-        return $this->hours;
+        return $this->code;
     }
 
-    public function setHours(array $hours): static
+    public function setCode(?string $code): static
     {
-        $this->hours = $hours;
+        $this->code = $code;
 
         return $this;
     }
 
-    public function getDays(): array
+    public function getMatchHours(): array
     {
-        return $this->days;
+        return $this->matchHours;
     }
 
-    public function setDays(array $days): static
+    public function setMatchHours(array $matchHours): static
     {
-        $this->days = $days;
+        $this->matchHours = $matchHours;
 
         return $this;
     }
 
-    public function getWeeks(): array
+    public function getMatchDays(): array
     {
-        return $this->weeks;
+        return $this->matchDays;
     }
 
-    public function setWeeks(array $weeks): static
+    public function setMatchDays(array $matchDays): static
     {
-        $this->weeks = $weeks;
+        $this->matchDays = $matchDays;
 
         return $this;
     }
 
-    public function getWeekdays(): array
+    public function getMatchWeeks(): array
     {
-        return $this->weekdays;
+        return $this->matchWeeks;
     }
 
-    public function setWeekdays(array $weekdays): static
+    public function setMatchWeeks(array $matchWeeks): static
     {
-        $this->weekdays = $weekdays;
+        $this->matchWeeks = $matchWeeks;
+
+        return $this;
+    }
+
+    public function getMatchWeekdays(): array
+    {
+        return $this->matchWeekdays;
+    }
+
+    public function setMatchWeekdays(array $matchWeekdays): static
+    {
+        $this->matchWeekdays = $matchWeekdays;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }

@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Throwable;
 
-final class MailMessageEventSubscriber implements EventSubscriberInterface
+final class MailEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(private readonly DashboardRepository $dashboardRepository, private readonly LogRepository $logRepository, private readonly UserRepository $userRepository)
     {

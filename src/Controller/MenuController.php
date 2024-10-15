@@ -27,8 +27,8 @@ final class MenuController extends AbstractController
     #[Schema\ResponseForList(type: Menu::class, groups: [self::GROUP_LIST])]
     public function list(MenuRepository $menuRepository, ResponseService $responseService): Response
     {
-        $data = $menuRepository->getMenuData();
+        $menus = $menuRepository->getMenus();
 
-        return $responseService->getResponseForList($data, null, null, [self::GROUP_LIST]);
+        return $responseService->getResponseForList($menus, null, null, [self::GROUP_LIST]);
     }
 }

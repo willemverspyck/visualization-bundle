@@ -7,28 +7,27 @@ namespace Spyck\VisualizationBundle\Repository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
-use Spyck\VisualizationBundle\Entity\Mail;
+use Spyck\VisualizationBundle\Entity\Preload;
 use Spyck\VisualizationBundle\Entity\Schedule;
 
-class MailRepository extends AbstractRepository
+class PreloadRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($managerRegistry, Mail::class);
+        parent::__construct($managerRegistry, Preload::class);
     }
 
     /**
-     * @return array<int, Mail>
+     * @return array<int, Preload>
      */
-    public function getMailsBySchedule(Schedule $schedule): array
+    public function getPreloadsBySchedule(Schedule $schedule): array
     {
-        return $this->createQueryBuilder('mail')
-            ->innerJoin('mail.schedules', 'schedule', Join::WITH, 'schedule = :schedule')
-            ->innerJoin('mail.dashboard', 'dashboard')
+        return $this->createQueryBuilder('preload')
+            ->innerJoin('preload.schedules', 'schedule', Join::WITH, 'schedule = :schedule')
+            ->innerJoin('preload.dashboard', 'dashboard')
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->innerJoin('mail.users', 'user')
-            ->where('mail.active = TRUE')
+            ->where('preload.active = TRUE')
             ->setParameter('schedule', $schedule)
             ->getQuery()
             ->getResult();

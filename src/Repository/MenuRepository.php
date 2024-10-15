@@ -26,7 +26,7 @@ class MenuRepository extends AbstractRepository
      *
      * @return array<int, Menu>
      */
-    public function getMenuData(): array
+    public function getMenus(): array
     {
         $user = $this->getUserByToken($this->tokenStorage->getToken());
 
@@ -58,7 +58,7 @@ class MenuRepository extends AbstractRepository
     /**
      * @return array<int, Menu>
      */
-    public function getMenuDataByParent(?Menu $parent): array
+    public function getMenusByParent(?Menu $parent): array
     {
         $queryBuilder = $this->createQueryBuilder('menu')
             ->orderBy('menu.position');
