@@ -117,7 +117,7 @@ final class MailMessageHandler
 
         $attachments = $this->getAttachments($dashboardAsModel, $mailMessage);
 
-        $this->mailService->sendMail($user->getEmail(), $user->getName(), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments->toArray());
+        $this->mailService->executeMail($user->getEmail(), $user->getName(), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments->toArray());
     }
 
     private function getAttachments(DashboardAsModel $dashboardAsModel, MailMessage $mailMessage): ArrayCollection

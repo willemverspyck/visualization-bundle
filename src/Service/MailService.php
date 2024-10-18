@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Service;
 
 use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Entity\ScheduleInterface;
+use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Repository\MailRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -23,6 +24,31 @@ readonly class MailService
     {
     }
 
+    public function executeMailMessage(Mail $mail, array $parameters): void
+    {
+        foreach ($mail->getUsers() as $user) {
+            $this->executeMailMessageForUser($mail, $user, $parameters);
+        }
+    }
+
+    public function executeMailMessageForUser(Mail $mail, UserInterface $user, array $parameters = []): void
+    {
+        $dashboard = $mail->getDashboard();
+
+        $mailMessage = new MailMessage();
+        $mailMessage->setId($dashboard->getId());
+        $mailMessage->setUser($user->getId());
+        $mailMessage->setName($mail->getName());
+        $mailMessage->setDescription($mail->getDescription());
+        $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
+        $mailMessage->setView($mail->getView());
+        $mailMessage->setInline($mail->isInline());
+        $mailMessage->setRoute($mail->hasRoute());
+        $mailMessage->setMerge($mail->isMerge());
+
+        $this->messageBus->dispatch($mailMessage);
+    }
+
     public function executeMailMessageBySchedule(ScheduleInterface $schedule, array $parameters = []): void
     {
         $mails = $this->mailRepository->getMailsBySchedule($schedule);
@@ -32,30 +58,10 @@ readonly class MailService
         }
     }
 
-    public function executeMailMessage(Mail $mail, array $parameters = []): void
-    {
-        $dashboard = $mail->getDashboard();
-
-        foreach ($mail->getUsers() as $user) {
-            $mailMessage = new MailMessage();
-            $mailMessage->setId($dashboard->getId());
-            $mailMessage->setUser($user->getId());
-            $mailMessage->setName($mail->getName());
-            $mailMessage->setDescription($mail->getDescription());
-            $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
-            $mailMessage->setView($mail->getView());
-            $mailMessage->setInline($mail->isInline());
-            $mailMessage->setRoute($mail->hasRoute());
-            $mailMessage->setMerge($mail->isMerge());
-
-            $this->messageBus->dispatch($mailMessage);
-        }
-    }
-
     /**
      * @throws TransportExceptionInterface
      */
-    public function sendMail(string $toEmail, ?string $toName, string $subject, string $template, array $data = [], array $attachments = []): void
+    public function executeMail(string $toEmail, ?string $toName, string $subject, string $template, array $data = [], array $attachments = []): void
     {
         $email = new TemplatedEmail();
 
