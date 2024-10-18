@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Filter;
 
 use Spyck\VisualizationBundle\Request\RequestInterface;
 
-final class OffsetFilter extends AbstractOptionFilter
+final class OffsetFilter extends AbstractFilter
 {
     public static function getField(): string
     {
@@ -20,6 +20,6 @@ final class OffsetFilter extends AbstractOptionFilter
 
     public function getType(): string
     {
-        return FilterInterface::TYPE_INPUT;
+        return FilterInterface::TYPE_NUMBER;
     }
 }

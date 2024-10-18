@@ -9,8 +9,10 @@ use Spyck\VisualizationBundle\Request\RequestInterface;
 interface FilterInterface extends RequestInterface
 {
     public const TYPE_CHECKBOX = 'checkbox';
-    public const TYPE_INPUT = 'input';
+    public const TYPE_NUMBER = 'number';
+    public const TYPE_PERCENTAGE = 'percentage';
     public const TYPE_SELECT = 'select';
+    public const TYPE_TEXT = 'text';
 
     public function getConfig(): ?array;
 

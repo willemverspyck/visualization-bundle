@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Filter;
 
 use Spyck\VisualizationBundle\Request\RequestInterface;
 
-final class LimitFilter extends AbstractOptionFilter
+final class LimitFilter extends AbstractFilter
 {
     public static function getField(): string
     {
@@ -20,6 +20,6 @@ final class LimitFilter extends AbstractOptionFilter
 
     public function getType(): string
     {
-        return FilterInterface::TYPE_INPUT;
+        return FilterInterface::TYPE_NUMBER;
     }
 }
