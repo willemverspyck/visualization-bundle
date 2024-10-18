@@ -6,14 +6,13 @@ namespace Spyck\VisualizationBundle\Tests\Event\Subscriber;
 
 use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Spyck\VisualizationBundle\Entity\Schedule;
+use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 use Spyck\VisualizationBundle\Event\ScheduleEvent;
 use Spyck\VisualizationBundle\Event\Subscriber\ScheduleEventSubscriber;
 use Spyck\VisualizationBundle\Service\MailService;
 use Spyck\VisualizationBundle\Service\PreloadService;
-use Spyck\VisualizationBundle\Entity\Schedule;
-use DateTime;
 
 final class ScheduleEventSubscriberTest extends TestCase
 {
@@ -35,7 +34,7 @@ final class ScheduleEventSubscriberTest extends TestCase
     public function testOnScheduleWithDataProvider(array $hours, array $days, array $weeks, array $weekdays, DateTimeImmutable $date, bool $execute): void
     {
         // Create a mock Schedule
-        $schedule = $this->createMock(Schedule::class);
+        $schedule = $this->createMock(ScheduleInterface::class);
         $schedule->method('getHours')->willReturn($hours);
         $schedule->method('getDays')->willReturn($days);
         $schedule->method('getWeeks')->willReturn($weeks);
@@ -58,7 +57,7 @@ final class ScheduleEventSubscriberTest extends TestCase
         // Call the onSchedule method
         $this->scheduleEventSubscriber->onSchedule($event);
 
-        $this->assertTrue(true, "Ensure at least one assertion is made.");
+        $this->assertTrue(true, 'Ensure at least one assertion is made.');
     }
 
     public function provideScheduleData(): array

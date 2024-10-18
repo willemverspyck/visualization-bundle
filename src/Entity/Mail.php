@@ -14,8 +14,10 @@ use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: MailRepository::class)]
 #[Doctrine\Table(name: 'visualization_mail')]
-class Mail implements Stringable
+class Mail implements Stringable, TimestampInterface
 {
+    use TimestampTrait;
+
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
@@ -48,13 +50,16 @@ class Mail implements Stringable
     #[Doctrine\Column(name: 'merge', type: Types::BOOLEAN)]
     private bool $merge;
 
+    #[Doctrine\Column(name: 'subscribe', type: Types::BOOLEAN)]
+    private bool $subscribe;
+
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
     private bool $active;
 
     /**
-     * @var Collection<int, Schedule>
+     * @var Collection<int, ScheduleInterface>
      */
-    #[Doctrine\ManyToMany(targetEntity: Schedule::class)]
+    #[Doctrine\ManyToMany(targetEntity: AbstractSchedule::class)]
     #[Doctrine\JoinTable(name: 'visualization_mail_schedule')]
     #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Doctrine\InverseJoinColumn(name: 'schedule_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
@@ -178,6 +183,18 @@ class Mail implements Stringable
         return $this;
     }
 
+    public function isSubscribe(): bool
+    {
+        return $this->subscribe;
+    }
+
+    public function setSubscribe(bool $subscribe): static
+    {
+        $this->subscribe = $subscribe;
+
+        return $this;
+    }
+
     public function isActive(): bool
     {
         return $this->active;
@@ -190,7 +207,7 @@ class Mail implements Stringable
         return $this;
     }
 
-    public function addSchedule(Schedule $schedule): static
+    public function addSchedule(ScheduleInterface $schedule): static
     {
         $this->schedules->add($schedule);
 
@@ -203,14 +220,14 @@ class Mail implements Stringable
     }
 
     /**
-     * @return Collection<int, Schedule>
+     * @return Collection<int, ScheduleInterface>
      */
     public function getSchedules(): Collection
     {
         return $this->schedules;
     }
 
-    public function removeSchedule(Schedule $schedule): void
+    public function removeSchedule(ScheduleInterface $schedule): void
     {
         $this->schedules->removeElement($schedule);
     }

@@ -6,12 +6,19 @@ namespace Spyck\VisualizationBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use Spyck\VisualizationBundle\Repository\ScheduleRepository;
 use Stringable;
 use Symfony\Component\Validator\Constraints as Validator;
 
+#[Doctrine\Entity(repositoryClass: ScheduleRepository::class)]
+#[Doctrine\InheritanceType(value: 'SINGLE_TABLE')]
+#[Doctrine\DiscriminatorColumn(name: 'discriminator', type: Types::STRING, length: 128)]
+#[Doctrine\DiscriminatorMap(value: [
+    ScheduleForEvent::class => ScheduleForEvent::class,
+    ScheduleForSystem::class => ScheduleForSystem::class,
+])]
 #[Doctrine\Table(name: 'visualization_schedule')]
-#[Doctrine\Entity]
-class Schedule implements Stringable
+abstract class AbstractSchedule implements ScheduleInterface, Stringable
 {
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Service;
 
 use Spyck\VisualizationBundle\Entity\Mail;
-use Spyck\VisualizationBundle\Entity\Schedule;
+use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Repository\MailRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -23,7 +23,7 @@ readonly class MailService
     {
     }
 
-    public function executeMailMessageBySchedule(Schedule $schedule, array $parameters = []): void
+    public function executeMailMessageBySchedule(ScheduleInterface $schedule, array $parameters = []): void
     {
         $mails = $this->mailRepository->getMailsBySchedule($schedule);
 

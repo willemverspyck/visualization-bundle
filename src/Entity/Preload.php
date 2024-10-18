@@ -35,9 +35,9 @@ class Preload implements Stringable, TimestampInterface
     private bool $active;
 
     /**
-     * @var Collection<int, Schedule>
+     * @var Collection<int, ScheduleInterface>
      */
-    #[Doctrine\ManyToMany(targetEntity: Schedule::class)]
+    #[Doctrine\ManyToMany(targetEntity: AbstractSchedule::class)]
     #[Doctrine\JoinTable(name: 'visualization_preload_schedule')]
     #[Doctrine\JoinColumn(name: 'preload_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Doctrine\InverseJoinColumn(name: 'schedule_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
@@ -89,7 +89,7 @@ class Preload implements Stringable, TimestampInterface
         return $this;
     }
 
-    public function addSchedule(Schedule $schedule): static
+    public function addSchedule(ScheduleInterface $schedule): static
     {
         $this->schedules->add($schedule);
 
@@ -102,14 +102,14 @@ class Preload implements Stringable, TimestampInterface
     }
 
     /**
-     * @return Collection<int, Schedule>
+     * @return Collection<int, ScheduleInterface>
      */
     public function getSchedules(): Collection
     {
         return $this->schedules;
     }
 
-    public function removeSchedule(Schedule $schedule): void
+    public function removeSchedule(ScheduleInterface $schedule): void
     {
         $this->schedules->removeElement($schedule);
     }

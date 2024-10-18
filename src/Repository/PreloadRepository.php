@@ -7,7 +7,7 @@ namespace Spyck\VisualizationBundle\Repository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Preload;
-use Spyck\VisualizationBundle\Entity\Schedule;
+use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 
 class PreloadRepository extends AbstractRepository
 {
@@ -19,7 +19,7 @@ class PreloadRepository extends AbstractRepository
     /**
      * @return array<int, Preload>
      */
-    public function getPreloadsBySchedule(Schedule $schedule): array
+    public function getPreloadsBySchedule(ScheduleInterface $schedule): array
     {
         return $this->createQueryBuilder('preload')
             ->innerJoin('preload.schedules', 'schedule', Join::WITH, 'schedule = :schedule')

@@ -16,8 +16,10 @@ use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: MenuRepository::class)]
 #[Doctrine\Table(name: 'visualization_menu')]
-class Menu implements Stringable
+class Menu implements Stringable, TimestampInterface
 {
+    use TimestampTrait;
+
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]

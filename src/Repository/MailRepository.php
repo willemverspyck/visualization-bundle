@@ -7,7 +7,7 @@ namespace Spyck\VisualizationBundle\Repository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Mail;
-use Spyck\VisualizationBundle\Entity\Schedule;
+use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 
 class MailRepository extends AbstractRepository
 {
@@ -19,7 +19,7 @@ class MailRepository extends AbstractRepository
     /**
      * @return array<int, Mail>
      */
-    public function getMailsBySchedule(Schedule $schedule): array
+    public function getMailsBySchedule(ScheduleInterface $schedule): array
     {
         return $this->createQueryBuilder('mail')
             ->innerJoin('mail.schedules', 'schedule', Join::WITH, 'schedule = :schedule')

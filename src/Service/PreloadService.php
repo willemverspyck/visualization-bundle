@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Service;
 
 use Spyck\VisualizationBundle\Entity\Preload;
-use Spyck\VisualizationBundle\Entity\Schedule;
+use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 use Spyck\VisualizationBundle\Message\PreloadMessage;
 use Spyck\VisualizationBundle\Repository\PreloadRepository;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -16,7 +16,7 @@ readonly class PreloadService
     {
     }
 
-    public function executePreloadMessageBySchedule(Schedule $schedule): void
+    public function executePreloadMessageBySchedule(ScheduleInterface $schedule): void
     {
         $preloads = $this->preloadRepository->getPreloadsBySchedule($schedule);
 

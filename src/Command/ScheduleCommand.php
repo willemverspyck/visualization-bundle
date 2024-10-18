@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Command;
 
 use DateTimeImmutable;
 use Exception;
+use Spyck\VisualizationBundle\Entity\ScheduleForSystem;
 use Spyck\VisualizationBundle\Event\ScheduleEvent;
 use Spyck\VisualizationBundle\Repository\ScheduleRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -29,7 +30,7 @@ final class ScheduleCommand extends Command
     {
         $date = new DateTimeImmutable();
 
-        $schedules = $this->scheduleRepository->getSchedules();
+        $schedules = $this->scheduleRepository->getSchedules(ScheduleForSystem::class);
 
         foreach ($schedules as $schedule) {
             $scheduleEvent = new ScheduleEvent($schedule, $date);
