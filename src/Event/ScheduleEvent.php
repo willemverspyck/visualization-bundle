@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Event;
 
-use DateTimeImmutable;
+use DateTimeInterface;
 use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class ScheduleEvent extends Event
 {
-    public function __construct(private readonly ScheduleInterface $schedule, private readonly DateTimeImmutable $date)
+    public function __construct(private readonly ScheduleInterface $schedule, private readonly DateTimeInterface $date)
     {
     }
 
@@ -19,7 +19,7 @@ final class ScheduleEvent extends Event
         return $this->schedule;
     }
 
-    public function getDate(): DateTimeImmutable
+    public function getDate(): DateTimeInterface
     {
         return $this->date;
     }
