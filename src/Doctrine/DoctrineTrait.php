@@ -12,7 +12,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 trait DoctrineTrait
 {
-    private EntityManagerInterface $entityManager;
+    private readonly EntityManagerInterface $entityManager;
 
     #[Required]
     public function setEntityManager(EntityManagerInterface $entityManager): void
