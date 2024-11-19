@@ -142,6 +142,14 @@ abstract class AbstractSchedule implements ScheduleInterface, Stringable
 
     public function __toString(): string
     {
+        if ($this instanceof ScheduleForEvent) {
+            return sprintf('%s (Event)', $this->getName());
+        }
+
+        if ($this instanceof ScheduleForSystem) {
+            return sprintf('%s (System)', $this->getName());
+        }
+
         return $this->getName();
     }
 }
