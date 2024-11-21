@@ -35,4 +35,6 @@ interface ScheduleInterface
     public function isActive(): bool;
 
     public function setActive(bool $active): static;
+
+    public function getDiscriminator(): string;
 }

@@ -9,4 +9,8 @@ use Doctrine\ORM\Mapping as Doctrine;
 #[Doctrine\Entity]
 class ScheduleForSystem extends AbstractSchedule
 {
+    public function getDiscriminator(): string
+    {
+        return 'System';
+    }
 }
