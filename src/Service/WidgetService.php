@@ -155,6 +155,22 @@ readonly class WidgetService
         return $this->getDashboardAsModel($widget, $variables);
     }
 
+    public function getDashboardAsModelByWidget(WidgetInterface $widget, string $name): DashboardAsModel
+    {
+        $blockAsModel = new BlockAsModel();
+        $blockAsModel->setWidget($this->getWidgetAsModel($widget));
+        $blockAsModel->setName($name);
+
+        $user = $this->userService->getUser();
+
+        $dashboardAsModel = new DashboardAsModel();
+        $dashboardAsModel->setUser($user);
+        $dashboardAsModel->setName($name);
+        $dashboardAsModel->addBlock($blockAsModel);
+
+        return $dashboardAsModel;
+    }
+
     /**
      * Get the data with a callback.
      *
@@ -505,7 +521,7 @@ readonly class WidgetService
         if (false === $this->cacheActive || null === $widget->getCache()) {
             $this->logger->info('Cache disabled');
 
-            return iterator_to_array($widget->getData(), false);
+            return $this->mapData($widget);
         }
 
         $key = $this->getKey($widget);
@@ -517,12 +533,12 @@ readonly class WidgetService
                 $item->tag(sprintf('spyck_visualization_widget_%s', $widget->getWidget()->getId()));
             }
 
-            return iterator_to_array($widget->getData(), false);
-        }, null, $metadata);
+            return $this->mapData($widget);
+        }, null, $meta);
 
         $this->logger->info('Cache', [
             'cache' => $widget->getCache(),
-            'metadata' => $metadata,
+            'meta' => $meta,
         ]);
 
         return $data;
@@ -835,6 +851,17 @@ readonly class WidgetService
             FieldInterface::TYPE_TIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getTimeFromString($value),
             default => $value,
         };
+    }
+
+    private function mapData(WidgetInterface $widget): array
+    {
+        $returnData = [];
+
+        foreach ($widget->getData() as $data) {
+            $returnData[] = $widget->mapData($data);
+        }
+
+        return $returnData;
     }
 
     /**

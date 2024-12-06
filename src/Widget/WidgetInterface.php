@@ -41,6 +41,8 @@ interface WidgetInterface
 
     public function getType(): ?string;
 
+    public function mapData(array $data): array;
+
     public function setView(?string $view): static;
 
     public function getView(): ?string;
