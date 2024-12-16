@@ -22,7 +22,7 @@ final class WeekStartParameter extends AbstractDateParameter
             return null;
         }
 
-        $modifier = match($this->weekday) {
+        $modifier = match ($this->weekday) {
             DateParameterInterface::SUNDAY => 'Sunday this week',
             DateParameterInterface::MONDAY => 'Monday this week',
             default => throw new Exception('Unknown weekday'),
