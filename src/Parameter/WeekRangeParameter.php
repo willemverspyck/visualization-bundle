@@ -8,14 +8,14 @@ use Spyck\VisualizationBundle\Request\AbstractMultipleRequest;
 
 final class WeekRangeParameter extends AbstractMultipleRequest
 {
-    public function __construct(bool $full = false)
+    public function __construct(int $weekday = DateParameterInterface::MONDAY)
     {
-        $weekStartParameter = new WeekStartParameter();
+        $weekStartParameter = new WeekStartParameter($weekday);
         $weekStartParameter->setParent($this);
 
         $this->addChild($weekStartParameter);
 
-        $weekEndParameter = new WeekEndParameter();
+        $weekEndParameter = new WeekEndParameter($weekday);
         $weekEndParameter->setParent($this);
 
         $this->addChild($weekEndParameter);
