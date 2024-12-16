@@ -21,6 +21,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use Spyck\VisualizationBundle\Config\Config;
+use Spyck\VisualizationBundle\Context\ExcelContext;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 use Spyck\VisualizationBundle\Format\BarFormat;
@@ -153,9 +154,15 @@ final class ExcelView extends AbstractView
         });
 
         WidgetUtility::walkFields($widget->getFields(), function (FieldInterface $field, int $index) use ($sheet, $count): void {
-            $sheet
-                ->getColumnDimensionByColumn($index + 1)
-                ->setAutoSize(true);
+            $context = $field->getConfig()->getContext(ViewInterface::XLSX);
+
+            $columnDimension = $sheet->getColumnDimensionByColumn($index + 1);
+
+            if ($context instanceof ExcelContext && null !== $context->getWidth()) {
+                $columnDimension->setWidth($context->getWidth());
+            } else {
+                $columnDimension->setAutoSize(true);
+            }
 
             $style = $sheet->getStyle([$index + 1, 2, $index + 1, $count + 1]);
 

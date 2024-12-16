@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Config;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Spyck\VisualizationBundle\Context\ContextInterface;
+use Spyck\VisualizationBundle\Context\ExcelContext;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
 use Symfony\Component\Serializer\Annotation as Serializer;
@@ -23,6 +27,18 @@ final class Config
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private ?array $chart = null;
+
+    /**
+     * @var Collection<int, ContextInterface<ExcelContext>>
+     */
+    private Collection $contexts;
+
+    public function __construct()
+    {
+        $this->contexts = new ArrayCollection();
+
+        $this->addContext(new ExcelContext());
+    }
 
     public function getField(): FieldInterface
     {
@@ -72,15 +88,46 @@ final class Config
         return $this;
     }
 
+    /**
+     * @deprecated: Use contexts
+     */
     public function getChart(): ?array
     {
         return $this->chart;
     }
 
+    /**
+     * @deprecated: Use contexts
+     */
     public function setChart(?array $chart): static
     {
         $this->chart = $chart;
 
         return $this;
+    }
+
+    public function addContext(ContextInterface $context): void
+    {
+        $this->contexts->add($context);
+    }
+
+    /**
+     * @return ContextInterface<ExcelContext>|null
+     */
+    public function getContext(string $view): ?ContextInterface
+    {
+        $contexts = $this->getContexts()->filter(function (ContextInterface $context) use ($view): bool {
+            return $view === $context->getView();
+        });
+
+        return $contexts->isEmpty() ? null : $contexts->first();
+    }
+
+    /**
+     * @return Collection<int, ContextInterface<ExcelContext>>
+     */
+    public function getContexts(): Collection
+    {
+        return $this->contexts;
     }
 }
