@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Parameter;
 
+use DateMalformedStringException;
 use DateTimeImmutable;
-use Exception;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -46,7 +46,7 @@ abstract class AbstractDateParameter extends AbstractParameter implements DatePa
     {
         try {
             $this->data = new DateTimeImmutable($data);
-        } catch (Exception) {
+        } catch (DateMalformedStringException) {
             throw new NotFoundHttpException(sprintf('Parameter "%s" with "%s" is invalid', $this->getName(), $data));
         }
     }
