@@ -16,14 +16,14 @@ final class MailMessage implements MailMessageInterface
     private bool $route;
     private bool $merge;
 
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getUser(): int
@@ -76,16 +76,6 @@ final class MailMessage implements MailMessageInterface
         $this->view = $view;
     }
 
-    public function isInline(): bool
-    {
-        return $this->inline;
-    }
-
-    public function setInline(bool $inline): void
-    {
-        $this->inline = $inline;
-    }
-
     public function hasRoute(): bool
     {
         return $this->route;
@@ -94,6 +84,16 @@ final class MailMessage implements MailMessageInterface
     public function setRoute(bool $route): void
     {
         $this->route = $route;
+    }
+
+    public function isInline(): bool
+    {
+        return $this->inline;
+    }
+
+    public function setInline(bool $inline): void
+    {
+        $this->inline = $inline;
     }
 
     public function isMerge(): bool

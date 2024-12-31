@@ -6,11 +6,11 @@ namespace Spyck\VisualizationBundle\Message;
 
 interface PreloadMessageInterface
 {
-    public function setId(int $id): void;
-
     public function getId(): int;
 
-    public function setVariables(array $variables): void;
+    public function setId(int $id): void;
 
     public function getVariables(): array;
+
+    public function setVariables(array $variables): void;
 }
