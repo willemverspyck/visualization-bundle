@@ -34,16 +34,9 @@ final class ScheduleEventSubscriber implements EventSubscriberInterface
         $schedule = $event->getSchedule();
         $date = $event->getDate();
 
-        dump($schedule->getName());
-        dump($date->format('Y-m-d H:i:s'));
-
         if (false === $this->isMatchBySchedule($schedule, $date)) {
-            dump('False');
-
             return;
         }
-
-        dump('True');
 
         $this->mailService->executeMailMessageBySchedule($schedule);
         $this->preloadService->executePreloadMessageBySchedule($schedule);
