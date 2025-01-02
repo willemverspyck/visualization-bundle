@@ -18,8 +18,10 @@ use Symfony\Component\Validator\Constraints as Validator;
     ScheduleForSystem::class => ScheduleForSystem::class,
 ])]
 #[Doctrine\Table(name: 'visualization_schedule')]
-abstract class AbstractSchedule implements ScheduleInterface, Stringable
+abstract class AbstractSchedule implements ScheduleInterface, Stringable, TimestampInterface
 {
+    use TimestampTrait;
+
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
