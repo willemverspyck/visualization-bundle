@@ -16,21 +16,21 @@ readonly class PreloadService
     {
     }
 
-    public function executePreloadMessageBySchedule(ScheduleInterface $schedule): void
-    {
-        $preloads = $this->preloadRepository->getPreloadsBySchedule($schedule);
-
-        foreach ($preloads as $preload) {
-            $this->executePreloadMessage($preload);
-        }
-    }
-
-    public function executePreloadMessage(Preload $preload): void
+    public function executePreloadAsMessage(Preload $preload): void
     {
         $preloadMessage = new PreloadMessage();
         $preloadMessage->setId($preload->getDashboard()->getId());
         $preloadMessage->setVariables($preload->getVariables());
 
         $this->messageBus->dispatch($preloadMessage);
+    }
+
+    public function executePreloadAsMessageBySchedule(ScheduleInterface $schedule): void
+    {
+        $preloads = $this->preloadRepository->getPreloadsBySchedule($schedule);
+
+        foreach ($preloads as $preload) {
+            $this->executePreloadAsMessage($preload);
+        }
     }
 }

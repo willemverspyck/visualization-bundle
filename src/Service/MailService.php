@@ -24,40 +24,6 @@ readonly class MailService
     {
     }
 
-    public function executeMailMessage(Mail $mail, array $parameters): void
-    {
-        foreach ($mail->getUsers() as $user) {
-            $this->executeMailMessageForUser($mail, $user, $parameters);
-        }
-    }
-
-    public function executeMailMessageForUser(Mail $mail, UserInterface $user, array $parameters = []): void
-    {
-        $dashboard = $mail->getDashboard();
-
-        $mailMessage = new MailMessage();
-        $mailMessage->setId($dashboard->getId());
-        $mailMessage->setUser($user->getId());
-        $mailMessage->setName($mail->getName());
-        $mailMessage->setDescription($mail->getDescription());
-        $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
-        $mailMessage->setView($mail->getView());
-        $mailMessage->setInline($mail->isInline());
-        $mailMessage->setRoute($mail->hasRoute());
-        $mailMessage->setMerge($mail->isMerge());
-
-        $this->messageBus->dispatch($mailMessage);
-    }
-
-    public function executeMailMessageBySchedule(ScheduleInterface $schedule, array $parameters = []): void
-    {
-        $mails = $this->mailRepository->getMailsBySchedule($schedule);
-
-        foreach ($mails as $mail) {
-            $this->executeMailMessage($mail, $parameters);
-        }
-    }
-
     /**
      * @throws TransportExceptionInterface
      */
@@ -84,5 +50,34 @@ readonly class MailService
         $this->bodyRenderer->render($email);
 
         $this->mailer->send($email);
+    }
+
+    public function executeMailAsMessage(Mail $mail, UserInterface $user, array $parameters = []): void
+    {
+        $dashboard = $mail->getDashboard();
+
+        $mailMessage = new MailMessage();
+        $mailMessage->setId($dashboard->getId());
+        $mailMessage->setUser($user->getId());
+        $mailMessage->setName($mail->getName());
+        $mailMessage->setDescription($mail->getDescription());
+        $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
+        $mailMessage->setView($mail->getView());
+        $mailMessage->setInline($mail->isInline());
+        $mailMessage->setRoute($mail->hasRoute());
+        $mailMessage->setMerge($mail->isMerge());
+
+        $this->messageBus->dispatch($mailMessage);
+    }
+
+    public function executeMailAsMessageBySchedule(ScheduleInterface $schedule, array $parameters = []): void
+    {
+        $mails = $this->mailRepository->getMailsBySchedule($schedule);
+
+        foreach ($mails as $mail) {
+            foreach ($mail->getUsers() as $user) {
+                $this->executeMailAsMessage($mail, $user, $parameters);
+            }
+        }
     }
 }

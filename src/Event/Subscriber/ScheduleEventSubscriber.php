@@ -13,7 +13,6 @@ use Spyck\VisualizationBundle\Service\PreloadService;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-#[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
 final class ScheduleEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(private readonly MailService $mailService, private readonly PreloadService $preloadService)
@@ -38,8 +37,8 @@ final class ScheduleEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->mailService->executeMailMessageBySchedule($schedule);
-        $this->preloadService->executePreloadMessageBySchedule($schedule);
+        $this->mailService->executeMailAsMessageBySchedule($schedule);
+        $this->preloadService->executePreloadAsMessageBySchedule($schedule);
     }
 
     private function isMatch(array $data, array $matches): bool

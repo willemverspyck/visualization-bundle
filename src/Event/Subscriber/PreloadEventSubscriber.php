@@ -9,7 +9,6 @@ use Spyck\VisualizationBundle\Service\PreloadService;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-#[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
 final class PreloadEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(private readonly PreloadService $preloadService)
@@ -30,6 +29,6 @@ final class PreloadEventSubscriber implements EventSubscriberInterface
      */
     public function onPreload(PreloadEvent $event): void
     {
-        $this->preloadService->executePreloadMessage($event->getPreload());
+        $this->preloadService->executePreloadAsMessage($event->getPreload());
     }
 }
