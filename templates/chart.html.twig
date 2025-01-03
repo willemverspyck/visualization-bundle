@@ -24,9 +24,9 @@
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) %}
                 &euro; {{ getNumber(config, value) }}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATE')) %}
-                {{ value|date('Y-m-d') }}
+                {{ value|date(constant('Spyck\\VisualizationBundle\\Utility\\DateTimeUtility::FORMAT_DATE')) }}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATETIME')) %}
-                {{ value|date('Y-m-d H:i:s') }}
+                {{ value|date(constant('Spyck\\VisualizationBundle\\Utility\\DateTimeUtility::FORMAT_DATETIME')) }}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_IMAGE')) %}
                 {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                     <img src="{{ getDirectory(value) }}" alt="" width="32" height="32" align="top">
@@ -48,7 +48,7 @@
                     <span>{{ value|abs }}</span>
                 {% endif %}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_TIME')) %}
-                {{ value|date('H:i:s') }}
+                {{ value|date(constant('Spyck\\VisualizationBundle\\Utility\\DateTimeUtility::FORMAT_TIME')) }}
             {% else %}
                 {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
                     {{ value|u.truncate(40, '...') }}
