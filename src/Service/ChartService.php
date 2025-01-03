@@ -20,7 +20,7 @@ readonly class ChartService
 
     public function hasChart(): bool
     {
-        return null !== $this->command && null !== $this->directory;
+        return null === $this->command || null === $this->directory;
     }
 
     /**
@@ -32,35 +32,30 @@ readonly class ChartService
             throw new Exception('Chart not configured');
         }
 
-        $widget = $block->getWidget();
         $type = $block->getCharts()[0];
+        $widget = $block->getWidget();
 
-        $name = md5(sprintf('%s-%s', serialize($widget), $type));
+        $output = sprintf('%s/%s-%s.png', $this->directory, $type, serialize($widget));
 
-        $chart = sprintf('%s/%s.png', $this->directory, $name);
-
-        if (file_exists($chart)) {
-            return $chart;
+        if (file_exists($output)) {
+            return $output;
         }
 
+        $input = sprintf('%s/%s-%s.html', $this->directory, $type, serialize($widget));
+
         $content = $this->environment->render('@SpyckVisualization/chart/index.html.twig', [
-            'block' => $block,
             'type' => $type,
-            'name' => $name,
+            'widget' => $widget,
         ]);
 
-        $file = sprintf('%s/%s.html', $this->directory, $name);
-
-        $result = file_put_contents($file, $content);
-
-        if (false === $result) {
+        if (false === file_put_contents($input, $content)) {
             throw new Exception('File not writable');
         }
 
         $commands = [
             $this->command,
-            sprintf('--file=%s', $file),
-            sprintf('--directory=%s', $this->directory),
+            sprintf('--input=%s', $input),
+            sprintf('--output=%s', $output),
         ];
 
         $process = new Process($commands);
@@ -71,13 +66,13 @@ readonly class ChartService
             throw new ProcessFailedException($process);
         }
 
-        if (file_exists($chart)) {
+        if (file_exists($output)) {
             $filesystem = new Filesystem();
-            $filesystem->remove($file);
+            $filesystem->remove($input);
 
-            return $chart;
+            return $output;
         }
 
-        throw new Exception(sprintf('Chart "%s" not found', $name));
+        throw new Exception(sprintf('Chart not found (%s)', $input));
     }
 }
