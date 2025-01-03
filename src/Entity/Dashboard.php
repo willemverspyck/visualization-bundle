@@ -6,7 +6,6 @@ namespace Spyck\VisualizationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
@@ -54,7 +53,7 @@ class Dashboard implements Stringable, TimestampInterface
      * @var Collection<int, Block>
      */
     #[Doctrine\OneToMany(mappedBy: 'dashboard', targetEntity: Block::class, cascade: ['persist'], orphanRemoval: true)]
-    #[Doctrine\OrderBy(value: ['position' => Criteria::ASC])]
+    #[Doctrine\OrderBy(value: ['position' => 'ASC'])]
     #[Validator\Valid]
     private Collection $blocks;
 

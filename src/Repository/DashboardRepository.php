@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Repository;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -77,7 +76,7 @@ class DashboardRepository extends AbstractRepository
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
             ->where('dashboard.active = TRUE')
-            ->orderBy('dashboard.timestampCreated', Criteria::DESC)
+            ->orderBy('dashboard.timestampCreated', 'DESC')
             ->addOrderBy('block.position');
 
         if ($authentication) {
