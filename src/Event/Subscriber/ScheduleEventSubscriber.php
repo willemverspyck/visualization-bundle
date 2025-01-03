@@ -10,7 +10,6 @@ use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 use Spyck\VisualizationBundle\Event\ScheduleEvent;
 use Spyck\VisualizationBundle\Service\MailService;
 use Spyck\VisualizationBundle\Service\PreloadService;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ScheduleEventSubscriber implements EventSubscriberInterface
