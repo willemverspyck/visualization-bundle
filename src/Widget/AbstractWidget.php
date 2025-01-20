@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Widget;
 
-use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\Query\Expr\Func;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
@@ -230,45 +228,12 @@ abstract class AbstractWidget implements WidgetInterface
      */
     protected function hasFilterOption(string $option): bool
     {
-        $parameters = $this->getFilter(OptionFilter::class);
+        $filter = $this->getFilter(OptionFilter::class);
 
-        if (null === $parameters) {
+        if (null === $filter) {
             return false;
         }
 
-        return in_array($option, $parameters, true);
-    }
-
-    /**
-     * Return function for filter with option.
-     */
-    protected function filterByOption(string $field): ?Func
-    {
-        $parameters = $this->getFilter(OptionFilter::class);
-
-        if (null === $parameters) {
-            return null;
-        }
-
-        $expr = new Expr();
-
-        return $expr->in($field, $parameters);
-    }
-
-    /**
-     * Return function to filter with field name.
-     */
-    protected function filterBy(string $name, string $field): Func
-    {
-        $expr = new Expr();
-
-        $parameters = $this->getFilter($name);
-        $parameterIds = [];
-
-        foreach ($parameters as $parameter) {
-            $parameterIds[] = $parameter->getId();
-        }
-
-        return $expr->in($field, $parameterIds);
+        return in_array($option, $filter, true);
     }
 }
