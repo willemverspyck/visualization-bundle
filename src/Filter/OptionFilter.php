@@ -8,9 +8,10 @@ use Spyck\VisualizationBundle\Request\RequestInterface;
 
 final class OptionFilter extends AbstractOptionFilter
 {
-    public function __construct(array $options = [])
+    public function __construct(array $options = [], bool $multiple = true)
     {
         $this->setOptions($options);
+        $this->setMultiple($multiple);
     }
 
     public static function getField(): string
