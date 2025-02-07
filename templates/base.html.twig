@@ -57,7 +57,7 @@
                                                                 <tr>
                                                                     {% for field in widget.fields %}
                                                                         {% if isMultipleField(field) %}
-                                                                            <th colspan="{{ field.children|length }}">{{ field.name }}</th>
+                                                                            <th colspan="{{ field.children|length }}" class="multiple">{{ field.name }}</th>
                                                                         {% else %}
                                                                             <th>&nbsp;</th>
                                                                         {% endif %}
