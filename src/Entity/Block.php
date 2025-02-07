@@ -15,12 +15,12 @@ class Block implements Stringable, TimestampInterface
 {
     use TimestampTrait;
 
-    public const SIZE_LARGE = 'L';
-    public const SIZE_LARGE_NAME = 'Large';
-    public const SIZE_MEDIUM = 'M';
-    public const SIZE_MEDIUM_NAME = 'Medium';
-    public const SIZE_SMALL = 'S';
-    public const SIZE_SMALL_NAME = 'Small';
+    public const string SIZE_LARGE = 'L';
+    public const string SIZE_LARGE_NAME = 'Large';
+    public const string SIZE_MEDIUM = 'M';
+    public const string SIZE_MEDIUM_NAME = 'Medium';
+    public const string SIZE_SMALL = 'S';
+    public const string SIZE_SMALL_NAME = 'Small';
 
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]

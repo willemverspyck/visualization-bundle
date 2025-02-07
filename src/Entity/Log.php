@@ -15,10 +15,10 @@ use Symfony\Component\Validator\Constraints as Validator;
 #[Doctrine\Table(name: 'visualization_log')]
 class Log
 {
-    public const TYPE_API = 1;
-    public const TYPE_API_NAME = 'API';
-    public const TYPE_MAIL = 2;
-    public const TYPE_MAIL_NAME = 'Mail';
+    public const int TYPE_API = 1;
+    public const string TYPE_API_NAME = 'API';
+    public const int TYPE_MAIL = 2;
+    public const string TYPE_MAIL_NAME = 'Mail';
 
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]
