@@ -9,9 +9,9 @@ use Exception;
 
 final class DateTimeUtility
 {
-    public const FORMAT_DATE = 'Y-m-d';
-    public const FORMAT_DATETIME = 'Y-m-d H:i:s';
-    public const FORMAT_TIME = 'H:i:s';
+    public const string FORMAT_DATE = 'Y-m-d';
+    public const string FORMAT_DATETIME = 'Y-m-d H:i:s';
+    public const string FORMAT_TIME = 'H:i:s';
 
     /**
      * @throws Exception
