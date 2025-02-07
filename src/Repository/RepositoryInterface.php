@@ -14,5 +14,5 @@ interface RepositoryInterface
 
     public function getVisualizationEntityById(int $id): ?object;
 
-    public function getVisualizationEntityData(WidgetInterface $widget): array;
+    public function getVisualizationEntities(WidgetInterface $widget): array;
 }

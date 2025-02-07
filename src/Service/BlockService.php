@@ -116,7 +116,7 @@ readonly class BlockService
 
             $name = $filter->getName();
 
-            $entityData = $this->repositoryService->getRepository($name)->getVisualizationEntityData($widget);
+            $entityData = $this->repositoryService->getRepository($name)->getVisualizationEntities($widget);
 
             foreach ($entityData as $entityRow) {
                 $data[] = [
