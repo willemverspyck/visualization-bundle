@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Model;
 
 use Spyck\VisualizationBundle\Controller\DashboardController;
 use Spyck\VisualizationBundle\Controller\MenuController;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class Route
 {

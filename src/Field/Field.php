@@ -10,7 +10,7 @@ use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Config\Config;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Route\RouteInterface;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class Field extends AbstractField implements FieldInterface
 {

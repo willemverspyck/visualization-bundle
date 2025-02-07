@@ -18,24 +18,24 @@ class Widget implements Stringable, TimestampInterface
 {
     use TimestampTrait;
 
-    public const CHART_AREA = 'area';
-    public const CHART_AREA_NAME = 'Area';
-    public const CHART_BAR = 'bar';
-    public const CHART_BAR_NAME = 'Bar';
-    public const CHART_COLUMN = 'column';
-    public const CHART_COLUMN_NAME = 'Column';
-    public const CHART_COUNTRY = 'country';
-    public const CHART_COUNTRY_NAME = 'Country';
-    public const CHART_GANTT = 'gantt';
-    public const CHART_GANTT_NAME = 'Gantt';
-    public const CHART_LINE = 'line';
-    public const CHART_LINE_NAME = 'Line';
-    public const CHART_PIE = 'pie';
-    public const CHART_PIE_NAME = 'Pie';
-    public const CHART_REGION = 'region';
-    public const CHART_REGION_NAME = 'Region';
-    public const CHART_TABLE = 'table';
-    public const CHART_TABLE_NAME = 'Table';
+    public const string CHART_AREA = 'area';
+    public const string CHART_AREA_NAME = 'Area';
+    public const string CHART_BAR = 'bar';
+    public const string CHART_BAR_NAME = 'Bar';
+    public const string CHART_COLUMN = 'column';
+    public const string CHART_COLUMN_NAME = 'Column';
+    public const string CHART_COUNTRY = 'country';
+    public const string CHART_COUNTRY_NAME = 'Country';
+    public const string CHART_GANTT = 'gantt';
+    public const string CHART_GANTT_NAME = 'Gantt';
+    public const string CHART_LINE = 'line';
+    public const string CHART_LINE_NAME = 'Line';
+    public const string CHART_PIE = 'pie';
+    public const string CHART_PIE_NAME = 'Pie';
+    public const string CHART_REGION = 'region';
+    public const string CHART_REGION_NAME = 'Region';
+    public const string CHART_TABLE = 'table';
+    public const string CHART_TABLE_NAME = 'Table';
 
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]

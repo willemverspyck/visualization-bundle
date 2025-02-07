@@ -10,13 +10,13 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 #[Autoconfigure(tags: ['spyck.visualization.view'])]
 interface ViewInterface
 {
-    public const CSV = 'csv';
-    public const JSON = 'json';
-    public const PDF = 'pdf';
-    public const SSV = 'ssv';
-    public const TSV = 'tsv';
-    public const XLSX = 'xlsx';
-    public const XML = 'xml';
+    public const string CSV = 'csv';
+    public const string JSON = 'json';
+    public const string PDF = 'pdf';
+    public const string SSV = 'ssv';
+    public const string TSV = 'tsv';
+    public const string XLSX = 'xlsx';
+    public const string XML = 'xml';
 
     public function getContent(Dashboard $dashboard): string;
 

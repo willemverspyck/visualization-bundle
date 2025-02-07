@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Format;
 
 use DateTimeInterface;
 use Spyck\VisualizationBundle\Controller\WidgetController;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class ConditionFormat implements FormatInterface
 {

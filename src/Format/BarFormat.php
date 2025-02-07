@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Format;
 
 use Spyck\VisualizationBundle\Controller\WidgetController;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class BarFormat implements FormatInterface
 {

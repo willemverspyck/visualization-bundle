@@ -11,17 +11,17 @@ use Spyck\VisualizationBundle\Route\RouteInterface;
 
 interface FieldInterface extends AbstractFieldInterface
 {
-    public const TYPE_IMAGE = 'image';
-    public const TYPE_BOOLEAN = 'boolean';
-    public const TYPE_NUMBER = 'number';
-    public const TYPE_CURRENCY = 'currency';
-    public const TYPE_POSITION = 'position';
-    public const TYPE_ARRAY = 'array';
-    public const TYPE_DATETIME = 'datetime';
-    public const TYPE_DATE = 'date';
-    public const TYPE_PERCENTAGE = 'percentage';
-    public const TYPE_TEXT = 'text';
-    public const TYPE_TIME = 'time';
+    public const string TYPE_IMAGE = 'image';
+    public const string TYPE_BOOLEAN = 'boolean';
+    public const string TYPE_NUMBER = 'number';
+    public const string TYPE_CURRENCY = 'currency';
+    public const string TYPE_POSITION = 'position';
+    public const string TYPE_ARRAY = 'array';
+    public const string TYPE_DATETIME = 'datetime';
+    public const string TYPE_DATE = 'date';
+    public const string TYPE_PERCENTAGE = 'percentage';
+    public const string TYPE_TEXT = 'text';
+    public const string TYPE_TIME = 'time';
 
     public function getParent(): ?MultipleFieldInterface;
 

@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Controller\CategoryController;
 use Spyck\VisualizationBundle\Repository\CategoryRepository;
 use Stringable;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: CategoryRepository::class)]

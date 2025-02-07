@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Format;
 
 use Spyck\VisualizationBundle\Controller\WidgetController;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class ScaleFormat implements FormatInterface
 {
-    public const TYPE_MEAN = 'mean';
-    public const TYPE_MEDIAN = 'median';
+    public const string TYPE_MEAN = 'mean';
+    public const string TYPE_MEDIAN = 'median';
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private ?Color $color = null;

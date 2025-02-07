@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Model;
 
-use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OpenApi;
 use Spyck\VisualizationBundle\Controller\DashboardController;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class Block
 {

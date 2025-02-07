@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Format\FormatInterface;
 use Spyck\VisualizationBundle\Model\Aggregate;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 abstract class AbstractField
 {

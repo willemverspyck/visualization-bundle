@@ -10,7 +10,7 @@ use Spyck\VisualizationBundle\Context\ContextInterface;
 use Spyck\VisualizationBundle\Context\ExcelContext;
 use Spyck\VisualizationBundle\Controller\WidgetController;
 use Spyck\VisualizationBundle\Field\FieldInterface;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class Config
 {

@@ -6,12 +6,12 @@ namespace Spyck\VisualizationBundle\Request;
 
 interface RequestInterface
 {
-    public const DATE = 'date';
-    public const DATE_START = 'dateStart';
-    public const DATE_END = 'dateEnd';
-    public const LIMIT = 'limit';
-    public const OFFSET = 'offset';
-    public const OPTION = 'option';
+    public const string DATE = 'date';
+    public const string DATE_START = 'dateStart';
+    public const string DATE_END = 'dateEnd';
+    public const string LIMIT = 'limit';
+    public const string OFFSET = 'offset';
+    public const string OPTION = 'option';
 
     public function getParent(): ?MultipleRequestInterface;
 

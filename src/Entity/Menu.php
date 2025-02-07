@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Controller\MenuController;
 use Spyck\VisualizationBundle\Repository\MenuRepository;
 use Stringable;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: MenuRepository::class)]

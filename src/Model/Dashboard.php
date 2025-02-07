@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use OpenApi\Attributes as OpenApi;
 use Spyck\VisualizationBundle\Controller\DashboardController;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class Dashboard
 {

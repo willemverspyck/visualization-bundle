@@ -12,7 +12,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, NormalizerAwar
 {
     use NormalizerAwareTrait;
 
-    private const KEY = 'normalized';
+    private const string KEY = 'normalized';
 
     protected function setNormalized(mixed $data, array &$context): void
     {
