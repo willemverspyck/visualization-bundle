@@ -57,8 +57,8 @@ readonly class MailService
         $dashboard = $mail->getDashboard();
 
         $mailMessage = new MailMessage();
-        $mailMessage->setId($dashboard->getId());
-        $mailMessage->setUser($user->getId());
+        $mailMessage->setDashboardId($dashboard->getId());
+        $mailMessage->setUserId($user->getId());
         $mailMessage->setName($mail->getName());
         $mailMessage->setDescription($mail->getDescription());
         $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));

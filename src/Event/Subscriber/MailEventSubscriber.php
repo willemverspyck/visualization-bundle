@@ -44,13 +44,13 @@ final class MailEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $user = $this->userRepository->getUserById($mailMessage->getUser());
+        $user = $this->userRepository->getUserById($mailMessage->getUserId());
 
         if (null === $user) {
             return;
         }
 
-        $dashboard = $this->dashboardRepository->getDashboardById($mailMessage->getId(), false);
+        $dashboard = $this->dashboardRepository->getDashboardById($mailMessage->getDashboardId(), false);
 
         if (null === $dashboard) {
             return;

@@ -44,7 +44,7 @@ final class MailMessageHandler
      */
     public function __invoke(MailMessageInterface $mailMessage): void
     {
-        $user = $this->getUserById($mailMessage->getUser());
+        $user = $this->getUserById($mailMessage->getUserId());
 
         $token = $this->tokenStorage->getToken();
 
@@ -52,7 +52,7 @@ final class MailMessageHandler
 
         $this->tokenStorage->setToken($usernamePasswordToken);
 
-        $dashboard = $this->getDashboardById($mailMessage->getId());
+        $dashboard = $this->getDashboardById($mailMessage->getDashboardId());
 
         $this->executeMail($mailMessage, $user, $dashboard);
 

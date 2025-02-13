@@ -119,8 +119,8 @@ final class MailController extends AbstractController
         }
 
         $mailMessage = new MailMessage();
-        $mailMessage->setId($dashboardId);
-        $mailMessage->setUser($user->getId());
+        $mailMessage->setDashboardId($dashboardId);
+        $mailMessage->setUserId($user->getId());
         $mailMessage->setName($mailAsPayload->getName());
         $mailMessage->setDescription($mailAsPayload->getDescription());
         $mailMessage->setVariables($mailAsPayload->getVariables());

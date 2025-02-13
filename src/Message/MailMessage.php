@@ -6,8 +6,8 @@ namespace Spyck\VisualizationBundle\Message;
 
 final class MailMessage implements MailMessageInterface
 {
-    private int $id;
-    private int $user;
+    private int $dashboardId;
+    private int $userId;
     private string $name;
     private ?string $description = null;
     private array $variables;
@@ -18,22 +18,22 @@ final class MailMessage implements MailMessageInterface
 
     public function getId(): int
     {
-        return $this->id;
+        return $this->dashboardId;
     }
 
-    public function setId(int $id): void
+    public function setDashboardId(int $dashboardId): void
     {
-        $this->id = $id;
+        $this->dashboardId = $dashboardId;
     }
 
-    public function getUser(): int
+    public function getUserId(): int
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser(int $user): void
+    public function setUserId(int $userId): void
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 
     public function getName(): string

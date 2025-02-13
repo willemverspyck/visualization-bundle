@@ -19,7 +19,7 @@ readonly class PreloadService
     public function executePreloadAsMessage(Preload $preload): void
     {
         $preloadMessage = new PreloadMessage();
-        $preloadMessage->setId($preload->getDashboard()->getId());
+        $preloadMessage->setDashboardId($preload->getDashboard()->getId());
         $preloadMessage->setVariables($preload->getVariables());
 
         $this->messageBus->dispatch($preloadMessage);

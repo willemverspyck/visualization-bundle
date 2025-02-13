@@ -57,7 +57,7 @@ final class PreloadMessageHandler
      */
     private function executePreload(PreloadMessageInterface $preloadMessage): void
     {
-        $dashboard = $this->getDashboardById($preloadMessage->getId());
+        $dashboard = $this->getDashboardById($preloadMessage->getDashboardId());
 
         $this->dashboardService->getDashboardAsModel($dashboard, $preloadMessage->getVariables(), null, true);
     }
