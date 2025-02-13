@@ -8,8 +8,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use Spyck\VisualizationBundle\Controller\MailController;
 use Spyck\VisualizationBundle\Repository\MailRepository;
 use Stringable;
+use Symfony\Component\Serializer\Attribute as Serializer;
 use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: MailRepository::class)]
@@ -21,6 +23,7 @@ class Mail implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'id', type: Types::INTEGER, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
+    #[Serializer\Groups(groups: [MailController::GROUP_LIST])]
     private ?int $id = null;
 
     #[Doctrine\ManyToOne(targetEntity: Dashboard::class)]
@@ -30,6 +33,7 @@ class Mail implements Stringable, TimestampInterface
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 256)]
     #[Validator\NotNull]
+    #[Serializer\Groups(groups: [MailController::GROUP_LIST])]
     private string $name;
 
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]

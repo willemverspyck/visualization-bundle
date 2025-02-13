@@ -16,6 +16,21 @@ class MailRepository extends AbstractRepository
         parent::__construct($managerRegistry, Mail::class);
     }
 
+    public function getMailById(): ?Mail
+    {
+        return $this->createQueryBuilder('mail')
+            ->innerJoin('mail.dashboard', 'dashboard')
+            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
+            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
+            ->leftJoin('mail.users', 'user')
+            ->where('mail.id = :id')
+            ->andWhere('mail.active = TRUE')
+            ->andWhere('mail.subscribe = TRUE')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * @return array<int, Mail>
      */
@@ -31,5 +46,33 @@ class MailRepository extends AbstractRepository
             ->setParameter('schedule', $schedule)
             ->getQuery()
             ->getResult();
+    }
+
+    public function getMailsBySubscribe(bool $subscribe): array
+    {
+        return $this->createQueryBuilder('mail')
+            ->innerJoin('mail.dashboard', 'dashboard')
+            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
+            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
+            ->leftJoin('mail.users', 'user')
+            ->where('mail.active = TRUE')
+            ->andWhere('mail.subscribe = :subscribe')
+            ->setParameter('subscribe', $subscribe)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function patchMail(Mail $mail, array $fields, ?ArrayCollection $users = null): void
+    {
+        if (in_array('users', $fields, true) && null !== $users) {
+            $mail->clearUsers();
+
+            foreach ($users as $user) {
+                $mail->addUser($user);
+            }
+        }
+
+        $this->getEntityManager()->persist($mail);
+        $this->getEntityManager()->flush();
     }
 }
