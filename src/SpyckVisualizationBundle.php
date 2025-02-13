@@ -24,6 +24,8 @@ final class SpyckVisualizationBundle extends AbstractBundle
         $builder->setAlias('spyck.visualization.config.cache.adapter', $config['cache']['adapter']);
         $builder->setParameter('spyck.visualization.config.cache.expiry', $config['cache']['expiry']);
 
+        $builder->setParameter('spyck.visualization.config.download.directory', $config['download']['directory']);
+
         $builder->setParameter('spyck.visualization.config.chart.command', $config['chart']['command']);
         $builder->setParameter('spyck.visualization.config.chart.directory', $config['chart']['directory']);
 
