@@ -30,9 +30,7 @@ final class PreloadMessageHandler
      */
     public function __invoke(PreloadMessageInterface $preloadMessage): void
     {
-        $dashboard = $this->getDashboardById($preloadMessage->getId());
-
-        $this->executePreloadWithMessage($preloadMessage, $dashboard);
+        $this->executePreload($preloadMessage);
     }
 
     /**
@@ -57,8 +55,10 @@ final class PreloadMessageHandler
      * @throws InvalidArgumentException
      * @throws TransportExceptionInterface
      */
-    private function executePreloadWithMessage(PreloadMessageInterface $preloadMessage, Dashboard $dashboard): void
+    private function executePreload(PreloadMessageInterface $preloadMessage): void
     {
+        $dashboard = $this->getDashboardById($preloadMessage->getId());
+
         $this->dashboardService->getDashboardAsModel($dashboard, $preloadMessage->getVariables(), null, true);
     }
 }
