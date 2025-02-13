@@ -9,15 +9,15 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer as BaseAbstractNo
 
 final class ParameterNormalizer extends AbstractNormalizer
 {
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $group = $object->getGroup();
+        $group = $data->getGroup();
 
         if (null !== $group) {
             $context[BaseAbstractNormalizer::GROUPS][] = $group;
         }
 
-        return $this->normalizer->normalize($object->getDataAsObject(), $format, $context);
+        return $this->normalizer->normalize($data->getDataAsObject(), $format, $context);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

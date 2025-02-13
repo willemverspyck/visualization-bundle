@@ -13,26 +13,26 @@ final class MenuNormalizer extends AbstractNormalizer
     {
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $this->setNormalized($object, $context);
+        $this->setNormalized($data, $context);
 
-        $data = $this->normalizer->normalize($object, $format, $context);
-        $data['dashboard'] = null;
+        $normalize = $this->normalizer->normalize($data, $format, $context);
+        $normalize['dashboard'] = null;
 
-        if (null === $object->getDashboard()) {
-            return $data;
+        if (null === $data->getDashboard()) {
+            return $normalize;
         }
 
-        $route = $this->dashboardService->getRoute($object->getDashboard(), $object->getVariables());
+        $route = $this->dashboardService->getRoute($data->getDashboard(), $data->getVariables());
 
         if (null === $route) {
-            return $data;
+            return $normalize;
         }
 
-        $data['dashboard'] = $this->normalizer->normalize($route, $format, $context);
+        $normalize['dashboard'] = $this->normalizer->normalize($route, $format, $context);
 
-        return $data;
+        return $normalize;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

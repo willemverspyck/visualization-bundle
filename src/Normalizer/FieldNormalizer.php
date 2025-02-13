@@ -8,20 +8,20 @@ use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 
 final class FieldNormalizer extends AbstractNormalizer
 {
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $this->setNormalized($object, $context);
+        $this->setNormalized($data, $context);
 
-        $data = $this->normalizer->normalize($object, $format, $context);
-        $data['children'] = [];
+        $normalize = $this->normalizer->normalize($data, $format, $context);
+        $normalize['children'] = [];
 
-        foreach ($object->getChildren() as $child) {
+        foreach ($data->getChildren() as $child) {
             if ($child->isActive()) {
-                $data['children'][] = $this->normalizer->normalize($child, $format, $context);
+                $normalize['children'][] = $this->normalizer->normalize($child, $format, $context);
             }
         }
 
-        return $data;
+        return $normalize;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
