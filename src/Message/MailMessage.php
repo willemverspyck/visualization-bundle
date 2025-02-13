@@ -16,7 +16,7 @@ final class MailMessage implements MailMessageInterface
     private bool $inline;
     private bool $merge;
 
-    public function getId(): int
+    public function getDashboardId(): int
     {
         return $this->dashboardId;
     }

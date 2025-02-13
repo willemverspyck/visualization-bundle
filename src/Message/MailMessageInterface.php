@@ -6,13 +6,13 @@ namespace Spyck\VisualizationBundle\Message;
 
 interface MailMessageInterface
 {
-    public function getId(): int;
+    public function getDashboardId(): int;
 
-    public function setId(int $id): void;
+    public function setDashboardId(int $dashboardId): void;
 
-    public function getUser(): int;
+    public function getUserId(): int;
 
-    public function setUser(int $user): void;
+    public function setUserId(int $userId): void;
 
     public function getName(): string;
 

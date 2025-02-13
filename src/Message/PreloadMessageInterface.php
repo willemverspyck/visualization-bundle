@@ -6,9 +6,9 @@ namespace Spyck\VisualizationBundle\Message;
 
 interface PreloadMessageInterface
 {
-    public function getId(): int;
+    public function getDashboardId(): int;
 
-    public function setId(int $id): void;
+    public function setDashboardId(int $dashboardId): void;
 
     public function getVariables(): array;
 
