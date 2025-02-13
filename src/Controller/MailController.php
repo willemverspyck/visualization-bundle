@@ -8,10 +8,18 @@ use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Mail;
+use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Message\MailMessage;
+use Spyck\VisualizationBundle\Payload\Mail as MailAsPayload;
+use Spyck\VisualizationBundle\Repository\DashboardRepository;
 use Spyck\VisualizationBundle\Repository\MailRepository;
+use Spyck\VisualizationBundle\Service\DashboardService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -83,5 +91,50 @@ final class MailController extends AbstractController
         $mailRepository->patchMail(mail: $mail, fields: ['users'], users: $users);
 
         return $responseService->getResponseForItem();
+    }
+
+    /**
+     * @throws Exception
+     */
+    #[Route(path: '/api/mail/dashboard/{dashboardId}', name: 'spyck_visualization_mail_dashboard', requirements: ['dashboardId' => Requirement::DIGITS], methods: [Request::METHOD_POST])]
+    public function dashboard(DashboardRepository $dashboardRepository, DashboardService $dashboardService, MessageBusInterface $messageBus, ResponseService $responseService, TokenStorageInterface $tokenStorage, #[MapRequestPayload] MailAsPayload $mailAsPayload, int $dashboardId): Response
+    {
+        $dashboard = $dashboardRepository->getDashboardById($dashboardId);
+
+        if (null === $dashboard) {
+            return $responseService->getResponseForItem();
+        }
+
+        $requests = $dashboardService->validateParameters($dashboard, $mailAsPayload->getVariables());
+
+        if (null !== $requests) {
+            return new JsonResponse(null, Response::HTTP_BAD_REQUEST);
+        }
+
+        /** @var UserInterface $user */
+        $user = $tokenStorage->getToken()?->getUser();
+
+        if (null === $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $mailMessage = new MailMessage();
+        $mailMessage->setId($dashboardId);
+        $mailMessage->setUser($user->getId());
+        $mailMessage->setName($mailAsPayload->getName());
+        $mailMessage->setDescription($mailAsPayload->getDescription());
+        $mailMessage->setVariables($mailAsPayload->getVariables());
+        $mailMessage->setView($mailAsPayload->getView());
+        $mailMessage->setRoute($mailAsPayload->hasRoute());
+        $mailMessage->setInline($mailAsPayload->isInline());
+        $mailMessage->setMerge($mailAsPayload->isMerge());
+
+        $messageBus->dispatch($mailMessage);
+
+        $data = [
+            'status' => 'OK',
+        ];
+
+        return new JsonResponse(data: $data);
     }
 }

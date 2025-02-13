@@ -2,39 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Spyck\VisualizationBundle\Message;
+namespace Spyck\VisualizationBundle\Payload;
 
-final class MailMessage implements MailMessageInterface
+use Symfony\Component\Validator\Constraints as Validator;
+
+final class Mail
 {
-    private int $id;
-    private int $user;
+    #[Validator\NotBlank]
+    #[Validator\Type(type: 'string')]
     private string $name;
+
+    #[Validator\NotBlank]
+    #[Validator\Type(type: 'string')]
     private ?string $description = null;
+
+    #[Validator\Type(type: 'array')]
     private array $variables;
+
+    #[Validator\NotBlank]
+    #[Validator\Type(type: 'string')]
     private ?string $view = null;
+
+    #[Validator\Type(type: 'boolean')]
     private bool $route;
+
+    #[Validator\Type(type: 'boolean')]
     private bool $inline;
+
+    #[Validator\Type(type: 'boolean')]
     private bool $merge;
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getUser(): int
-    {
-        return $this->user;
-    }
-
-    public function setUser(int $user): void
-    {
-        $this->user = $user;
-    }
 
     public function getName(): string
     {

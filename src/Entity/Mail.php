@@ -45,11 +45,11 @@ class Mail implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8, nullable: true)]
     private ?string $view = null;
 
-    #[Doctrine\Column(name: 'inline', type: Types::BOOLEAN)]
-    private bool $inline;
-
     #[Doctrine\Column(name: 'route', type: Types::BOOLEAN)]
     private bool $route;
+
+    #[Doctrine\Column(name: 'inline', type: Types::BOOLEAN)]
+    private bool $inline;
 
     #[Doctrine\Column(name: 'merge', type: Types::BOOLEAN)]
     private bool $merge;
@@ -139,6 +139,18 @@ class Mail implements Stringable, TimestampInterface
         return $this;
     }
 
+    public function hasRoute(): bool
+    {
+        return $this->route;
+    }
+
+    public function setRoute(bool $route): static
+    {
+        $this->route = $route;
+
+        return $this;
+    }
+
     public function getView(): ?string
     {
         return $this->view;
@@ -159,18 +171,6 @@ class Mail implements Stringable, TimestampInterface
     public function setInline(bool $inline): static
     {
         $this->inline = $inline;
-
-        return $this;
-    }
-
-    public function hasRoute(): bool
-    {
-        return $this->route;
-    }
-
-    public function setRoute(bool $route): static
-    {
-        $this->route = $route;
 
         return $this;
     }

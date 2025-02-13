@@ -170,7 +170,7 @@ readonly class DashboardService
         }
 
         return [
-            'url' => $this->router->generate('spyck_visualization_dashboard_mail', [
+            'url' => $this->router->generate('spyck_visualization_mail_dashboard', [
                 'dashboardId' => $dashboardAsEntity->getId(),
             ], UrlGeneratorInterface::ABSOLUTE_URL),
             'fields' => [
