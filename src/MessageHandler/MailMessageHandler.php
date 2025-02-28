@@ -44,6 +44,7 @@ final class MailMessageHandler
      */
     public function __invoke(MailMessageInterface $mailMessage): void
     {
+        $dashboard = $this->getDashboardById($mailMessage->getDashboardId());
         $user = $this->getUserById($mailMessage->getUserId());
 
         $token = $this->tokenStorage->getToken();
@@ -51,8 +52,6 @@ final class MailMessageHandler
         $usernamePasswordToken = new UsernamePasswordToken($user, get_class($this), $user->getRoles());
 
         $this->tokenStorage->setToken($usernamePasswordToken);
-
-        $dashboard = $this->getDashboardById($mailMessage->getDashboardId());
 
         $this->executeMail($mailMessage, $user, $dashboard);
 
@@ -87,7 +86,7 @@ final class MailMessageHandler
         $dashboard = $this->dashboardRepository->getDashboardById($id);
 
         if (null === $dashboard) {
-            throw new AuthenticationException(sprintf('Dashboard not found (%d) (Access Denied)', $id));
+            throw new AuthenticationException(sprintf('Dashboard not found (%d)', $id));
         }
 
         return $dashboard;
