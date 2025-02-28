@@ -8,27 +8,28 @@ use Symfony\Component\Validator\Constraints as Validator;
 
 final class Mail
 {
-    #[Validator\NotBlank]
-    #[Validator\Type(type: 'string')]
+    #[Validator\NotNull]
     private string $name;
 
-    #[Validator\NotBlank]
     #[Validator\Type(type: 'string')]
     private ?string $description = null;
 
+    #[Validator\NotNull]
     #[Validator\Type(type: 'array')]
     private array $variables;
 
-    #[Validator\NotBlank]
     #[Validator\Type(type: 'string')]
     private ?string $view = null;
 
+    #[Validator\NotNull]
     #[Validator\Type(type: 'boolean')]
     private bool $route;
 
+    #[Validator\NotNull]
     #[Validator\Type(type: 'boolean')]
     private bool $inline;
 
+    #[Validator\NotNull]
     #[Validator\Type(type: 'boolean')]
     private bool $merge;
 

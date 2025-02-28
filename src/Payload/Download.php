@@ -8,10 +8,11 @@ use Symfony\Component\Validator\Constraints as Validator;
 
 final class Download
 {
-    #[Validator\NotBlank]
+    #[Validator\NotNull]
     #[Validator\Type(type: 'string')]
     private string $view;
 
+    #[Validator\NotNull]
     #[Validator\Type(type: 'array')]
     private array $variables;
 
