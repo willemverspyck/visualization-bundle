@@ -9,10 +9,12 @@ use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Download;
 use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Event\DownloadEvent;
 use Spyck\VisualizationBundle\Message\DownloadMessageInterface;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Repository\UserRepository;
 use Spyck\VisualizationBundle\Service\DownloadService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -23,7 +25,7 @@ use Throwable;
 #[AsMessageHandler]
 final class DownloadMessageHandler
 {
-    public function __construct(private readonly DownloadRepository $downloadRepository, private readonly DownloadService $downloadService, private readonly TokenStorageInterface $tokenStorage, private readonly UserRepository $userRepository)
+    public function __construct(private readonly DownloadRepository $downloadRepository, private readonly DownloadService $downloadService, private readonly EventDispatcherInterface $eventDispatcher, private readonly TokenStorageInterface $tokenStorage, private readonly UserRepository $userRepository)
     {
     }
 
@@ -33,6 +35,7 @@ final class DownloadMessageHandler
      */
     public function __invoke(DownloadMessageInterface $downloadMessage): void
     {
+        $download = $this->getDownloadById($downloadMessage->getId());
         $user = $this->getUserById($downloadMessage->getUserId());
 
         $token = $this->tokenStorage->getToken();
@@ -41,9 +44,13 @@ final class DownloadMessageHandler
 
         $this->tokenStorage->setToken($usernamePasswordToken);
 
-        $this->executeDownload($downloadMessage);
+        $this->downloadService->executeDownload($download);
 
         $this->tokenStorage->setToken($token);
+
+        $downloadEvent = new DownloadEvent($download);
+
+        $this->eventDispatcher->dispatch($downloadEvent);
     }
 
     /**
@@ -76,18 +83,5 @@ final class DownloadMessageHandler
         }
 
         return $download;
-    }
-
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws TransportExceptionInterface
-     * @throws Throwable
-     */
-    private function executeDownload(DownloadMessageInterface $downloadMessage): void
-    {
-        $download = $this->getDownloadById($downloadMessage->getId());
-
-        $this->downloadService->executeDownload($download);
     }
 }
