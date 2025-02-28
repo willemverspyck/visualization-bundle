@@ -38,13 +38,11 @@ final class WidgetController extends AbstractController
 
             $content = $view->getContent($widget);
 
-            $headers = [];
+            $file = $view->getFile($widget->getName(), $widget->getParametersAsStringForSlug());
 
-            if (null !== $view->getExtension()) {
-                $headers['Content-Disposition'] = sprintf('attachment; filename="%s.%s"', $view->getFile($widget->getName(), $widget->getParametersAsStringForSlug()), $view->getExtension());
-            }
-
-            return new Response($content, Response::HTTP_OK, $headers);
+            return new Response($content, Response::HTTP_OK, [
+                'Content-Disposition' => sprintf('attachment; filename="%s"', $file),
+            ]);
         } catch (ParameterException $parameterException) {
             throw $this->createNotFoundException($parameterException->getMessage());
         }

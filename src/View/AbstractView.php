@@ -24,7 +24,7 @@ abstract class AbstractView implements ViewInterface
             $filename[] = sprintf('%s', $parameter);
         }
 
-        return $slugger->slug(implode('-', $filename))->lower()->toString();
+        return sprintf('%s.%s', $slugger->slug(implode('-', $filename))->lower()->toString(), $this->getExtension());
     }
 
     public static function isMerge(): ?bool
