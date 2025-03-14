@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Normalizer;
 
 use Spyck\VisualizationBundle\Entity\Bookmark;
-use Spyck\VisualizationBundle\Entity\Download;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 final class BookmarkNormalizer extends AbstractNormalizer

@@ -6,13 +6,10 @@ namespace Spyck\VisualizationBundle\MessageHandler;
 
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
-use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Download;
-use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Event\DownloadEvent;
 use Spyck\VisualizationBundle\Message\DownloadMessageInterface;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
-use Spyck\VisualizationBundle\Repository\UserRepository;
 use Spyck\VisualizationBundle\Service\DownloadService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -20,12 +17,11 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Throwable;
 
 #[AsMessageHandler]
-final class DownloadMessageHandler
+final readonly class DownloadMessageHandler
 {
-    public function __construct(private readonly DownloadRepository $downloadRepository, private readonly DownloadService $downloadService, private readonly EventDispatcherInterface $eventDispatcher, private readonly TokenStorageInterface $tokenStorage, private readonly UserRepository $userRepository)
+    public function __construct(private DownloadRepository $downloadRepository, private DownloadService $downloadService, private EventDispatcherInterface $eventDispatcher, private TokenStorageInterface $tokenStorage)
     {
     }
 
@@ -36,7 +32,7 @@ final class DownloadMessageHandler
     public function __invoke(DownloadMessageInterface $downloadMessage): void
     {
         $download = $this->getDownloadById($downloadMessage->getId());
-        $user = $this->getUserById($downloadMessage->getUserId());
+        $user = $download->getUser();
 
         $token = $this->tokenStorage->getToken();
 
@@ -51,21 +47,6 @@ final class DownloadMessageHandler
         $downloadEvent = new DownloadEvent($download);
 
         $this->eventDispatcher->dispatch($downloadEvent);
-    }
-
-    /**
-     * @throws NonUniqueResultException
-     * @throws UnrecoverableMessageHandlingException
-     */
-    private function getUserById(int $id): UserInterface
-    {
-        $user = $this->userRepository->getUserById($id);
-
-        if (null === $user) {
-            throw new UnrecoverableMessageHandlingException(sprintf('User not found (%d)', $id));
-        }
-
-        return $user;
     }
 
     /**

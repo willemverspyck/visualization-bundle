@@ -8,6 +8,7 @@ use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Download;
+use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Payload\Download as DownloadAsPayload;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Repository\WidgetRepository;
@@ -35,7 +36,7 @@ final class DownloadController extends AbstractController
         $download = $downloadRepository->getDownloadById($downloadId);
 
         if (null === $download) {
-            throw new $this->createNotFoundException('Download not found');
+            throw $this->createNotFoundException('Download not found');
         }
 
         $contentDisposition = HeaderUtils::makeDisposition(
@@ -67,6 +68,7 @@ final class DownloadController extends AbstractController
     #[Schema\ResponseForItem(type: Download::class, groups: [self::GROUP_WIDGET])]
     public function widget(DownloadRepository $downloadRepository, ResponseService $responseService, TokenStorageInterface $tokenStorage, WidgetRepository $widgetRepository, #[MapRequestPayload] DownloadAsPayload $downloadAsPayload, int $widgetId): Response
     {
+        /** @var UserInterface $user */
         $user = $tokenStorage->getToken()?->getUser();
 
         if (null === $user) {

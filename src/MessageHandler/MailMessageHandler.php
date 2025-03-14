@@ -32,14 +32,15 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 #[AsMessageHandler]
-final class MailMessageHandler
+final readonly class MailMessageHandler
 {
-    public function __construct(private readonly DashboardRepository $dashboardRepository, private readonly DashboardService $dashboardService, private readonly LogRepository $logRepository, private readonly MailService $mailService, private readonly TokenStorageInterface $tokenStorage, private readonly UserRepository $userRepository, private readonly ViewService $viewService)
+    public function __construct(private DashboardRepository $dashboardRepository, private DashboardService $dashboardService, private LogRepository $logRepository, private MailService $mailService, private TokenStorageInterface $tokenStorage, private UserRepository $userRepository, private ViewService $viewService)
     {
     }
 
     /**
      * @throws Exception
+     * @throws InvalidArgumentException
      * @throws TransportExceptionInterface
      */
     public function __invoke(MailMessageInterface $mailMessage): void
@@ -119,6 +120,9 @@ final class MailMessageHandler
         $this->mailService->executeMail($user->getEmail(), $user->getName(), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments->toArray());
     }
 
+    /**
+     * @throws Exception
+     */
     private function getAttachments(DashboardAsModel $dashboardAsModel, MailMessage $mailMessage): ArrayCollection
     {
         $attachments = new ArrayCollection();

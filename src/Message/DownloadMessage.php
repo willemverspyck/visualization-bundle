@@ -7,7 +7,6 @@ namespace Spyck\VisualizationBundle\Message;
 final class DownloadMessage implements DownloadMessageInterface
 {
     private int $id;
-    private int $userId;
     private array $variables;
     private string $view;
 
@@ -19,16 +18,6 @@ final class DownloadMessage implements DownloadMessageInterface
     public function setId(int $id): void
     {
         $this->id = $id;
-    }
-
-    public function getUserId(): int
-    {
-        return $this->userId;
-    }
-
-    public function setUserId(int $userId): void
-    {
-        $this->userId = $userId;
     }
 
     public function getVariables(): array

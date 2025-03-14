@@ -10,10 +10,6 @@ interface DownloadMessageInterface
 
     public function setId(int $id): void;
 
-    public function getUserId(): int;
-
-    public function setUserId(int $userId): void;
-
     public function getVariables(): array;
 
     public function setVariables(array $variables): void;

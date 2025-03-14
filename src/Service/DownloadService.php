@@ -8,7 +8,6 @@ use DateTimeImmutable;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Download;
 use Spyck\VisualizationBundle\Message\DownloadMessage;
-use Spyck\VisualizationBundle\Model\Widget;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;

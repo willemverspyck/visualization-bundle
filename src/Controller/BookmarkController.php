@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Controller;
 
+use Exception;
 use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
@@ -18,7 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -41,6 +41,9 @@ final class BookmarkController extends AbstractController
         return $responseService->getResponseForList(data: $bookmarks, groups: [self::GROUP_LIST]);
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route(path: '/api/bookmark/dashboard/{dashboardId}', name: 'spyck_visualization_bookmark_dashboard', requirements: ['dashboardId' => Requirement::DIGITS], methods: [Request::METHOD_POST])]
     public function dashboard(BookmarkRepository $bookmarkRepository, DashboardRepository $dashboardRepository, DashboardService $dashboardService, ResponseService $responseService, TokenStorageInterface $tokenStorage, #[MapRequestPayload] BookmarkAsPayload $bookmarkAsPayload, int $dashboardId): Response
     {
@@ -78,7 +81,7 @@ final class BookmarkController extends AbstractController
         $user = $tokenStorage->getToken()?->getUser();
 
         if (null === $user) {
-            return $this->createAccessDeniedException();
+            throw $this->createAccessDeniedException();
         }
 
         $bookmark = $bookmarkRepository->getBookmarkById($bookmarkId);

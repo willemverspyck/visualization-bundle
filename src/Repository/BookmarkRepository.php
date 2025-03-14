@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Repository;
 
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Bookmark;
+use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;

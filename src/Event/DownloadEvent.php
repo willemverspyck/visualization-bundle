@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Event;
 
 use Spyck\VisualizationBundle\Entity\Download;
-use Spyck\VisualizationBundle\Entity\Widget;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class DownloadEvent extends Event
