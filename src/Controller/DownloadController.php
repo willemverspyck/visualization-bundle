@@ -13,6 +13,7 @@ use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Repository\WidgetRepository;
 use Spyck\VisualizationBundle\Service\DownloadService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -37,7 +38,14 @@ final class DownloadController extends AbstractController
             throw new $this->createNotFoundException('Download not found');
         }
 
-        return new BinaryFileResponse($downloadService->getFile($download));
+        $contentDisposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            $download->getName(),
+        );
+
+        return new BinaryFileResponse(file: sprintf('%s/%s', $downloadService->getDirectory(), $download->getFile()), headers: [
+            'Content-Disposition' => $contentDisposition,
+        ]);
     }
 
     #[Route(path: '/api/downloads', name: 'spyck_visualization_download_list', methods: [Request::METHOD_GET])]

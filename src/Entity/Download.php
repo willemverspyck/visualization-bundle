@@ -8,8 +8,10 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Controller\DownloadController;
+use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Stringable;
 use Symfony\Component\Serializer\Attribute as Serializer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: DownloadRepository::class)]
@@ -40,10 +42,17 @@ class Download implements Stringable, TimestampInterface
     #[Validator\NotNull]
     private Widget $widget;
 
+    #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128, nullable: true)]
+    #[Serializer\Groups(groups: [DownloadController::GROUP_LIST])]
+    private ?string $name = null;
+
+    #[Doctrine\Column(name: 'file', type: Types::STRING, length: 128, nullable: true)]
+    private ?string $file = null;
+
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
 
-    #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8, nullable: false)]
+    #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8)]
     #[Serializer\Groups(groups: [DownloadController::GROUP_LIST])]
     private string $view;
 
@@ -52,12 +61,15 @@ class Download implements Stringable, TimestampInterface
     private ?string $status = null;
 
     #[Doctrine\Column(name: 'duration', type: Types::INTEGER, nullable: true)]
+    #[Serializer\Groups(groups: [DownloadController::GROUP_LIST])]
     private ?int $duration = null;
 
     #[Doctrine\Column(name: 'messages', type: Types::JSON, nullable: true)]
+    #[Serializer\Groups(groups: [DownloadController::GROUP_LIST])]
     private ?array $messages = null;
 
     #[Doctrine\Column(name: 'timestamp', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Serializer\Context([DateTimeNormalizer::FORMAT_KEY => DateTimeUtility::FORMAT_DATETIME])]
     #[Serializer\Groups(groups: [DownloadController::GROUP_LIST])]
     private ?DateTimeImmutable $timestamp = null;
 
@@ -86,6 +98,30 @@ class Download implements Stringable, TimestampInterface
     public function setWidget(Widget $widget): static
     {
         $this->widget = $widget;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getFile(): ?string
+    {
+        return $this->file;
+    }
+
+    public function setFile(?string $file): static
+    {
+        $this->file = $file;
 
         return $this;
     }

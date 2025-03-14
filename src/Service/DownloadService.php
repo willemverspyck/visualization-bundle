@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Download;
 use Spyck\VisualizationBundle\Message\DownloadMessage;
+use Spyck\VisualizationBundle\Model\Widget;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -24,15 +25,28 @@ readonly class DownloadService
 
         $this->downloadRepository->patchDownload(download: $download, fields: ['status', 'duration', 'messages', 'timestamp'], status: Download::STATUS_PENDING, timestamp: $timestamp);
 
-        $dashboardAsModel = $this->widgetService->getDashboardAsModelById($download->getWidget()->getId(), $download->getVariables());
+        try {
+            $dashboardAsModel = $this->widgetService->getDashboardAsModelById($download->getWidget()->getId(), $download->getVariables());
 
-        $content = $this->viewService->getView($download->getView())->getContent($dashboardAsModel);
+            $view = $this->viewService->getView($download->getView());
 
-        file_put_contents($this->getFile($download), $content);
+            $file = $this->getFile($download);
+            $content = $view->getContent($dashboardAsModel);
 
-        $duration = $this->getDuration($timestamp);
+            $this->putFile($file, $content);
 
-        $this->downloadRepository->patchDownload(download: $download, fields: ['status', 'duration'], status: Download::STATUS_COMPLETE, duration: $duration);
+            $name = $view->getFile($dashboardAsModel->getName(), $dashboardAsModel->getParametersAsStringForSlug());
+            $duration = $this->getDuration($timestamp);
+
+            $this->downloadRepository->patchDownload(download: $download, fields: ['name', 'file', 'status', 'duration'], name: $name, file: $file, status: Download::STATUS_COMPLETE, duration: $duration);
+        } catch (Exception $exception) {
+            $duration = $this->getDuration($timestamp);
+            $messages = [
+                $exception->getMessage(),
+            ];
+
+            $this->downloadRepository->patchDownload(download: $download, fields: ['status', 'duration', 'messages'], status: Download::STATUS_ERROR, duration: $duration, messages: $messages);
+        }
     }
 
     public function executeDownloadAsMessage(Download $download): void
@@ -46,16 +60,30 @@ readonly class DownloadService
         $this->messageBus->dispatch($downloadMessage);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getFile(Download $download): string
+    public function getDirectory(): string
     {
         if (null === $this->directory) {
             throw new Exception('Directory not found');
         }
 
-        return sprintf('%s/%s', $this->directory, md5(sprintf('%s', $download->getId() + $download->getTimestamp()->getTimestamp())));
+        return $this->directory;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getFile(Download $download): string
+    {
+        return md5(sprintf('%s', $download->getId() / $download->getTimestamp()->getTimestamp()));
+    }
+
+    public function putFile(string $file, string $content): void
+    {
+        $filename = sprintf('%s/%s', $this->getDirectory(), $file);
+
+        if (false === file_put_contents($filename, $content)) {
+            throw new Exception('Unable to create file');
+        }
     }
 
     private function getDuration(DateTimeImmutable $dateTimeStart): int

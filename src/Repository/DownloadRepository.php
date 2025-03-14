@@ -66,8 +66,16 @@ class DownloadRepository extends AbstractRepository
             ->getResult();
     }
 
-    public function patchDownload(Download $download, array $fields, ?string $status = null, ?int $duration = null, ?array $messages = null, ?DateTimeImmutable $timestamp = null): void
+    public function patchDownload(Download $download, array $fields, ?string $name = null, ?string $file = null, ?string $status = null, ?int $duration = null, ?array $messages = null, ?DateTimeImmutable $timestamp = null): void
     {
+        if (in_array('name', $fields, true)) {
+            $download->setName($name);
+        }
+
+        if (in_array('file', $fields, true)) {
+            $download->setFile($file);
+        }
+
         if (in_array('status', $fields, true)) {
             $download->setStatus($status);
         }
