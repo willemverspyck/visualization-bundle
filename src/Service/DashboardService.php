@@ -39,6 +39,7 @@ readonly class DashboardService
         $dashboardAsModel = new DashboardAsModel();
 
         $dashboardAsModel
+            ->setId($dashboardAsEntity->getId())
             ->setUser($user)
             ->setName($dashboardAsEntity->getName())
             ->setDescription($dashboardAsEntity->getDescription())

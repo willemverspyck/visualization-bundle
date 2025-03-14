@@ -12,23 +12,26 @@ use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class Dashboard
 {
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
+    private ?int $id = null;
+
     private string $user;
 
-    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private string $name;
 
-    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?string $description = null;
 
     private ?string $copyright = null;
 
-    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?string $url = null;
 
     /**
      * @todo: How to handle this in OpenApi
      */
-    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     #[OpenApi\Property(type: 'string')]
     private array $parameters = [];
 
@@ -40,7 +43,7 @@ final class Dashboard
      * @todo: How to handle this in OpenApi
      */
     #[OpenApi\Property(type: 'string')]
-    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $downloads = [];
 
     private array $variables = [];
@@ -48,12 +51,24 @@ final class Dashboard
     /**
      * @var ArrayCollection<int, Block>
      */
-    #[Serializer\Groups([DashboardController::GROUP_ITEM])]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ArrayCollection $blocks;
 
     public function __construct()
     {
         $this->blocks = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getUser(): string
