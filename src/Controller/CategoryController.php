@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[OpenApi\Tag(name: 'Category')]
+#[OpenApi\Tag(name: 'Categories')]
 final class CategoryController extends AbstractController
 {
     public const string GROUP_LIST = 'spyck:visualization:category:list';
