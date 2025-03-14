@@ -52,9 +52,8 @@ readonly class DownloadService
     {
         $downloadMessage = new DownloadMessage();
         $downloadMessage->setId($download->getId());
-        $downloadMessage->setUserId($download->getUser()->getId());
-        $downloadMessage->setView($download->getView());
         $downloadMessage->setVariables($download->getVariables());
+        $downloadMessage->setView($download->getView());
 
         $this->messageBus->dispatch($downloadMessage);
     }
