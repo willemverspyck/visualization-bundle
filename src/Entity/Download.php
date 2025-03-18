@@ -34,8 +34,8 @@ class Download implements Stringable, TimestampInterface
     private ?int $id = null;
 
     #[Doctrine\ManyToOne(targetEntity: UserInterface::class)]
-    #[Doctrine\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-    private UserInterface $user;
+    #[Doctrine\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true)]
+    private ?UserInterface $user = null;
 
     #[Doctrine\ManyToOne(targetEntity: Widget::class)]
     #[Doctrine\JoinColumn(name: 'widget_id', referencedColumnName: 'id', nullable: false)]
@@ -78,12 +78,12 @@ class Download implements Stringable, TimestampInterface
         return $this->id;
     }
 
-    public function getUser(): UserInterface
+    public function getUser(): ?UserInterface
     {
         return $this->user;
     }
 
-    public function setUser(UserInterface $user): static
+    public function setUser(?UserInterface $user): static
     {
         $this->user = $user;
 

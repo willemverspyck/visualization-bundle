@@ -27,9 +27,9 @@ class Bookmark implements TimestampInterface
     private ?int $id = null;
 
     #[Doctrine\ManyToOne(targetEntity: UserInterface::class)]
-    #[Doctrine\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    #[Doctrine\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true)]
     #[Validator\NotNull]
-    private UserInterface $user;
+    private ?UserInterface $user = null;
 
     #[Doctrine\ManyToOne(targetEntity: Dashboard::class)]
     #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', nullable: false)]
@@ -49,12 +49,12 @@ class Bookmark implements TimestampInterface
         return $this->id;
     }
 
-    public function getUser(): UserInterface
+    public function getUser(): ?UserInterface
     {
         return $this->user;
     }
 
-    public function setUser(UserInterface $user): static
+    public function setUser(?UserInterface $user): static
     {
         $this->user = $user;
 

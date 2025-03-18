@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Repository;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Bookmark;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\UserInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Spyck\VisualizationBundle\Service\UserService;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class BookmarkRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry, private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(ManagerRegistry $managerRegistry, private readonly UserService $userService)
     {
         parent::__construct($managerRegistry, Bookmark::class);
     }
@@ -24,19 +25,10 @@ class BookmarkRepository extends AbstractRepository
      */
     public function getBookmarkById(int $id): ?Bookmark
     {
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
-
-        if (null === $user) {
-            return null;
-        }
-
-        return $this->createQueryBuilder('bookmark')
-            ->innerJoin('bookmark.user', 'user', Join::WITH, 'user = :user')
-            ->where('bookmark.id = :id')
-            ->setParameter('user', $user)
+        return $this->getBookmarkQueryBuilder()
+            ->andWhere('bookmark.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->useQueryCache(true)
             ->getResult();
     }
 
@@ -47,24 +39,9 @@ class BookmarkRepository extends AbstractRepository
      */
     public function getBookmarks(): array
     {
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
-
-        if (null === $user) {
-            return [];
-        }
-
-        return $this->createQueryBuilder('bookmark')
-            ->addSelect('dashboard')
-            ->innerJoin('bookmark.user', 'user', Join::WITH, 'user = :user')
-            ->innerJoin('bookmark.dashboard', 'dashboard', Join::WITH, 'dashboard.active = TRUE')
-            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
-            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
+        return $this->getBookmarkQueryBuilder()
             ->orderBy('bookmark.timestampCreated', 'DESC')
-            ->setParameter('user', $user)
-            ->setParameter('groups', $user->getGroups())
             ->getQuery()
-            ->useQueryCache(true)
             ->getResult();
     }
 
@@ -74,7 +51,7 @@ class BookmarkRepository extends AbstractRepository
         $this->getEntityManager()->flush();
     }
 
-    public function putBookmark(UserInterface $user, Dashboard $dashboard, string $name, array $variables): Bookmark
+    public function putBookmark(?UserInterface $user, Dashboard $dashboard, string $name, array $variables): Bookmark
     {
         $bookmark = new Bookmark();
         $bookmark->setUser($user);
@@ -86,5 +63,27 @@ class BookmarkRepository extends AbstractRepository
         $this->getEntityManager()->flush();
 
         return $bookmark;
+    }
+
+    private function getBookmarkQueryBuilder(): QueryBuilder
+    {
+        $user = $this->userService->getUser();
+
+        $queryBuilder = $this->createQueryBuilder('bookmark')
+            ->addSelect('dashboard')
+            ->innerJoin('bookmark.dashboard', 'dashboard', Join::WITH, 'dashboard.active = TRUE')
+            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
+            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE');
+
+        if (null === $user) {
+            return $queryBuilder
+                ->where('bookmark.user IS NULL');
+        }
+
+        return $queryBuilder
+            ->addSelect('user')
+            ->innerJoin('bookmark.user', 'user', Join::WITH, 'user = :user')
+            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired MEMBER OF user.groups AND groupRequired.active = TRUE')
+            ->setParameter('user', $user);
     }
 }

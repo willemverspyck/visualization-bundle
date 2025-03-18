@@ -6,15 +6,16 @@ namespace Spyck\VisualizationBundle\Repository;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Download;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Entity\Widget;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Spyck\VisualizationBundle\Service\UserService;
 
 class DownloadRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry, private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(ManagerRegistry $managerRegistry, private readonly UserService $userService)
     {
         parent::__construct($managerRegistry, Download::class);
     }
@@ -22,46 +23,19 @@ class DownloadRepository extends AbstractRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getDownloadById(int $id): ?Download
+    public function getDownloadById(int $id, bool $authentication = true): ?Download
     {
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
-
-        if (null === $user) {
-            return null;
-        }
-
-        return $this->createQueryBuilder('download')
-            ->addSelect('user')
-            ->addSelect('widget')
-            ->innerJoin('download.user', 'user', Join::WITH, 'user = :user')
-            ->innerJoin('download.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
-            ->where('download.id = :id')
-            ->orderBy('download.timestampCreated', 'DESC')
+        return $this->getDownloadQueryBuilder($authentication)
+            ->andWhere('download.id = :id')
             ->setParameter('id', $id)
-            ->setParameter('user', $user)
-            ->setParameter('groups', $user->getGroups())
             ->getQuery()
             ->getOneOrNullResult();
     }
 
     public function getDownloads(): array
     {
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
-
-        if (null === $user) {
-            return [];
-        }
-
-        return $this->createQueryBuilder('download')
-            ->addSelect('user')
-            ->addSelect('widget')
-            ->innerJoin('download.user', 'user', Join::WITH, 'user = :user')
-            ->innerJoin('download.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
+        return $this->getDownloadQueryBuilder()
             ->orderBy('download.timestampCreated', 'DESC')
-            ->setParameter('user', $user)
-            ->setParameter('groups', $user->getGroups())
             ->getQuery()
             ->getResult();
     }
@@ -108,5 +82,25 @@ class DownloadRepository extends AbstractRepository
         $this->getEntityManager()->flush();
 
         return $download;
+    }
+
+    private function getDownloadQueryBuilder(bool $authentication = true): QueryBuilder
+    {
+        $user = $this->userService->getUser($authentication);
+
+        $queryBuilder = $this->createQueryBuilder('download')
+            ->addSelect('widget')
+            ->innerJoin('download.widget', 'widget', Join::WITH, 'widget.active = TRUE');
+
+        if (null === $user) {
+            return $queryBuilder
+                ->where('download.user IS NULL');
+        }
+
+        return $queryBuilder
+            ->addSelect('user')
+            ->innerJoin('download.user', 'user', Join::WITH, 'user = :user')
+            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired MEMBER OF user.groups AND groupRequired.active = TRUE')
+            ->setParameter('user', $user);
     }
 }

@@ -20,6 +20,8 @@ final class SpyckVisualizationBundle extends AbstractBundle
     {
         $container->import('../config/services.php');
 
+        $builder->setParameter('spyck.visualization.config.authentication', $config['authentication']);
+
         $builder->setParameter('spyck.visualization.config.cache.active', $config['cache']['active']);
         $builder->setAlias('spyck.visualization.config.cache.adapter', $config['cache']['adapter']);
         $builder->setParameter('spyck.visualization.config.cache.expiry', $config['cache']['expiry']);

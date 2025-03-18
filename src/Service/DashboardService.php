@@ -30,7 +30,7 @@ readonly class DashboardService
      */
     public function getDashboardAsModel(DashboardAsEntity $dashboardAsEntity, array $variables = [], ?string $view = null, bool $preload = false): DashboardAsModel
     {
-        $user = $this->userService->getUser();
+        $user = $this->userService->getUserAsString();
 
         $variables = $this->validateVariables($dashboardAsEntity, $variables);
 

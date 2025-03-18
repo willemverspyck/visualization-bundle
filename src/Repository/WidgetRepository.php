@@ -49,15 +49,15 @@ class WidgetRepository extends AbstractRepository
 
         $user = $this->getUserByToken($this->tokenStorage->getToken());
 
-        if (null !== $user) {
-            $queryBuilder
-                ->addSelect('groupRequired')
-                ->addSelect('groupOptional')
-                ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
-                ->leftJoin('widget.groups', 'groupOptional', Join::WITH, 'groupOptional.active = TRUE')
-                ->setParameter('groups', $user->getGroups());
+        if (null === $user) {
+            return $queryBuilder;
         }
 
-        return $queryBuilder;
+        return $queryBuilder
+           ->addSelect('groupRequired')
+           ->addSelect('groupOptional')
+           ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
+           ->leftJoin('widget.groups', 'groupOptional', Join::WITH, 'groupOptional.active = TRUE')
+           ->setParameter('groups', $user->getGroups());
     }
 }

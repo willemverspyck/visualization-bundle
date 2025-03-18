@@ -8,6 +8,11 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 return static function (DefinitionConfigurator $definition) {
     $definition->rootNode()
         ->children()
+            ->booleanNode('authentication')
+                ->defaultTrue()
+            ->end()
+        ->end()
+        ->children()
             ->arrayNode('cache')
                 ->children()
                     ->booleanNode('active')

@@ -8,11 +8,11 @@ use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Download;
-use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Payload\Download as DownloadAsPayload;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Repository\WidgetRepository;
 use Spyck\VisualizationBundle\Service\DownloadService;
+use Spyck\VisualizationBundle\Service\UserService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +21,6 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[AsController]
 #[OpenApi\Tag(name: 'Downloads')]
@@ -36,6 +35,10 @@ final class DownloadController extends AbstractController
         $download = $downloadRepository->getDownloadById($downloadId);
 
         if (null === $download) {
+            throw $this->createNotFoundException('Download not found');
+        }
+
+        if (Download::STATUS_COMPLETE !== $download->getStatus()) {
             throw $this->createNotFoundException('Download not found');
         }
 
@@ -66,14 +69,9 @@ final class DownloadController extends AbstractController
     #[Schema\Forbidden]
     #[Schema\NotFound]
     #[Schema\ResponseForItem(type: Download::class, groups: [self::GROUP_WIDGET])]
-    public function widget(DownloadRepository $downloadRepository, ResponseService $responseService, TokenStorageInterface $tokenStorage, WidgetRepository $widgetRepository, #[MapRequestPayload] DownloadAsPayload $downloadAsPayload, int $widgetId): Response
+    public function widget(DownloadRepository $downloadRepository, ResponseService $responseService, UserService $userService, WidgetRepository $widgetRepository, #[MapRequestPayload] DownloadAsPayload $downloadAsPayload, int $widgetId): Response
     {
-        /** @var UserInterface $user */
-        $user = $tokenStorage->getToken()?->getUser();
-
-        if (null === $user) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $userService->getUser();
 
         $widget = $widgetRepository->getWidgetById($widgetId);
 

@@ -7,11 +7,9 @@ namespace Spyck\VisualizationBundle\MessageHandler;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Download;
-use Spyck\VisualizationBundle\Event\DownloadEvent;
 use Spyck\VisualizationBundle\Message\DownloadMessageInterface;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Service\DownloadService;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -21,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 #[AsMessageHandler]
 final readonly class DownloadMessageHandler
 {
-    public function __construct(private DownloadRepository $downloadRepository, private DownloadService $downloadService, private EventDispatcherInterface $eventDispatcher, private TokenStorageInterface $tokenStorage)
+    public function __construct(private DownloadRepository $downloadRepository, private DownloadService $downloadService, private TokenStorageInterface $tokenStorage)
     {
     }
 
@@ -32,7 +30,14 @@ final readonly class DownloadMessageHandler
     public function __invoke(DownloadMessageInterface $downloadMessage): void
     {
         $download = $this->getDownloadById($downloadMessage->getId());
+
         $user = $download->getUser();
+
+        if (null === $user) {
+            $this->downloadService->executeDownload($download);
+
+            return;
+        }
 
         $token = $this->tokenStorage->getToken();
 
@@ -43,10 +48,6 @@ final readonly class DownloadMessageHandler
         $this->downloadService->executeDownload($download);
 
         $this->tokenStorage->setToken($token);
-
-        $downloadEvent = new DownloadEvent($download);
-
-        $this->eventDispatcher->dispatch($downloadEvent);
     }
 
     /**
@@ -57,7 +58,7 @@ final readonly class DownloadMessageHandler
      */
     private function getDownloadById(int $id): Download
     {
-        $download = $this->downloadRepository->getDownloadById($id);
+        $download = $this->downloadRepository->getDownloadById($id, false);
 
         if (null === $download) {
             throw new UnrecoverableMessageHandlingException(sprintf('Download not found (%d)', $id));

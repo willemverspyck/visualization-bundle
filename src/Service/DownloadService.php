@@ -7,14 +7,16 @@ namespace Spyck\VisualizationBundle\Service;
 use DateTimeImmutable;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Download;
+use Spyck\VisualizationBundle\Event\DownloadEvent;
 use Spyck\VisualizationBundle\Message\DownloadMessage;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class DownloadService
 {
-    public function __construct(private readonly DownloadRepository $downloadRepository, private readonly MessageBusInterface $messageBus, private readonly ViewService $viewService, private readonly WidgetService $widgetService, #[Autowire(param: 'spyck.visualization.config.download.directory')] private readonly ?string $directory)
+    public function __construct(private readonly DownloadRepository $downloadRepository, private EventDispatcherInterface $eventDispatcher, private readonly MessageBusInterface $messageBus, private readonly ViewService $viewService, private readonly WidgetService $widgetService, #[Autowire(param: 'spyck.visualization.config.download.directory')] private readonly ?string $directory)
     {
     }
 
@@ -37,7 +39,7 @@ readonly class DownloadService
             $name = $view->getFile($dashboardAsModel->getName(), $dashboardAsModel->getParametersAsStringForSlug());
             $duration = $this->getDuration($timestamp);
 
-            $this->downloadRepository->patchDownload(download: $download, fields: ['name', 'file', 'status', 'duration'], name: $name, file: $file, status: Download::STATUS_COMPLETE, duration: $duration);
+            $this->downloadRepository->patchDownload(download: $download, fields: ['name', 'file', 'status', 'duration', 'messages'], name: $name, file: $file, status: Download::STATUS_COMPLETE, duration: $duration);
         } catch (Exception $exception) {
             $duration = $this->getDuration($timestamp);
             $messages = [
@@ -46,6 +48,10 @@ readonly class DownloadService
 
             $this->downloadRepository->patchDownload(download: $download, fields: ['status', 'duration', 'messages'], status: Download::STATUS_ERROR, duration: $duration, messages: $messages);
         }
+
+        $downloadEvent = new DownloadEvent($download);
+
+        $this->eventDispatcher->dispatch($downloadEvent);
     }
 
     public function executeDownloadAsMessage(Download $download): void

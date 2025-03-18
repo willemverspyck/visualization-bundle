@@ -161,7 +161,7 @@ readonly class WidgetService
         $blockAsModel->setWidget($this->getWidgetAsModel($widget));
         $blockAsModel->setName($name);
 
-        $user = $this->userService->getUser();
+        $user = $this->userService->getUserAsString();
 
         $dashboardAsModel = new DashboardAsModel();
         $dashboardAsModel->setUser($user);
@@ -283,7 +283,7 @@ readonly class WidgetService
         $blockAsModel->setDescriptionEmpty($widgetAsEntity->getDescriptionEmpty());
         $blockAsModel->setCharts($widgetAsEntity->getCharts());
 
-        $user = $this->userService->getUser();
+        $user = $this->userService->getUserAsString();
 
         $dashboardAsModel = new DashboardAsModel();
         $dashboardAsModel->setUser($user);
