@@ -42,10 +42,11 @@ final class DownloadController extends AbstractController
             throw $this->createNotFoundException('Download not found');
         }
 
-        $contentDisposition = HeaderUtils::makeDisposition(
-            HeaderUtils::DISPOSITION_ATTACHMENT,
-            $download->getName(),
-        );
+        if (null === $download->getName() || null === $download->getFile()) {
+            throw $this->createNotFoundException('Download not found');
+        }
+
+        $contentDisposition = HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $download->getName());
 
         return new BinaryFileResponse(file: sprintf('%s/%s', $downloadService->getDirectory(), $download->getFile()), headers: [
             'Content-Disposition' => $contentDisposition,
