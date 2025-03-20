@@ -25,7 +25,7 @@ class BookmarkRepository extends AbstractRepository
      */
     public function getBookmarkById(int $id): ?Bookmark
     {
-        return $this->getBookmarkQueryBuilder()
+        return $this->getBookmarksAsQueryBuilder()
             ->andWhere('bookmark.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -39,7 +39,7 @@ class BookmarkRepository extends AbstractRepository
      */
     public function getBookmarks(): array
     {
-        return $this->getBookmarkQueryBuilder()
+        return $this->getBookmarksAsQueryBuilder()
             ->orderBy('bookmark.timestampCreated', 'DESC')
             ->getQuery()
             ->getResult();
@@ -65,15 +65,13 @@ class BookmarkRepository extends AbstractRepository
         return $bookmark;
     }
 
-    private function getBookmarkQueryBuilder(): QueryBuilder
+    private function getBookmarksAsQueryBuilder(): QueryBuilder
     {
-        $user = $this->userService->getUser();
-
         $queryBuilder = $this->createQueryBuilder('bookmark')
             ->addSelect('dashboard')
-            ->innerJoin('bookmark.dashboard', 'dashboard', Join::WITH, 'dashboard.active = TRUE')
-            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
-            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE');
+            ->innerJoin('bookmark.dashboard', 'dashboard');
+
+        $user = $this->userService->getUser();
 
         if (null === $user) {
             return $queryBuilder
@@ -83,7 +81,6 @@ class BookmarkRepository extends AbstractRepository
         return $queryBuilder
             ->addSelect('user')
             ->innerJoin('bookmark.user', 'user', Join::WITH, 'user = :user')
-            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired MEMBER OF user.groups AND groupRequired.active = TRUE')
             ->setParameter('user', $user);
     }
 }

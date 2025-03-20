@@ -25,7 +25,7 @@ class DownloadRepository extends AbstractRepository
      */
     public function getDownloadById(int $id, bool $authentication = true): ?Download
     {
-        return $this->getDownloadQueryBuilder($authentication)
+        return $this->getDownloadsAsQueryBuilder($authentication)
             ->andWhere('download.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -34,7 +34,7 @@ class DownloadRepository extends AbstractRepository
 
     public function getDownloads(): array
     {
-        return $this->getDownloadQueryBuilder()
+        return $this->getDownloadsAsQueryBuilder()
             ->orderBy('download.timestampCreated', 'DESC')
             ->getQuery()
             ->getResult();
@@ -84,13 +84,19 @@ class DownloadRepository extends AbstractRepository
         return $download;
     }
 
-    private function getDownloadQueryBuilder(bool $authentication = true): QueryBuilder
+    private function getDownloadsAsQueryBuilder(bool $authentication = true): QueryBuilder
     {
-        $user = $this->userService->getUser($authentication);
-
         $queryBuilder = $this->createQueryBuilder('download')
             ->addSelect('widget')
-            ->innerJoin('download.widget', 'widget', Join::WITH, 'widget.active = TRUE');
+            ->innerJoin('download.widget', 'widget');
+
+        if (false === $authentication) {
+            return $queryBuilder
+                ->addSelect('user')
+                ->leftJoin('download.user', 'user');
+        }
+
+        $user = $this->userService->getUser();
 
         if (null === $user) {
             return $queryBuilder
@@ -100,7 +106,6 @@ class DownloadRepository extends AbstractRepository
         return $queryBuilder
             ->addSelect('user')
             ->innerJoin('download.user', 'user', Join::WITH, 'user = :user')
-            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired MEMBER OF user.groups AND groupRequired.active = TRUE')
             ->setParameter('user', $user);
     }
 }

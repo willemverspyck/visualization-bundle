@@ -35,18 +35,18 @@ readonly class UserService
     /**
      * @throws AuthenticationException
      */
-    public function getUser(bool $authentication = true): ?UserInterface
+    public function getUser(): ?UserInterface
     {
-        if ($this->authentication && $authentication) {
-            $user = $this->tokenStorage->getToken()?->getUser();
-
-            if (null === $user) {
-                throw new AuthenticationException('User not found');
-            }
-
-            return $user;
+        if (false === $this->authentication) {
+            return null;
         }
 
-        return null;
+        $user = $this->tokenStorage->getToken()?->getUser();
+
+        if (null === $user) {
+            throw new AuthenticationException('User not found');
+        }
+
+        return $user;
     }
 }
