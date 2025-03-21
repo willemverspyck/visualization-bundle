@@ -32,9 +32,9 @@ class DownloadRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
-    public function getDownloads(): array
+    public function getDownloads(bool $authentication = true): array
     {
-        return $this->getDownloadsAsQueryBuilder()
+        return $this->getDownloadsAsQueryBuilder($authentication)
             ->orderBy('download.timestampCreated', 'DESC')
             ->getQuery()
             ->getResult();

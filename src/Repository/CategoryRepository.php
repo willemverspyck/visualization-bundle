@@ -5,18 +5,28 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Repository;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Category;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Spyck\VisualizationBundle\Service\UserService;
 
 class CategoryRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry, private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(ManagerRegistry $managerRegistry, private readonly UserService $userService)
     {
         parent::__construct($managerRegistry, Category::class);
     }
 
     public function getCategories(): array
+    {
+        return $this->getCategoriesAsQueryBuilder()
+            ->orderBy('category.name')
+            ->addOrderBy('dashboard.name')
+            ->getQuery()
+            ->getResult();
+    }
+
+    private function getCategoriesAsQueryBuilder(): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('category')
             ->addSelect('dashboard')
@@ -24,22 +34,17 @@ class CategoryRepository extends AbstractRepository
             ->addSelect('widget')
             ->innerJoin('category.dashboards', 'dashboard', Join::WITH, 'dashboard.active = TRUE')
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
-            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE');
+            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
+            ->where('category.active = TRUE');
 
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
+        $user = $this->userService->getUser();
 
-        if (null !== $user) {
-            $queryBuilder
-                ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
-                ->setParameter('groups', $user->getGroups());
+        if (null === $user) {
+            return $queryBuilder;
         }
 
         return $queryBuilder
-            ->where('category.active = TRUE')
-            ->orderBy('category.name')
-            ->addOrderBy('dashboard.name')
-            ->getQuery()
-            ->useQueryCache(true)
-            ->getResult();
+            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
+            ->setParameter('groups', $user->getGroups());
     }
 }

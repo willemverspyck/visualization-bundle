@@ -9,12 +9,12 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Dashboard;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Spyck\VisualizationBundle\Service\UserService;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class DashboardRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry, private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(ManagerRegistry $managerRegistry, private readonly UserService $userService)
     {
         parent::__construct($managerRegistry, Dashboard::class);
     }
@@ -25,11 +25,10 @@ class DashboardRepository extends AbstractRepository
      */
     public function getDashboardById(int $id, bool $authentication = true): ?Dashboard
     {
-        return $this->getDashboardQueryBuilder($authentication)
+        return $this->getDashboardAsQueryBuilder($authentication)
             ->andWhere('dashboard.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->useQueryCache(true)
             ->getOneOrNullResult();
     }
 
@@ -39,11 +38,10 @@ class DashboardRepository extends AbstractRepository
      */
     public function getDashboardByCode(string $code): ?Dashboard
     {
-        return $this->getDashboardQueryBuilder()
+        return $this->getDashboardAsQueryBuilder()
             ->andWhere('dashboard.code = :code')
             ->setParameter('code', $code)
             ->getQuery()
-            ->useQueryCache(true)
             ->getOneOrNullResult();
     }
 
@@ -54,21 +52,20 @@ class DashboardRepository extends AbstractRepository
      */
     public function getDashboardsByUser(): array
     {
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
+        $user = $this->userService->getUser();
 
         if (null === $user) {
             return [];
         }
 
-        return $this->getDashboardQueryBuilder()
-            ->leftJoin('dashboard.user', 'user', Join::WITH, 'user = :user')
+        return $this->getDashboardAsQueryBuilder()
+            ->innerJoin('dashboard.user', 'user', Join::WITH, 'user = :user')
             ->setParameter('user', $user)
             ->getQuery()
-            ->useQueryCache(true)
             ->getResult();
     }
 
-    private function getDashboardQueryBuilder(bool $authentication = true): QueryBuilder
+    private function getDashboardAsQueryBuilder(bool $authentication = true): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('dashboard')
             ->addSelect('block')
@@ -80,7 +77,7 @@ class DashboardRepository extends AbstractRepository
             ->addOrderBy('block.position');
 
         if ($authentication) {
-            $user = $this->getUserByToken($this->tokenStorage->getToken());
+            $user = $this->userService->getUser();
 
             if (null !== $user) {
                 $queryBuilder

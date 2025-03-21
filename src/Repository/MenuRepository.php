@@ -11,12 +11,12 @@ use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\Menu;
 use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Service\UserService;
 use Spyck\VisualizationBundle\Utility\DataUtility;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class MenuRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry, private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(ManagerRegistry $managerRegistry, private readonly UserService $userService)
     {
         parent::__construct($managerRegistry, Menu::class);
     }
@@ -28,7 +28,7 @@ class MenuRepository extends AbstractRepository
      */
     public function getMenus(): array
     {
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
+        $user = $this->userService->getUser();
 
         $expr = new Expr();
 

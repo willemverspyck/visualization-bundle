@@ -9,11 +9,11 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Widget;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Spyck\VisualizationBundle\Service\UserService;
 
 class WidgetRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry, private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(ManagerRegistry $managerRegistry, private readonly UserService $userService)
     {
         parent::__construct($managerRegistry, Widget::class);
     }
@@ -23,7 +23,7 @@ class WidgetRepository extends AbstractRepository
      */
     public function getWidgetById(int $id): ?Widget
     {
-        return $this->getWidgetQueryBuilder()
+        return $this->getWidgetAsQueryBuilder()
             ->andWhere('widget.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -35,19 +35,19 @@ class WidgetRepository extends AbstractRepository
      */
     public function getWidgetByAdapter(string $adapter): ?Widget
     {
-        return $this->getWidgetQueryBuilder()
+        return $this->getWidgetAsQueryBuilder()
             ->andWhere('widget.adapter = :adapter')
             ->setParameter('adapter', $adapter)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
-    private function getWidgetQueryBuilder(): QueryBuilder
+    private function getWidgetAsQueryBuilder(): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('widget')
             ->where('widget.active = TRUE');
 
-        $user = $this->getUserByToken($this->tokenStorage->getToken());
+        $user = $this->userService->getUser();
 
         if (null === $user) {
             return $queryBuilder;
