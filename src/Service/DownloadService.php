@@ -27,7 +27,7 @@ readonly class DownloadService
         $this->downloadRepository->patchDownload(download: $download, fields: ['status', 'duration', 'messages', 'timestamp'], status: Download::STATUS_PENDING, timestamp: $timestamp);
 
         try {
-            $dashboardAsModel = $this->widgetService->getDashboardAsModelById($download->getWidget()->getId(), $download->getVariables());
+            $dashboardAsModel = $this->widgetService->getDashboardAsModelById($download->getWidget()->getId(), $download->getVariables(), $download->getView());
 
             $view = $this->viewService->getView($download->getView());
 

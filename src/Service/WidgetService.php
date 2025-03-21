@@ -136,11 +136,11 @@ readonly class WidgetService
      * @throws InvalidArgumentException
      * @throws ParameterException
      */
-    public function getDashboardAsModelById(int $id, array $variables = []): DashboardAsModel
+    public function getDashboardAsModelById(int $id, array $variables = [], ?string $view = null): DashboardAsModel
     {
         $widget = $this->widgetRepository->getWidgetById($id);
 
-        return $this->getDashboardAsModel($widget, $variables);
+        return $this->getDashboardAsModel($widget, $variables, $view);
     }
 
     /**
@@ -148,11 +148,11 @@ readonly class WidgetService
      * @throws InvalidArgumentException
      * @throws ParameterException
      */
-    public function getDashboardAsModelByAdapter(string $adapter, array $variables = []): DashboardAsModel
+    public function getDashboardAsModelByAdapter(string $adapter, array $variables = [], ?string $view = null): DashboardAsModel
     {
         $widget = $this->widgetRepository->getWidgetByAdapter($adapter);
 
-        return $this->getDashboardAsModel($widget, $variables);
+        return $this->getDashboardAsModel($widget, $variables, $view);
     }
 
     public function getDashboardAsModelByWidget(WidgetInterface $widget, string $name): DashboardAsModel
@@ -265,17 +265,15 @@ readonly class WidgetService
      *
      * @todo: setParametersAsString and setParametersAsStringForSlug for unique naming when downloading
      */
-    private function getDashboardAsModel(?WidgetAsEntity $widgetAsEntity, array $variables = []): DashboardAsModel
+    private function getDashboardAsModel(?WidgetAsEntity $widgetAsEntity, array $variables = [], ?string $view = null): DashboardAsModel
     {
         if (null === $widgetAsEntity) {
             throw new NotFoundHttpException('The widget does not exist');
         }
 
-        $currentRequest = $this->requestStack->getCurrentRequest();
-
         $widget = $this->getWidget($widgetAsEntity->getAdapter(), $variables);
         $widget->setWidget($widgetAsEntity);
-        $widget->setView(null === $currentRequest ? ViewInterface::JSON : $currentRequest->getRequestFormat());
+        $widget->setView(null === $view ? ViewInterface::JSON : $view);
 
         $blockAsModel = new BlockAsModel();
         $blockAsModel->setWidget($this->getWidgetAsModel($widget));
