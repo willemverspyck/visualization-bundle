@@ -45,7 +45,6 @@ final readonly class MailMessageHandler
      */
     public function __invoke(MailMessageInterface $mailMessage): void
     {
-        $dashboard = $this->getDashboardById($mailMessage->getDashboardId());
         $user = $this->getUserById($mailMessage->getUserId());
 
         $token = $this->tokenStorage->getToken();
@@ -53,6 +52,8 @@ final readonly class MailMessageHandler
         $usernamePasswordToken = new UsernamePasswordToken($user, get_class($this), $user->getRoles());
 
         $this->tokenStorage->setToken($usernamePasswordToken);
+
+        $dashboard = $this->getDashboardById($mailMessage->getDashboardId());
 
         $this->executeMail($mailMessage, $user, $dashboard);
 
