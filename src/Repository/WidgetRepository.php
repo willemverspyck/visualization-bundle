@@ -21,9 +21,9 @@ class WidgetRepository extends AbstractRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getWidgetById(int $id): ?Widget
+    public function getWidgetById(int $id, bool $authentication = true): ?Widget
     {
-        return $this->getWidgetAsQueryBuilder()
+        return $this->getWidgetAsQueryBuilder($authentication)
             ->andWhere('widget.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -33,19 +33,23 @@ class WidgetRepository extends AbstractRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getWidgetByAdapter(string $adapter): ?Widget
+    public function getWidgetByAdapter(string $adapter, bool $authentication = true): ?Widget
     {
-        return $this->getWidgetAsQueryBuilder()
+        return $this->getWidgetAsQueryBuilder($authentication)
             ->andWhere('widget.adapter = :adapter')
             ->setParameter('adapter', $adapter)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
-    private function getWidgetAsQueryBuilder(): QueryBuilder
+    private function getWidgetAsQueryBuilder(bool $authentication): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('widget')
             ->where('widget.active = TRUE');
+
+        if (false === $authentication) {
+            return $queryBuilder;
+        }
 
         $user = $this->userService->getUser();
 

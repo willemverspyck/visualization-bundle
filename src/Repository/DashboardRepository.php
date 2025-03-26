@@ -36,9 +36,9 @@ class DashboardRepository extends AbstractRepository
      * @throws AuthenticationException
      * @throws NonUniqueResultException
      */
-    public function getDashboardByCode(string $code): ?Dashboard
+    public function getDashboardByCode(string $code, bool $authentication = true): ?Dashboard
     {
-        return $this->getDashboardAsQueryBuilder()
+        return $this->getDashboardAsQueryBuilder($authentication)
             ->andWhere('dashboard.code = :code')
             ->setParameter('code', $code)
             ->getQuery()
@@ -58,14 +58,14 @@ class DashboardRepository extends AbstractRepository
             return [];
         }
 
-        return $this->getDashboardAsQueryBuilder()
+        return $this->getDashboardAsQueryBuilder(true)
             ->innerJoin('dashboard.user', 'user', Join::WITH, 'user = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
     }
 
-    private function getDashboardAsQueryBuilder(bool $authentication = true): QueryBuilder
+    private function getDashboardAsQueryBuilder(bool $authentication): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('dashboard')
             ->addSelect('block')
