@@ -38,7 +38,7 @@ final readonly class PreloadMessageHandler
      */
     private function getDashboardById(int $id): Dashboard
     {
-        $dashboard = $this->dashboardRepository->getDashboardById($id);
+        $dashboard = $this->dashboardRepository->getDashboardById($id, false);
 
         if (null === $dashboard) {
             throw new AuthenticationException(sprintf('Dashboard not found (%d)', $id));
