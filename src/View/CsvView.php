@@ -36,14 +36,14 @@ class CsvView extends AbstractView
             return $field->getName();
         });
 
-        $splFileObject->fputcsv($data, $this->getSeparator());
+        $splFileObject->fputcsv(fields: $data, separator: $this->getSeparator(), escape: '');
 
         foreach ($widget->getData() as $row) {
             $data = WidgetUtility::mapFields($widget->getFields(), function (FieldInterface $field, int $index) use ($row): bool|float|int|string|null {
                 return $this->getValue($field->getType(), $field->getConfig(), $row[$index]['value']);
             });
 
-            $splFileObject->fputcsv($data, $this->getSeparator());
+            $splFileObject->fputcsv(fields: $data, separator: $this->getSeparator(), escape: '');
         }
 
         return ob_get_clean();
