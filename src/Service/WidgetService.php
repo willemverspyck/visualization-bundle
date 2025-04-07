@@ -38,9 +38,11 @@ use Spyck\VisualizationBundle\Parameter\DayParameter;
 use Spyck\VisualizationBundle\Parameter\DayStartParameter;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\MonthEndParameter;
+use Spyck\VisualizationBundle\Parameter\MonthParameter;
 use Spyck\VisualizationBundle\Parameter\MonthStartParameter;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use Spyck\VisualizationBundle\Parameter\WeekEndParameter;
+use Spyck\VisualizationBundle\Parameter\WeekParameter;
 use Spyck\VisualizationBundle\Parameter\WeekStartParameter;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
 use Spyck\VisualizationBundle\Repository\WidgetRepository;
@@ -568,8 +570,10 @@ readonly class WidgetService
             DayParameter::class => $this->request['dayParameter'],
             DayStartParameter::class => $this->request['dayStartParameter'],
             DayEndParameter::class => $this->request['dayEndParameter'],
+            WeekParameter::class => $this->request['weekParameter'],
             WeekStartParameter::class => $this->request['weekStartParameter'],
             WeekEndParameter::class => $this->request['weekEndParameter'],
+            MonthParameter::class => $this->request['monthParameter'],
             MonthStartParameter::class => $this->request['monthStartParameter'],
             MonthEndParameter::class => $this->request['monthEndParameter'],
             LimitFilter::class => sprintf('%d', $this->request['limitFilter']),

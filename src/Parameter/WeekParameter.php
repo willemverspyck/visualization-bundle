@@ -7,8 +7,12 @@ namespace Spyck\VisualizationBundle\Parameter;
 use DateTimeImmutable;
 use Spyck\VisualizationBundle\Request\RequestInterface;
 
-final class MonthParameter extends AbstractDateParameter
+final class WeekParameter extends AbstractDateParameter
 {
+    public function __construct(private readonly int $weekday = DateParameterInterface::MONDAY)
+    {
+    }
+
     public function getData(): ?DateTimeImmutable
     {
         $data = parent::getData();
@@ -17,9 +21,14 @@ final class MonthParameter extends AbstractDateParameter
             return null;
         }
 
-        return $data->modify('First day of this month');
-    }
+        $modifier = match ($this->weekday) {
+            DateParameterInterface::SUNDAY => 'Sunday this week',
+            DateParameterInterface::MONDAY => 'Monday this week',
+            default => throw new Exception('Unknown weekday'),
+        };
 
+        return $data->modify($modifier);
+    }
     public static function getField(): string
     {
         return RequestInterface::DATE;
