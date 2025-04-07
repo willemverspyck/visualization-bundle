@@ -29,6 +29,7 @@ final class WeekParameter extends AbstractDateParameter
 
         return $data->modify($modifier);
     }
+
     public static function getField(): string
     {
         return RequestInterface::DATE;
