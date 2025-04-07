@@ -40,6 +40,16 @@ class DownloadRepository extends AbstractRepository
             ->getResult();
     }
 
+    public function getDownloadsByTimestamp(DateTimeImmutable $timestamp, bool $authentication = true): array
+    {
+        return $this->getDownloadsAsQueryBuilder($authentication)
+            ->andWhere('download.timestamp < :timestamp')
+            ->orderBy('download.timestampCreated', 'DESC')
+            ->setParameter('timestamp', $timestamp)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function patchDownload(Download $download, array $fields, ?string $name = null, ?string $file = null, ?string $status = null, ?int $duration = null, ?array $messages = null, ?DateTimeImmutable $timestamp = null): void
     {
         if (in_array('name', $fields, true)) {
@@ -82,6 +92,12 @@ class DownloadRepository extends AbstractRepository
         $this->getEntityManager()->flush();
 
         return $download;
+    }
+
+    public function removeDownload(Download $download): void
+    {
+        $this->getEntityManager()->remove($download);
+        $this->getEntityManager()->flush();
     }
 
     private function getDownloadsAsQueryBuilder(bool $authentication = true): QueryBuilder
