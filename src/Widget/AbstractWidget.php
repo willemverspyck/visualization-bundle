@@ -11,6 +11,7 @@ use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\LimitFilter;
 use Spyck\VisualizationBundle\Filter\OffsetFilter;
 use Spyck\VisualizationBundle\Filter\OptionFilter;
+use Spyck\VisualizationBundle\Filter\QueryFilter;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
@@ -235,5 +236,27 @@ abstract class AbstractWidget implements WidgetInterface
         }
 
         return in_array($option, $filter, true);
+    }
+
+    /**
+     * Return filter for query.
+     */
+    protected function hasFilterQuery(): bool
+    {
+        return null !== $this->getFilter(QueryFilter::class);
+    }
+
+    /**
+     * Return filter for query.
+     */
+    protected function getFilterQuery(): ?string
+    {
+        $filter = $this->getFilter(QueryFilter::class);
+
+        if (null === $filter) {
+            return null;
+        }
+
+        return array_shift($filter);
     }
 }

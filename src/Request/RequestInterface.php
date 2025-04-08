@@ -12,6 +12,7 @@ interface RequestInterface
     public const string LIMIT = 'limit';
     public const string OFFSET = 'offset';
     public const string OPTION = 'option';
+    public const string QUERY = 'query';
 
     public function getParent(): ?MultipleRequestInterface;
 
