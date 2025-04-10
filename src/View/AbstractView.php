@@ -12,7 +12,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 abstract class AbstractView implements ViewInterface
 {
-    public function getFile(string $name, array $parameters): string
+    public function getFile(string $name, array $parameters = []): string
     {
         $slugger = new AsciiSlugger();
 

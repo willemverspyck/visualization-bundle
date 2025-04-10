@@ -12,6 +12,7 @@ use Spyck\VisualizationBundle\Entity\Download;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Service\UserService;
+use Spyck\VisualizationBundle\Utility\DataUtility;
 
 class DownloadRepository extends AbstractRepository
 {
@@ -53,6 +54,8 @@ class DownloadRepository extends AbstractRepository
     public function patchDownload(Download $download, array $fields, ?string $name = null, ?string $file = null, ?string $status = null, ?int $duration = null, ?array $messages = null, ?DateTimeImmutable $timestamp = null): void
     {
         if (in_array('name', $fields, true)) {
+            DataUtility::assert(null !== $name);
+
             $download->setName($name);
         }
 
@@ -80,11 +83,12 @@ class DownloadRepository extends AbstractRepository
         $this->getEntityManager()->flush();
     }
 
-    public function putDownload(UserInterface $user, Widget $widget, array $variables, string $view): Download
+    public function putDownload(UserInterface $user, Widget $widget, string $name, array $variables, string $view): Download
     {
         $download = new Download();
         $download->setUser($user);
         $download->setWidget($widget);
+        $download->setName($name);
         $download->setVariables($variables);
         $download->setView($view);
 

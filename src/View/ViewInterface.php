@@ -20,7 +20,7 @@ interface ViewInterface
 
     public function getContent(Dashboard $dashboard): string;
 
-    public function getFile(string $name, array $parameters): string;
+    public function getFile(string $name, array $parameters = []): string;
 
     public static function getContentType(): string;
 

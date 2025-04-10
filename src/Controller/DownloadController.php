@@ -13,6 +13,7 @@ use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Repository\WidgetRepository;
 use Spyck\VisualizationBundle\Service\DownloadService;
 use Spyck\VisualizationBundle\Service\UserService;
+use Spyck\VisualizationBundle\Service\ViewService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +31,7 @@ final class DownloadController extends AbstractController
     public const string GROUP_WIDGET = 'spyck:visualization:download:widget';
 
     #[Route(path: '/api/download/{downloadId}', name: 'spyck_visualization_download_item', requirements: ['downloadId' => Requirement::DIGITS], methods: [Request::METHOD_GET])]
-    public function item(DownloadRepository $downloadRepository, DownloadService $downloadService, int $downloadId): Response
+    public function item(DownloadRepository $downloadRepository, DownloadService $downloadService, ViewService $viewService, int $downloadId): Response
     {
         $download = $downloadRepository->getDownloadById($downloadId);
 
@@ -38,18 +39,23 @@ final class DownloadController extends AbstractController
             throw $this->createNotFoundException('Download not found');
         }
 
+        if (null === $download->getFile()) {
+            throw $this->createNotFoundException('File not found');
+        }
+
         if (Download::STATUS_COMPLETE !== $download->getStatus()) {
-            throw $this->createNotFoundException('Download not found');
+            throw $this->createNotFoundException('Download not completed');
         }
 
-        if (null === $download->getName() || null === $download->getFile()) {
-            throw $this->createNotFoundException('Download not found');
-        }
+        $view = $viewService->getView($download->getView());
 
-        $contentDisposition = HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $download->getName());
+        $file = $view->getFile($download->getName());
+
+        $contentDisposition = HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $file);
 
         return new BinaryFileResponse(file: sprintf('%s/%s', $downloadService->getDirectory(), $download->getFile()), headers: [
             'Content-Disposition' => $contentDisposition,
+            'Content-Type' => $view::getContentType(),
         ]);
     }
 
@@ -80,7 +86,7 @@ final class DownloadController extends AbstractController
             throw $this->createNotFoundException('Widget not found');
         }
 
-        $download = $downloadRepository->putDownload(user: $user, widget: $widget, variables: $downloadAsPayload->getVariables(), view: $downloadAsPayload->getView());
+        $download = $downloadRepository->putDownload(user: $user, widget: $widget, name: $downloadAsPayload->getName(), variables: $downloadAsPayload->getVariables(), view: $downloadAsPayload->getView());
 
         return $responseService->getResponseForItem(data: $download, groups: [self::GROUP_WIDGET]);
     }

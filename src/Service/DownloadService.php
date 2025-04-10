@@ -27,19 +27,19 @@ readonly class DownloadService
         $this->downloadRepository->patchDownload(download: $download, fields: ['status', 'duration', 'messages', 'timestamp'], status: Download::STATUS_PENDING, timestamp: $timestamp);
 
         try {
-            $dashboardAsModel = $this->widgetService->getDashboardAsModelById($download->getWidget()->getId(), $download->getVariables(), $download->getView());
-
             $view = $this->viewService->getView($download->getView());
 
-            $file = $this->getFile($download);
+            $name = bin2hex(random_bytes(16));
+            $dashboardAsModel = $this->widgetService->getDashboardAsModelById($download->getWidget()->getId(), $download->getVariables(), $download->getView());
+
+            $file = $view->getFile($name);
             $content = $view->getContent($dashboardAsModel);
 
             $this->putFile($file, $content);
 
-            $name = $view->getFile($dashboardAsModel->getName(), $dashboardAsModel->getParametersAsStringForSlug());
             $duration = $this->getDuration($timestamp);
 
-            $this->downloadRepository->patchDownload(download: $download, fields: ['name', 'file', 'status', 'duration', 'messages'], name: $name, file: $file, status: Download::STATUS_COMPLETE, duration: $duration);
+            $this->downloadRepository->patchDownload(download: $download, fields: ['file', 'status', 'duration', 'messages'], file: $file, status: Download::STATUS_COMPLETE, duration: $duration);
         } catch (Exception $exception) {
             $duration = $this->getDuration($timestamp);
             $messages = [
@@ -69,14 +69,6 @@ readonly class DownloadService
         }
 
         return $this->directory;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getFile(Download $download): string
-    {
-        return md5(sprintf('%s', $download->getId() / $download->getTimestamp()->getTimestamp()));
     }
 
     public function putFile(string $file, string $content): void

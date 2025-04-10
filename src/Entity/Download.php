@@ -42,9 +42,9 @@ class Download implements Stringable, TimestampInterface
     #[Validator\NotNull]
     private Widget $widget;
 
-    #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128, nullable: true)]
+    #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
     #[Serializer\Groups(groups: [DownloadController::GROUP_LIST])]
-    private ?string $name = null;
+    private string $name;
 
     #[Doctrine\Column(name: 'file', type: Types::STRING, length: 128, nullable: true)]
     private ?string $file = null;
@@ -102,12 +102,12 @@ class Download implements Stringable, TimestampInterface
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->name = $name;
 

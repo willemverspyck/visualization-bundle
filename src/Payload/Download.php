@@ -10,11 +10,27 @@ final class Download
 {
     #[Validator\NotNull]
     #[Validator\Type(type: 'string')]
+    private string $name;
+
+    #[Validator\NotNull]
+    #[Validator\Type(type: 'string')]
     private string $view;
 
     #[Validator\NotNull]
     #[Validator\Type(type: 'array')]
     private array $variables;
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
 
     public function getView(): string
     {
