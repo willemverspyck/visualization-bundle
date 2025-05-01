@@ -46,7 +46,7 @@
                                                     {% set chart = getChart(block) %}
 
                                                     <p>
-                                                        <img src="{{ email.image('@charts/' ~ chart|split('/')|last) }}" alt="{{ block.name }}">
+                                                        <img src="{{ email.image('@SpyckVisualizationForCharts/' ~ chart|split('/')|last) }}" alt="{{ block.name }}">
                                                     </p>
                                                 {% else %}
                                                     {% set fields = getFields(widget.fields) %}

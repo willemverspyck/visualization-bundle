@@ -12,11 +12,17 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Serializer\SerializerInterface;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 readonly class ChartService
 {
     public function __construct(private Environment $environment, private SerializerInterface $serializer, #[Autowire(param: 'spyck.visualization.config.chart.command')] private ?string $command, #[Autowire(param: 'spyck.visualization.config.chart.directory')] private ?string $directory)
     {
+        $loader = $environment->getLoader();
+
+        if ($loader instanceof FilesystemLoader) {
+            $loader->addPath($this->directory, 'SpyckVisualizationForCharts');
+        }
     }
 
     public function hasChart(): bool
