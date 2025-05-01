@@ -10,17 +10,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Serializer\SerializerInterface;
 use Twig\Environment;
 
 readonly class ChartService
 {
-    public function __construct(private Environment $environment, #[Autowire(param: 'spyck.visualization.config.chart.command')] private ?string $command, #[Autowire(param: 'spyck.visualization.config.chart.directory')] private ?string $directory)
+    public function __construct(private Environment $environment, private SerializerInterface $serializer, #[Autowire(param: 'spyck.visualization.config.chart.command')] private ?string $command, #[Autowire(param: 'spyck.visualization.config.chart.directory')] private ?string $directory)
     {
     }
 
     public function hasChart(): bool
     {
-        return null === $this->command || null === $this->directory;
+        return null !== $this->command && null !== $this->directory;
     }
 
     /**
@@ -32,20 +33,18 @@ readonly class ChartService
             throw new Exception('Chart not configured');
         }
 
-        $type = $block->getCharts()[0];
-        $widget = $block->getWidget();
+        $blockAsArray = $this->serializer->normalize($block);
 
-        $output = sprintf('%s/%s-%s.png', $this->directory, $type, serialize($widget));
+        $output = sprintf('%s/%s.png', $this->directory, md5(serialize($blockAsArray)));
 
         if (file_exists($output)) {
             return $output;
         }
 
-        $input = sprintf('%s/%s-%s.html', $this->directory, $type, serialize($widget));
+        $input = sprintf('%s/%s.html', $this->directory, md5(serialize($blockAsArray)));
 
         $content = $this->environment->render('@SpyckVisualization/chart/index.html.twig', [
-            'type' => $type,
-            'widget' => $widget,
+            'block' => $blockAsArray,
         ]);
 
         if (false === file_put_contents($input, $content)) {

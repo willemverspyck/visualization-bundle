@@ -16,14 +16,14 @@ use Spyck\VisualizationBundle\Service\ChartService;
 use Spyck\VisualizationBundle\Utility\ViewUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 #[Autoconfigure(tags: ['twig.extension'])]
 final class ViewExtension extends AbstractExtension
 {
-    public function __construct(private readonly ChartService $chartService, #[Autowire(param: 'spyck.visualization.config.directory')] private readonly string $directory)
+    public function __construct(private readonly ChartService $chartService, private readonly KernelInterface $kernel)
     {
     }
 
@@ -58,7 +58,7 @@ final class ViewExtension extends AbstractExtension
      */
     public function getDirectory(string $value): string
     {
-        return sprintf('%s%s', $this->directory, $value);
+        return sprintf('%s%s', $this->kernel->getProjectDir(), $value);
     }
 
     public function getClasses(AbstractFieldInterface $field): array
