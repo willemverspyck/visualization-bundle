@@ -20,14 +20,14 @@ readonly class ChartService
     {
         $loader = $environment->getLoader();
 
-        if ($loader instanceof FilesystemLoader) {
+        if ($loader instanceof FilesystemLoader && $this->isDirectory()) {
             $loader->addPath($this->directory, 'SpyckVisualizationForCharts');
         }
     }
 
     public function hasChart(): bool
     {
-        return null !== $this->command && null !== $this->directory;
+        return $this->isCommand() && $this->isDirectory();
     }
 
     /**
@@ -35,19 +35,18 @@ readonly class ChartService
      */
     public function getChart(Block $block): string
     {
-        if (false === $this->hasChart()) {
-            throw new Exception('Chart not configured');
-        }
+        $command = $this->getCommand();
+        $directory = $this->getDirectory();
 
         $blockAsArray = $this->serializer->normalize($block);
 
-        $output = sprintf('%s/%s.png', $this->directory, md5(serialize($blockAsArray)));
+        $output = sprintf('%s/%s.png', $directory, md5(serialize($blockAsArray)));
 
         if (file_exists($output)) {
             return $output;
         }
 
-        $input = sprintf('%s/%s.html', $this->directory, md5(serialize($blockAsArray)));
+        $input = sprintf('%s/%s.html', $directory, md5(serialize($blockAsArray)));
 
         $content = $this->environment->render('@SpyckVisualization/chart/index.html.twig', [
             'block' => $blockAsArray,
@@ -58,7 +57,7 @@ readonly class ChartService
         }
 
         $commands = [
-            $this->command,
+            $command,
             sprintf('--input=%s', $input),
             sprintf('--output=%s', $output),
         ];
@@ -79,5 +78,45 @@ readonly class ChartService
         }
 
         throw new Exception(sprintf('Chart not found (%s)', $input));
+    }
+
+    private function getCommand(): string
+    {
+        if ($this->isCommand()) {
+            return $this->command;
+        }
+
+        throw new Exception(sprintf('Command not found (%s)', $this->command));
+    }
+
+    private function isCommand(): bool
+    {
+        if (null === $this->command) {
+            return false;
+        }
+
+        $filesystem = new Filesystem();
+
+        return $filesystem->exists($this->command);
+    }
+
+    private function getDirectory(): string
+    {
+        if ($this->isDirectory()) {
+            return $this->directory;
+        }
+
+        throw new Exception(sprintf('Directory not found (%s)', $this->directory));
+    }
+
+    private function isDirectory(): bool
+    {
+        if (null === $this->directory) {
+            return false;
+        }
+
+        $filesystem = new Filesystem();
+
+        return $filesystem->exists($this->directory);
     }
 }
