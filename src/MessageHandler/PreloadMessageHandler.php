@@ -31,7 +31,7 @@ final readonly class PreloadMessageHandler
     }
 
     /**
-     * Check if the dashboard exists and if user has access.
+     * Check if the dashboard exists.
      *
      * @throws AuthenticationException
      * @throws NonUniqueResultException
