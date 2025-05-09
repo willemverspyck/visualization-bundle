@@ -17,19 +17,13 @@ readonly class UserService
 
     public function getUserAsString(): string
     {
-        $token = $this->tokenStorage->getToken();
+        $user = $this->getUser();
 
-        if (null === $token) {
+        if (null === $user) {
             return 'Anonymous';
         }
 
-        if (null === $token->getUser()) {
-            throw new AuthenticationException('User not found');
-        }
-
-        $user = $token->getUser();
-
-        return $user instanceof UserInterface && null !== $user->getName() ? $user->getName() : $user->getUserIdentifier();
+        return null === $user->getName() ? $user->getUserIdentifier() : $user->getName();
     }
 
     /**
