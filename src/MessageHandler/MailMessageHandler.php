@@ -21,7 +21,6 @@ use Spyck\VisualizationBundle\Repository\UserRepository;
 use Spyck\VisualizationBundle\Service\DashboardService;
 use Spyck\VisualizationBundle\Service\MailService;
 use Spyck\VisualizationBundle\Service\ViewService;
-use Spyck\VisualizationBundle\Utility\FileUtility;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -154,23 +153,8 @@ final readonly class MailMessageHandler
     {
         $content = $view->getContent($dashboard);
 
-        $filename = $this->getFilename(null === $name ? $dashboard->getName() : $name, $dashboard->getParametersAsStringForSlug(), $view->getExtension());
+        $file = $view->getFile(null === $name ? $dashboard->getName() : $name, $dashboard->getParametersAsStringForSlug());
 
-        return new DataPart($content, $filename, $view->getContentType());
-    }
-
-    private function getFilename(string $name, array $parameters, string $extension): string
-    {
-        $filename = [
-            $name,
-        ];
-
-        foreach ($parameters as $parameter) {
-            $filename[] = sprintf('%s', $parameter);
-        }
-
-        $slug = FileUtility::filter(implode('-', $filename));
-
-        return sprintf('%s.%s', $slug, $extension);
+        return new DataPart($content, $file, $view->getContentType());
     }
 }
