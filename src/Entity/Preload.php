@@ -44,8 +44,8 @@ class Preload implements Stringable, TimestampInterface
     private Collection $schedules;
 
     #[Doctrine\ManyToMany(targetEntity: UserInterface::class)]
-    #[Doctrine\JoinTable(name: 'visualization_mail_user')]
-    #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Doctrine\JoinTable(name: 'visualization_preload_user')]
+    #[Doctrine\JoinColumn(name: 'preload_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Doctrine\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Collection $users;
 
