@@ -54,10 +54,8 @@ readonly class MailService
 
     public function executeMailAsMessage(Mail $mail, UserInterface $user, array $parameters = []): void
     {
-        $dashboard = $mail->getDashboard();
-
         $mailMessage = new MailMessage();
-        $mailMessage->setDashboardId($dashboard->getId());
+        $mailMessage->setDashboardId($mail->getDashboard()->getId());
         $mailMessage->setUserId($user->getId());
         $mailMessage->setName($mail->getName());
         $mailMessage->setDescription($mail->getDescription());

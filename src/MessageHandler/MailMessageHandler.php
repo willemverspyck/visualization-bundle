@@ -62,38 +62,6 @@ final readonly class MailMessageHandler
     }
 
     /**
-     * @throws NonUniqueResultException
-     * @throws UnrecoverableMessageHandlingException
-     */
-    private function getUserById(int $id): UserInterface
-    {
-        $user = $this->userRepository->getUserById($id);
-
-        if (null === $user) {
-            throw new UnrecoverableMessageHandlingException(sprintf('User not found (%d)', $id));
-        }
-
-        return $user;
-    }
-
-    /**
-     * Check if the dashboard exists and if user has access.
-     *
-     * @throws AuthenticationException
-     * @throws NonUniqueResultException
-     */
-    private function getDashboardById(int $id): Dashboard
-    {
-        $dashboard = $this->dashboardRepository->getDashboardById($id);
-
-        if (null === $dashboard) {
-            throw new AuthenticationException(sprintf('Dashboard not found (%d)', $id));
-        }
-
-        return $dashboard;
-    }
-
-    /**
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws TransportExceptionInterface
@@ -156,5 +124,37 @@ final readonly class MailMessageHandler
         $file = $view->getFile(null === $name ? $dashboard->getName() : $name, $dashboard->getParametersAsStringForSlug());
 
         return new DataPart($content, $file, $view->getContentType());
+    }
+
+    /**
+     * Check if the dashboard exists and if user has access.
+     *
+     * @throws AuthenticationException
+     * @throws NonUniqueResultException
+     */
+    private function getDashboardById(int $id): Dashboard
+    {
+        $dashboard = $this->dashboardRepository->getDashboardById($id);
+
+        if (null === $dashboard) {
+            throw new AuthenticationException(sprintf('Dashboard not found (%d)', $id));
+        }
+
+        return $dashboard;
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws UnrecoverableMessageHandlingException
+     */
+    private function getUserById(int $id): UserInterface
+    {
+        $user = $this->userRepository->getUserById($id);
+
+        if (null === $user) {
+            throw new UnrecoverableMessageHandlingException(sprintf('User not found (%d)', $id));
+        }
+
+        return $user;
     }
 }
