@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Message;
 final class PreloadMessage implements PreloadMessageInterface
 {
     private int $dashboardId;
+    private ?int $userId;
     private array $variables;
 
     public function getDashboardId(): int
@@ -17,6 +18,16 @@ final class PreloadMessage implements PreloadMessageInterface
     public function setDashboardId(int $dashboardId): void
     {
         $this->dashboardId = $dashboardId;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(?int $userId): void
+    {
+        $this->userId = $userId;
     }
 
     public function getVariables(): array

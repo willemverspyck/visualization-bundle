@@ -43,9 +43,16 @@ class Preload implements Stringable, TimestampInterface
     #[Doctrine\InverseJoinColumn(name: 'schedule_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Collection $schedules;
 
+    #[Doctrine\ManyToMany(targetEntity: UserInterface::class)]
+    #[Doctrine\JoinTable(name: 'visualization_mail_user')]
+    #[Doctrine\JoinColumn(name: 'mail_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Doctrine\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Collection $users;
+
     public function __construct()
     {
         $this->schedules = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,6 +119,31 @@ class Preload implements Stringable, TimestampInterface
     public function removeSchedule(ScheduleInterface $schedule): void
     {
         $this->schedules->removeElement($schedule);
+    }
+
+    public function addUser(UserInterface $user): static
+    {
+        $this->users->add($user);
+
+        return $this;
+    }
+
+    public function clearUsers(): void
+    {
+        $this->users->clear();
+    }
+
+    /**
+     * @return Collection<int, UserInterface>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function removeUser(UserInterface $user): void
+    {
+        $this->users->removeElement($user);
     }
 
     public function __toString(): string

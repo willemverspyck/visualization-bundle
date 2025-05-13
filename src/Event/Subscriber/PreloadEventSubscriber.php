@@ -28,6 +28,6 @@ final class PreloadEventSubscriber implements EventSubscriberInterface
      */
     public function onPreload(PreloadEvent $event): void
     {
-        $this->preloadService->executePreloadAsMessage($event->getPreload());
+        $this->preloadService->executePreload($event->getPreload());
     }
 }

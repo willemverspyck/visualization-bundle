@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Service;
 
 use Spyck\VisualizationBundle\Entity\Preload;
 use Spyck\VisualizationBundle\Entity\ScheduleInterface;
+use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Message\PreloadMessage;
 use Spyck\VisualizationBundle\Repository\PreloadRepository;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -16,10 +17,26 @@ readonly class PreloadService
     {
     }
 
-    public function executePreloadAsMessage(Preload $preload): void
+    public function executePreload(Preload $preload): void
+    {
+        $users = $preload->getUsers();
+
+        if ($users->isEmpty()) {
+            $this->executePreloadAsMessage($preload);
+
+            return;
+        }
+
+        foreach ($users as $user) {
+            $this->executePreloadAsMessage($preload, $user);
+        }
+    }
+
+    public function executePreloadAsMessage(Preload $preload, ?UserInterface $user = null): void
     {
         $preloadMessage = new PreloadMessage();
         $preloadMessage->setDashboardId($preload->getDashboard()->getId());
+        $preloadMessage->setUserId(null === $user ? null : $user->getId());
         $preloadMessage->setVariables($preload->getVariables());
 
         $this->messageBus->dispatch($preloadMessage);
@@ -30,7 +47,7 @@ readonly class PreloadService
         $preloads = $this->preloadRepository->getPreloadsBySchedule($schedule);
 
         foreach ($preloads as $preload) {
-            $this->executePreloadAsMessage($preload);
+            $this->executePreload($preload);
         }
     }
 }
