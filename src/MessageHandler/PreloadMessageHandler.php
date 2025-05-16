@@ -36,7 +36,7 @@ final readonly class PreloadMessageHandler
             return;
         }
 
-        $user = $this->getUserById($mailMessage->getUserId());
+        $user = $this->getUserById($preloadMessage->getUserId());
 
         $token = $this->tokenStorage->getToken();
 
