@@ -29,7 +29,7 @@ class BookmarkRepository extends AbstractRepository
             ->andWhere('bookmark.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
     }
 
     /**

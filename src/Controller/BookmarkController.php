@@ -82,6 +82,6 @@ final class BookmarkController extends AbstractController
 
         $bookmarkRepository->deleteBookmark(bookmark: $bookmark);
 
-        return $responseService->getResponseForItem();
+        return new JsonResponse(data: ['OK']);
     }
 }
