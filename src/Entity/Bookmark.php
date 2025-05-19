@@ -37,6 +37,7 @@ class Bookmark implements TimestampInterface
     private Dashboard $dashboard;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
+    #[Validator\NotBlank]
     #[Validator\NotNull]
     #[Serializer\Groups(groups: [BookmarkController::GROUP_LIST])]
     private string $name;

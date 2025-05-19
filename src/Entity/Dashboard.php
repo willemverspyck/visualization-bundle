@@ -34,6 +34,7 @@ class Dashboard implements Stringable, TimestampInterface
     private ?UserInterface $user;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
+    #[Validator\NotBlank]
     #[Validator\NotNull]
     private string $name;
 

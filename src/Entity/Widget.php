@@ -47,6 +47,7 @@ class Widget implements Stringable, TimestampInterface
     private GroupInterface $group;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
+    #[Validator\NotBlank]
     #[Validator\NotNull]
     private string $name;
 
@@ -57,6 +58,7 @@ class Widget implements Stringable, TimestampInterface
     protected ?string $descriptionEmpty = null;
 
     #[Doctrine\Column(name: 'adapter', type: Types::STRING, length: 128)]
+    #[Validator\NotBlank]
     #[Validator\NotNull]
     private string $adapter;
 
