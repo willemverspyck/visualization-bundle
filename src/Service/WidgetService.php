@@ -847,6 +847,7 @@ readonly class WidgetService
         }
 
         return match ($field->getType()) {
+            FieldInterface::TYPE_BOOLEAN => (bool) $value,
             FieldInterface::TYPE_CURRENCY, FieldInterface::TYPE_NUMBER, FieldInterface::TYPE_PERCENTAGE => (float) $value,
             FieldInterface::TYPE_DATE => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateFromString($value),
             FieldInterface::TYPE_DATETIME => $value instanceof DateTimeInterface ? $value : DateTimeUtility::getDateTimeFromString($value),
