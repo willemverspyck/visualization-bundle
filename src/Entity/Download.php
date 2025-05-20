@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Controller\DownloadController;
+use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Stringable;
 use Symfony\Component\Serializer\Attribute as Serializer;
