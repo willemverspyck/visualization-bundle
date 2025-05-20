@@ -8,6 +8,7 @@ use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Download;
+use Spyck\VisualizationBundle\Map\DownloadMap;
 use Spyck\VisualizationBundle\Payload\Download as DownloadAsPayload;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Spyck\VisualizationBundle\Repository\WidgetRepository;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -64,11 +66,11 @@ final class DownloadController extends AbstractController
     #[Schema\Forbidden]
     #[Schema\NotFound]
     #[Schema\ResponseForList(type: Download::class, groups: [self::GROUP_LIST])]
-    public function list(DownloadRepository $downloadRepository, ResponseService $responseService): Response
+    public function list(DownloadRepository $downloadRepository, ResponseService $responseService, #[MapQueryString] DownloadMap $downloadMap = new DownloadMap()): Response
     {
-        $downloads = $downloadRepository->getDownloads();
+        $downloads = $downloadRepository->getDownloadsByMapAsQueryBuilder($downloadMap);
 
-        return $responseService->getResponseForList(data: $downloads, groups: [self::GROUP_LIST]);
+        return $responseService->getResponseForList(data: $downloads, map: $downloadMap, groups: [self::GROUP_LIST]);
     }
 
     #[Route(path: '/api/download/widget/{widgetId}', name: 'spyck_visualization_download_widget', requirements: ['widgetId' => Requirement::DIGITS], methods: [Request::METHOD_POST])]

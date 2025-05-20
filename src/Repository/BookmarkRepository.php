@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Bookmark;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Map\BookmarkMap;
 use Spyck\VisualizationBundle\Service\UserService;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
@@ -37,12 +38,10 @@ class BookmarkRepository extends AbstractRepository
      *
      * @throws AuthenticationException
      */
-    public function getBookmarks(): array
+    public function getBookmarksByMapAsQueryBuilder(BookmarkMap $bookmarkMap): QueryBuilder
     {
         return $this->getBookmarksAsQueryBuilder()
-            ->orderBy('bookmark.timestampCreated', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('bookmark.timestampCreated', 'DESC');
     }
 
     public function deleteBookmark(Bookmark $bookmark): void

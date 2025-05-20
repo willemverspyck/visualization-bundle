@@ -9,6 +9,7 @@ use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Menu;
+use Spyck\VisualizationBundle\Map\BookmarkMap;
 use Spyck\VisualizationBundle\Payload\Bookmark as BookmarkAsPayload;
 use Spyck\VisualizationBundle\Repository\BookmarkRepository;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -33,11 +35,11 @@ final class BookmarkController extends AbstractController
     #[Schema\Forbidden]
     #[Schema\NotFound]
     #[Schema\ResponseForList(type: Menu::class, groups: [self::GROUP_LIST])]
-    public function list(BookmarkRepository $bookmarkRepository, ResponseService $responseService): Response
+    public function list(BookmarkRepository $bookmarkRepository, ResponseService $responseService, #[MapQueryString] BookmarkMap $bookmarkMap = new BookmarkMap()): Response
     {
-        $bookmarks = $bookmarkRepository->getBookmarks();
+        $bookmarks = $bookmarkRepository->getBookmarksByMapAsQueryBuilder($bookmarkMap);
 
-        return $responseService->getResponseForList(data: $bookmarks, groups: [self::GROUP_LIST]);
+        return $responseService->getResponseForList(data: $bookmarks, map: $bookmarkMap, groups: [self::GROUP_LIST]);
     }
 
     /**

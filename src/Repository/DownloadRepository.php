@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Download;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Map\DownloadMap;
 use Spyck\VisualizationBundle\Service\UserService;
 use Spyck\VisualizationBundle\Utility\DataUtility;
 
@@ -33,12 +34,10 @@ class DownloadRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
-    public function getDownloads(bool $authentication = true): array
+    public function getDownloadsByMapAsQueryBuilder(DownloadMap $downloadMap): QueryBuilder
     {
-        return $this->getDownloadsAsQueryBuilder($authentication)
-            ->orderBy('download.timestampCreated', 'DESC')
-            ->getQuery()
-            ->getResult();
+        return $this->getDownloadsAsQueryBuilder()
+            ->orderBy('download.timestampCreated', 'DESC');
     }
 
     public function getDownloadsByTimestamp(DateTimeImmutable $timestamp, bool $authentication = true): array
