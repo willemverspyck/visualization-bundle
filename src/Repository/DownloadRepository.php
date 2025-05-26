@@ -97,7 +97,7 @@ class DownloadRepository extends AbstractRepository
         return $download;
     }
 
-    public function removeDownload(Download $download): void
+    public function deleteDownload(Download $download): void
     {
         $this->getEntityManager()->remove($download);
         $this->getEntityManager()->flush();

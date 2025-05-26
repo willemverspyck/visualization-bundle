@@ -12,7 +12,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[AsCommand(name: 'spyck:visualization:download', description: 'Command for downloads.')]
 final class DownloadCommand extends Command
@@ -29,18 +28,10 @@ final class DownloadCommand extends Command
     {
         $date = new DateTimeImmutable('1 month ago');
 
-        $filesystem = new Filesystem();
-
         $downloads = $this->downloadRepository->getDownloadsByTimestamp($date, false);
 
         foreach ($downloads as $download) {
-            $file = sprintf('%s/%s', $this->downloadService->getDirectory(), $download->getFile());
-
-            if ($filesystem->exists($file)) {
-                $filesystem->remove($file);
-            }
-
-            $this->downloadRepository->removeDownload($download);
+            $this->downloadService->deleteDownload($download);
         }
 
         return Command::SUCCESS;

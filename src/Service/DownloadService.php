@@ -12,6 +12,7 @@ use Spyck\VisualizationBundle\Message\DownloadMessage;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class DownloadService
@@ -62,6 +63,13 @@ readonly class DownloadService
         $this->messageBus->dispatch($downloadMessage);
     }
 
+    public function deleteDownload(Download $download): void
+    {
+        $this->deleteFile($download);
+
+        $this->downloadRepository->deleteDownload($download);
+    }
+
     public function getDirectory(): string
     {
         if (null === $this->directory) {
@@ -77,6 +85,21 @@ readonly class DownloadService
 
         if (false === file_put_contents($filename, $content)) {
             throw new Exception('Unable to create file');
+        }
+    }
+
+    private function deleteFile(Download $download): void
+    {
+        if (null === $download->getFile()) {
+            return;
+        }
+
+        $file = sprintf('%s/%s', $this->getDirectory(), $download->getFile());
+
+        $filesystem = new Filesystem();
+
+        if ($filesystem->exists($file)) {
+            $filesystem->remove($file);
         }
     }
 
