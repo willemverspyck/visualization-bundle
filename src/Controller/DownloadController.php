@@ -73,6 +73,23 @@ final class DownloadController extends AbstractController
         return $responseService->getResponseForList(data: $downloads, map: $downloadMap, groups: [self::GROUP_LIST]);
     }
 
+    /**
+     * @throws Exception
+     */
+    #[Route(path: '/api/download/{downloadId}/message', name: 'spyck_visualization_download_message', requirements: ['downloadId' => Requirement::DIGITS], methods: [Request::METHOD_GET])]
+    public function message(DownloadRepository $downloadRepository, DownloadService $downloadService, int $downloadId): Response
+    {
+        $download = $downloadRepository->getDownloadById($downloadId);
+
+        if (null === $download) {
+            throw $this->createNotFoundException('Download not found');
+        }
+
+        $downloadService->executeDownloadAsMessage($download);
+
+        return new Response();
+    }
+
     #[Route(path: '/api/download/widget/{widgetId}', name: 'spyck_visualization_download_widget', requirements: ['widgetId' => Requirement::DIGITS], methods: [Request::METHOD_POST])]
     #[Schema\BadRequest]
     #[Schema\Forbidden]
