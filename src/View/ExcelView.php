@@ -200,15 +200,29 @@ final class ExcelView extends AbstractView
     private function getColumnFormat(string $type, Config $config): ?string
     {
         return match ($type) {
-            FieldInterface::TYPE_CURRENCY => sprintf('€ #,##0%s', null === $config->getPrecision() || 0 === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
+            FieldInterface::TYPE_CURRENCY => sprintf('€ %s%s', $this->getNumber($config), $this->getPrecision($config)),
             FieldInterface::TYPE_DATE => NumberFormat::FORMAT_DATE_DDMMYYYY,
             FieldInterface::TYPE_DATETIME => sprintf('%s hh:mm:ss', NumberFormat::FORMAT_DATE_DDMMYYYY),
-            FieldInterface::TYPE_NUMBER => sprintf('#,##0%s', null === $config->getPrecision() || 0 === $config->getPrecision() ? '' : sprintf('.%s_-', str_repeat('0', $config->getPrecision()))),
-            FieldInterface::TYPE_PERCENTAGE => sprintf('0%s%%', null === $config->getPrecision() || 0 === $config->getPrecision() ? '' : sprintf('.%s', str_repeat('0', $config->getPrecision()))),
-            FieldInterface::TYPE_POSITION => sprintf('[Color 10]▲ #,##0;[Color 3]▼ #,##0'),
+            FieldInterface::TYPE_NUMBER => sprintf('%s%s', $this->getNumber($config), $this->getPrecision($config)),
+            FieldInterface::TYPE_PERCENTAGE => sprintf('0%s%%', $this->getPrecision($config)),
+            FieldInterface::TYPE_POSITION => sprintf('[Color 10]▲ %s;[Color 3]▼ %s', $this->getNumber($config), $this->getNumber($config)),
             FieldInterface::TYPE_TIME => 'hh:mm:ss',
             default => null,
         };
+    }
+
+    private function getNumber(Config $config): string
+    {
+        return $config->hasSeparator() ? '#,##0' : '0';
+    }
+
+    private function getPrecision(Config $config): string
+    {
+        if (null === $config->getPrecision() || 0 === $config->getPrecision()) {
+            return '';
+        }
+
+        return sprintf('.%s', str_repeat('0', $config->getPrecision()));
     }
 
     /**

@@ -26,6 +26,9 @@ final class Config
     private bool $merge = false;
 
     #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
+    private bool $separator = true;
+
+    #[Serializer\Groups(groups: [WidgetController::GROUP_ITEM])]
     private ?array $chart = null;
 
     /**
@@ -84,6 +87,18 @@ final class Config
     public function setMerge(bool $merge): static
     {
         $this->merge = $merge;
+
+        return $this;
+    }
+
+    public function hasSeparator(): bool
+    {
+        return $this->separator;
+    }
+
+    public function setSeparator(bool $separator): static
+    {
+        $this->separator = $separator;
 
         return $this;
     }

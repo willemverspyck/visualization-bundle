@@ -33,7 +33,7 @@ final class ViewUtility
 
         $number = round($value, $precision);
 
-        return number_format($number, $precision, ',', '.');
+        return number_format($number, $precision, ',', $config->hasSeparator() ? '.' : '');
     }
 
     public static function getClasses(AbstractFieldInterface $field, bool $group): array
