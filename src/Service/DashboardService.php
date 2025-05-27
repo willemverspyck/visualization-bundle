@@ -32,7 +32,7 @@ readonly class DashboardService
     {
         $user = $this->userService->getUserAsString();
 
-        $variables = $this->validateVariables($dashboardAsEntity, $variables);
+        $variables = $this->getVariables($dashboardAsEntity, $variables);
 
         $dashboardRoute = $this->getRoute($dashboardAsEntity, $variables);
 
@@ -47,8 +47,8 @@ readonly class DashboardService
             ->setParameters($this->getParameters($dashboardAsEntity, $variables))
             ->setParametersAsString($this->getParametersAsString($dashboardAsEntity, $variables))
             ->setParametersAsStringForSlug($this->getParametersAsString($dashboardAsEntity, $variables, true))
-            ->setViews($this->getViews($dashboardAsEntity))
-            ->setVariables($this->getVariables($dashboardAsEntity, $variables));
+            ->setVariables($variables)
+            ->setViews($this->getViews());
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
             $blockAsModel = $this->blockService->getBlockAsModel($block, $variables, $view, $preload);
@@ -155,20 +155,6 @@ readonly class DashboardService
         return $data;
     }
 
-    private function getViews(DashboardAsEntity $dashboardAsEntity): array
-    {
-        $data = [];
-
-        foreach ($this->viewService->getViews() as $name => $view) {
-            $data[] = [
-                'id' => $name,
-                'name' => $this->translator->trans(id: sprintf('view.%s.name', $name), domain: 'SpyckVisualizationBundle'),
-            ];
-        }
-
-        return $data;
-    }
-
     public function getRoute(DashboardAsEntity $dashboardAsEntity, array $variables = []): RouteAsModel
     {
         $variables['dashboardId'] = $dashboardAsEntity->getId();
@@ -180,28 +166,35 @@ readonly class DashboardService
             ->setUrl($this->router->generate('spyck_visualization_dashboard_show', $variables, UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
-    private function getVariables(DashboardAsEntity $dashboardAsEntity, array $variables): array
-    {
-        $data = $this->getParameters($dashboardAsEntity, $variables, true);
-
-        return array_merge($data, $variables);
-    }
-
     /**
      * Remove variables that are not part of the dashboard.
      *
      * @throws Exception
      */
-    private function validateVariables(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
+    public function getVariables(DashboardAsEntity $dashboardAsEntity, array $variables = [], bool $required = true): array
     {
         $data = [];
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
-            $widget = $this->widgetService->getWidgetByBlock($block, $variables);
+            $widget = $this->widgetService->getWidgetByBlock($block, $variables, $required);
 
             $data = array_replace($data, $widget->getParameterDataRequest(), $widget->getFilterDataRequest());
         }
 
         return array_intersect_key($variables, $data);
+    }
+
+    private function getViews(): array
+    {
+        $data = [];
+
+        foreach ($this->viewService->getViews() as $name => $view) {
+            $data[] = [
+                'id' => $name,
+                'name' => $this->translator->trans(id: sprintf('view.%s.name', $name), domain: 'SpyckVisualizationBundle'),
+            ];
+        }
+
+        return $data;
     }
 }

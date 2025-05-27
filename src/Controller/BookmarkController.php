@@ -54,15 +54,9 @@ final class BookmarkController extends AbstractController
             return $responseService->getResponseForItem();
         }
 
-        $errors = $dashboardService->getErrors($dashboard, $bookmarkAsPayload->getVariables());
-
-        if (count($errors) > 0) {
-            return new JsonResponse(null, Response::HTTP_BAD_REQUEST);
-        }
-
         $user = $userService->getUser();
         $name = $bookmarkAsPayload->getName();
-        $variables = $bookmarkAsPayload->getVariables();
+        $variables = $dashboardService->getVariables($dashboard, $bookmarkAsPayload->getVariables(), false);
 
         $bookmarkRepository->putBookmark(user: $user, dashboard: $dashboard, name: $name, variables: $variables);
 
