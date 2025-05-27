@@ -105,9 +105,9 @@ final class MailController extends AbstractController
             return $responseService->getResponseForItem();
         }
 
-        $requests = $dashboardService->validateParameters($dashboard, $mailAsPayload->getVariables());
+        $errors = $dashboardService->getErrors($dashboard, $mailAsPayload->getVariables());
 
-        if (null !== $requests) {
+        if (count($errors) > 0) {
             return new JsonResponse(null, Response::HTTP_BAD_REQUEST);
         }
 

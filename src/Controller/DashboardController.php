@@ -71,24 +71,26 @@ final class DashboardController extends AbstractController
 
         $variables = $request->query->all();
 
-        $requests = $dashboardService->validateParameters($dashboard, $variables);
+        $errors = $dashboardService->getErrors($dashboard, $variables);
 
-        if (null === $requests) {
-            $data = $dashboardService->getDashboardAsModel($dashboard, $variables);
+        if (count($errors) > 0) {
+            $dashboardAsModel = [
+                'id' => $dashboard->getId(),
+                'name' => $dashboard->getName(),
+                'description' => $dashboard->getDescription(),
+                'variables' => $variables,
+                'errors' => $errors,
+            ];
 
-            $user = $tokenStorage->getToken()?->getUser();
-
-            $logRepository->putLog(user: $user, dashboard: $dashboard, variables: $data->getVariables(), view: ViewInterface::JSON, type: Log::TYPE_API);
-
-            return $responseService->getResponseForItem(data: $data, groups: [self::GROUP_ITEM]);
+            return new JsonResponse($dashboardAsModel);
         }
 
-        $data = [
-            'error' => true,
-            'name' => $dashboard->getName(),
-            'requests' => $requests,
-        ];
+        $dashboardAsModel = $dashboardService->getDashboardAsModel($dashboard, $variables);
 
-        return new JsonResponse($data);
+        $user = $tokenStorage->getToken()?->getUser();
+
+        $logRepository->putLog(user: $user, dashboard: $dashboard, variables: $dashboardAsModel->getVariables(), view: ViewInterface::JSON, type: Log::TYPE_API);
+
+        return $responseService->getResponseForItem(data: $dashboardAsModel, groups: [self::GROUP_ITEM]);
     }
 }

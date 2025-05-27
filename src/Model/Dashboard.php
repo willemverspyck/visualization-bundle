@@ -44,8 +44,13 @@ final class Dashboard
      */
     #[OpenApi\Property(type: 'string')]
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
-    private array $downloads = [];
+    private array $views = [];
 
+    /**
+     * @todo: How to handle this in OpenApi
+     */
+    #[OpenApi\Property(type: 'string')]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $variables = [];
 
     /**
@@ -176,14 +181,14 @@ final class Dashboard
         return $this;
     }
 
-    public function getDownloads(): array
+    public function getViews(): array
     {
-        return $this->downloads;
+        return $this->views;
     }
 
-    public function setDownloads(array $downloads): static
+    public function setViews(array $views): static
     {
-        $this->downloads = $downloads;
+        $this->views = $views;
 
         return $this;
     }

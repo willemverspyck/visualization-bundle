@@ -47,7 +47,7 @@ readonly class DashboardService
             ->setParameters($this->getParameters($dashboardAsEntity, $variables))
             ->setParametersAsString($this->getParametersAsString($dashboardAsEntity, $variables))
             ->setParametersAsStringForSlug($this->getParametersAsString($dashboardAsEntity, $variables, true))
-            ->setDownloads($this->getDownloads($dashboardAsEntity, $variables))
+            ->setViews($this->getViews($dashboardAsEntity))
             ->setVariables($this->getVariables($dashboardAsEntity, $variables));
 
         foreach ($dashboardAsEntity->getBlocks() as $block) {
@@ -57,6 +57,34 @@ readonly class DashboardService
         }
 
         return $dashboardAsModel;
+    }
+
+    /**
+     * Check for missing dashboard parameters.
+     *
+     * @throws Exception
+     */
+    public function getErrors(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
+    {
+        $returnData = [];
+
+        $parameters = $this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables);
+
+        foreach ($parameters as $parameter) {
+            if ($parameter instanceof EntityParameterInterface) {
+                $data = $parameter->getData();
+
+                if (null === $data) {
+                    $returnData[] = [
+                        'url' => $this->router->generate($parameter->getRoute(), [], UrlGeneratorInterface::ABSOLUTE_URL),
+                        'variables' => $variables,
+                        'field' => $parameter->getField(),
+                    ];
+                }
+            }
+        }
+
+        return $returnData;
     }
 
     /**
@@ -127,39 +155,7 @@ readonly class DashboardService
         return $data;
     }
 
-    /**
-     * Check for missing dashboard parameters.
-     *
-     * @throws Exception
-     */
-    public function validateParameters(DashboardAsEntity $dashboardAsEntity, array $variables = []): ?array
-    {
-        $returnData = [];
-
-        $parameters = $this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables);
-
-        foreach ($parameters as $parameter) {
-            if ($parameter instanceof EntityParameterInterface) {
-                $data = $parameter->getData();
-
-                if (null === $data) {
-                    $returnData[] = [
-                        'url' => $this->router->generate($parameter->getRoute(), [], UrlGeneratorInterface::ABSOLUTE_URL),
-                        'variables' => $variables,
-                        'field' => $parameter->getField(),
-                    ];
-                }
-            }
-        }
-
-        if (0 === count($returnData)) {
-            return null;
-        }
-
-        return $returnData;
-    }
-
-    private function getDownloads(DashboardAsEntity $dashboardAsEntity, array $variables): array
+    private function getViews(DashboardAsEntity $dashboardAsEntity): array
     {
         $data = [];
 
@@ -170,19 +166,7 @@ readonly class DashboardService
             ];
         }
 
-        return [
-            'url' => $this->router->generate('spyck_visualization_mail_dashboard', [
-                'dashboardId' => $dashboardAsEntity->getId(),
-            ], UrlGeneratorInterface::ABSOLUTE_URL),
-            'fields' => [
-                'view' => [
-                    'name' => 'Format',
-                    'field' => 'view',
-                    'data' => $data,
-                ],
-            ],
-            'variables' => $variables,
-        ];
+        return $data;
     }
 
     public function getRoute(DashboardAsEntity $dashboardAsEntity, array $variables = []): RouteAsModel
