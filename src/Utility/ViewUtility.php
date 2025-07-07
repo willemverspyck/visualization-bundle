@@ -140,11 +140,15 @@ final class ViewUtility
         return $field->getParent()->getFormats();
     }
 
-    private static function getColorInterpolate(int $start, int $end, float $steps, float $count): int
+    private static function getColorInterpolate(int $start, int $end, float $steps, float $percentage): int
     {
-        $final = $start + (($end - $start) / $steps) * $count;
+        if (0.0 === $steps) {
+            return $start;
+        }
 
-        return (int) floor($final);
+        $data = $start + (($end - $start) / $steps) * $percentage;
+
+        return (int) $data;
     }
 
     private static function getPercentage(?Aggregate $aggregate, ScaleFormat $format, float $value): ?float
@@ -156,15 +160,25 @@ final class ViewUtility
         $valueMin = null === $format->getValueMin() ? $aggregate->getMin() : $format->getValueMin();
         $valueMax = null === $format->getValueMax() ? $aggregate->getMax() : $format->getValueMax();
 
-        $percentage = ($value - $valueMin) / ($valueMax - $valueMin);
+        $difference = $valueMax - $valueMin;
+
+        if (0.0 === $difference) {
+            return null;
+        }
+
+        $percentage = ($value - $valueMin) / $difference;
 
         return max(min($percentage, 1), 0);
     }
 
-    private static function getPercentageOfMidpoint(?Aggregate $aggregate, ScaleFormat $format): float
+    private static function getPercentageOfMidpoint(?Aggregate $aggregate, ScaleFormat $format): ?float
     {
         if (null === $format->getValue()) {
             if (ScaleFormat::TYPE_MEDIAN === $format->getType()) {
+                if (null === $aggregate || null === $aggregate->getMedian()) {
+                    return null;
+                }
+
                 return self::getPercentage($aggregate, $format, $aggregate->getMedian());
             }
 
@@ -198,6 +212,10 @@ final class ViewUtility
 
         if (null !== $color) {
             $percentageOfCenter = self::getPercentageOfMidpoint($aggregate, $format);
+
+            if (null === $percentageOfCenter) {
+                return null;
+            }
 
             if ($percentage < $percentageOfCenter) {
                 $colorStart = $colorMin;
