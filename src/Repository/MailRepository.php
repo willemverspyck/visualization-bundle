@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Mail;
@@ -16,7 +17,7 @@ class MailRepository extends AbstractRepository
         parent::__construct($managerRegistry, Mail::class);
     }
 
-    public function getMailById(): ?Mail
+    public function getMailById(int $id): ?Mail
     {
         return $this->createQueryBuilder('mail')
             ->innerJoin('mail.dashboard', 'dashboard')

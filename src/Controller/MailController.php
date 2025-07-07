@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
@@ -57,7 +58,7 @@ final class MailController extends AbstractController
             return $responseService->getResponseForItem();
         }
 
-        $users = $mail->getUsers();
+        $users = new ArrayCollection($mail->getUsers()->toArray());
 
         if ($users->contains($user)) {
             return $responseService->getResponseForItem();
@@ -67,7 +68,7 @@ final class MailController extends AbstractController
 
         $mailRepository->patchMail(mail: $mail, fields: ['users'], users: $users);
 
-        return $responseService->getResponseForItem();
+        return $responseService->getResponseForItem(data: $mail);
     }
 
     #[Route(path: '/api/mail/{mailId}', name: 'spyck_visualization_mail_subscribe', requirements: ['mailId' => Requirement::DIGITS], methods: [Request::METHOD_DELETE])]
@@ -85,12 +86,12 @@ final class MailController extends AbstractController
             return $responseService->getResponseForItem();
         }
 
-        $users = $mail->getUsers();
+        $users = new ArrayCollection($mail->getUsers()->toArray());
         $users->removeElement($user);
 
         $mailRepository->patchMail(mail: $mail, fields: ['users'], users: $users);
 
-        return $responseService->getResponseForItem();
+        return $responseService->getResponseForItem(data: $mail);
     }
 
     /**
