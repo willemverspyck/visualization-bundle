@@ -202,10 +202,6 @@ final class ViewUtility
         $colorMin = $format->getColorMin();
         $colorMax = $format->getColorMax();
 
-        if (null === $colorMin || null === $colorMax) {
-            return null;
-        }
-
         $colorStart = $colorMin;
         $colorEnd = $colorMax;
         $step = 1;
@@ -218,12 +214,10 @@ final class ViewUtility
             }
 
             if ($percentage < $percentageOfCenter) {
-                $colorStart = $colorMin;
                 $colorEnd = $color;
                 $step = $percentageOfCenter;
             } else {
                 $colorStart = $color;
-                $colorEnd = $colorMax;
                 $step = 1 - $percentageOfCenter;
                 $percentage = $percentage - $percentageOfCenter;
             }
