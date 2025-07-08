@@ -66,11 +66,7 @@ class MailRepository extends AbstractRepository
     public function patchMail(Mail $mail, array $fields, ?ArrayCollection $users = null): void
     {
         if (in_array('users', $fields, true) && null !== $users) {
-            $mail->clearUsers();
-
-            foreach ($users as $user) {
-                $mail->addUser($user);
-            }
+            $this->patchCollection($mail->getUsers(), $users);
         }
 
         $this->getEntityManager()->persist($mail);
