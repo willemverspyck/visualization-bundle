@@ -54,7 +54,7 @@ final class MailController extends AbstractController
 
         $mail = $mailRepository->getMailById($mailId);
 
-        if (null === $mail) {
+        if (null === $mail || false === $mail->isSubscribe()) {
             return $responseService->getResponseForItem();
         }
 
@@ -82,7 +82,7 @@ final class MailController extends AbstractController
 
         $mail = $mailRepository->getMailById($mailId);
 
-        if (null === $mail) {
+        if (null === $mail || false === $mail->isSubscribe()) {
             return $responseService->getResponseForItem();
         }
 

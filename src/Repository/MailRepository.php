@@ -6,27 +6,23 @@ namespace Spyck\VisualizationBundle\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Entity\ScheduleInterface;
+use Spyck\VisualizationBundle\Service\UserService;
 
 class MailRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(ManagerRegistry $managerRegistry, private readonly UserService $userService)
     {
         parent::__construct($managerRegistry, Mail::class);
     }
 
     public function getMailById(int $id): ?Mail
     {
-        return $this->createQueryBuilder('mail')
-            ->innerJoin('mail.dashboard', 'dashboard')
-            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
-            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->leftJoin('mail.users', 'user')
-            ->where('mail.id = :id')
-            ->andWhere('mail.active = TRUE')
-            ->andWhere('mail.subscribe = TRUE')
+        return $this->getMailAsQueryBuilder(true)
+            ->andWhere('mail.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();
@@ -37,13 +33,8 @@ class MailRepository extends AbstractRepository
      */
     public function getMailsBySchedule(ScheduleInterface $schedule): array
     {
-        return $this->createQueryBuilder('mail')
+        return $this->getMailAsQueryBuilder(false)
             ->innerJoin('mail.schedules', 'schedule', Join::WITH, 'schedule = :schedule')
-            ->innerJoin('mail.dashboard', 'dashboard')
-            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
-            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->innerJoin('mail.users', 'user')
-            ->where('mail.active = TRUE')
             ->setParameter('schedule', $schedule)
             ->getQuery()
             ->getResult();
@@ -51,16 +42,33 @@ class MailRepository extends AbstractRepository
 
     public function getMailsBySubscribe(bool $subscribe): array
     {
-        return $this->createQueryBuilder('mail')
-            ->innerJoin('mail.dashboard', 'dashboard')
-            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
-            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->leftJoin('mail.users', 'user')
-            ->where('mail.active = TRUE')
+        return $this->getMailAsQueryBuilder(true)
             ->andWhere('mail.subscribe = :subscribe')
             ->setParameter('subscribe', $subscribe)
             ->getQuery()
             ->getResult();
+    }
+
+    private function getMailAsQueryBuilder(bool $authentication): QueryBuilder
+    {
+        $queryBuilder = $this->createQueryBuilder('mail')
+            ->innerJoin('mail.dashboard', 'dashboard')
+            ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
+            ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
+            ->leftJoin('mail.users', 'user')
+            ->where('mail.active = TRUE');
+
+        if ($authentication) {
+            $user = $this->userService->getUser();
+
+            if (null !== $user) {
+                $queryBuilder
+                    ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
+                    ->setParameter('groups', $user->getGroups());
+            }
+        }
+
+        return $queryBuilder;
     }
 
     public function patchMail(Mail $mail, array $fields, ?ArrayCollection $users = null): void
