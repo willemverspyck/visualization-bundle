@@ -164,6 +164,10 @@ final class ExcelView extends AbstractView
                 $columnDimension->setAutoSize(true);
             }
 
+            if ($context instanceof ExcelContext && false === $context->isVisible()) {
+                $columnDimension->setVisible(false);
+            }
+
             $style = $sheet->getStyle([$index + 1, 2, $index + 1, $count + 1]);
 
             $this->setFieldStyle($style, $field);
