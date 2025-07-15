@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Service;
 use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Entity\ScheduleInterface;
 use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Event\CacheForDashboardEvent;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Repository\MailRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -17,10 +18,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 readonly class MailService
 {
-    public function __construct(private BodyRendererInterface $bodyRenderer, private MailRepository $mailRepository, private MessageBusInterface $messageBus, private MailerInterface $mailer, #[Autowire(param: 'spyck.visualization.config.mail.fromEmail')] private string $fromEmail, #[Autowire(param: 'spyck.visualization.config.mail.fromName')] private string $fromName)
+    public function __construct(private BodyRendererInterface $bodyRenderer, private EventDispatcherInterface $eventDispatcher, private MailRepository $mailRepository, private MessageBusInterface $messageBus, private MailerInterface $mailer, #[Autowire(param: 'spyck.visualization.config.mail.fromEmail')] private string $fromEmail, #[Autowire(param: 'spyck.visualization.config.mail.fromName')] private string $fromName)
     {
     }
 
@@ -73,6 +75,12 @@ readonly class MailService
         $mails = $this->mailRepository->getMailsBySchedule($schedule);
 
         foreach ($mails as $mail) {
+            if ($mail->isCache()) {
+                $cacheForDashboardEvent = new CacheForDashboardEvent($mail->getDashboard());
+
+                $this->eventDispatcher->dispatch($cacheForDashboardEvent);
+            }
+
             foreach ($mail->getUsers() as $user) {
                 $this->executeMailAsMessage($mail, $user, $parameters);
             }

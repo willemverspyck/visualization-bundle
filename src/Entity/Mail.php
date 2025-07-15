@@ -45,6 +45,9 @@ class Mail implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'view', type: Types::STRING, length: 8, nullable: true)]
     private ?string $view = null;
 
+    #[Doctrine\Column(name: 'cache', type: Types::BOOLEAN)]
+    private bool $cache;
+
     #[Doctrine\Column(name: 'route', type: Types::BOOLEAN)]
     private bool $route;
 
@@ -84,6 +87,7 @@ class Mail implements Stringable, TimestampInterface
         $this->users = new ArrayCollection();
 
         $this->setRoute(true);
+        $this->setCache(true);
     }
 
     public function getId(): ?int
@@ -159,6 +163,18 @@ class Mail implements Stringable, TimestampInterface
     public function setView(?string $view): static
     {
         $this->view = $view;
+
+        return $this;
+    }
+
+    public function isCache(): bool
+    {
+        return $this->cache;
+    }
+
+    public function setCache(bool $cache): static
+    {
+        $this->cache = $cache;
 
         return $this;
     }
