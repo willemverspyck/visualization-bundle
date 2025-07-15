@@ -11,9 +11,9 @@ use Spyck\VisualizationBundle\Event\DownloadEvent;
 use Spyck\VisualizationBundle\Message\DownloadMessage;
 use Spyck\VisualizationBundle\Repository\DownloadRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 readonly class DownloadService
 {
