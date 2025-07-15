@@ -44,11 +44,8 @@ final class DashboardController extends AbstractController
             throw $this->createNotFoundException('The dashboard does not exist');
         }
 
-        $parameters = $request->query->all();
-        $parameters['dashboardId'] = $dashboard->getId();
-
         return $this->render('@SpyckVisualization/dashboard/index.html.twig', [
-            'parameters' => $parameters,
+            'dashboard' => $dashboard,
         ]);
     }
 
