@@ -76,16 +76,14 @@ class DashboardRepository extends AbstractRepository
             ->orderBy('dashboard.timestampCreated', 'DESC')
             ->addOrderBy('block.position');
 
-        if ($authentication) {
-            $user = $this->userService->getUser();
+        $user = $this->userService->getUser();
 
-            if (null !== $user) {
-                $queryBuilder
-                    ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
-                    ->setParameter('groups', $user->getGroups());
-            }
+        if (null === $user) {
+            return $queryBuilder;
         }
 
-        return $queryBuilder;
+        return $queryBuilder
+            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
+            ->setParameter('groups', $user->getGroups());
     }
 }

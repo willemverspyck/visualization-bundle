@@ -43,7 +43,7 @@ final class CacheForDashboardEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $dashboard = $this->dashboardRepository->getDashboardById($event->getDashboard()->getId());
+        $dashboard = $this->dashboardRepository->getDashboardById($event->getDashboard()->getId(), false);
 
         foreach ($dashboard->getBlocks() as $block) {
             $this->cache->invalidateTags([
