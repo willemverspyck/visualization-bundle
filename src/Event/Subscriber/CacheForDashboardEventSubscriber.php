@@ -8,7 +8,6 @@ use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Spyck\VisualizationBundle\Event\CacheForDashboardEvent;
-use Spyck\VisualizationBundle\Repository\DashboardRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,7 +17,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 #[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
 final class CacheForDashboardEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private readonly CacheInterface $cache, private readonly DashboardRepository $dashboardRepository, private readonly LoggerInterface $logger)
+    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private readonly CacheInterface $cache, private readonly LoggerInterface $logger)
     {
     }
 
@@ -43,9 +42,7 @@ final class CacheForDashboardEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $dashboard = $this->dashboardRepository->getDashboardById($event->getDashboard()->getId(), false);
-
-        foreach ($dashboard->getBlocks() as $block) {
+        foreach ($event->getDashboard()->getBlocks() as $block) {
             $this->cache->invalidateTags([
                 sprintf('spyck_visualization_widget_%s', $block->getWidget()->getId()),
             ]);
