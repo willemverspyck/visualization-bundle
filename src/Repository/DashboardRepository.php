@@ -76,6 +76,10 @@ class DashboardRepository extends AbstractRepository
             ->orderBy('dashboard.timestampCreated', 'DESC')
             ->addOrderBy('block.position');
 
+        if (false === $authentication) {
+            return $queryBuilder;
+        }
+
         $user = $this->userService->getUser();
 
         if (null === $user) {

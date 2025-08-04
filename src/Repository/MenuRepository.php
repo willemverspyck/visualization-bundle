@@ -45,12 +45,14 @@ class MenuRepository extends AbstractRepository
             ->orderBy('menu.position')
             ->addOrderBy('menuChildren.position');
 
-        if (null !== $user) {
-            $queryBuilder
-                ->setParameter('groups', $user->getGroups());
+        if (null === $user) {
+            return $queryBuilder
+                ->getQuery()
+                ->getResult();
         }
 
         return $queryBuilder
+            ->setParameter('groups', $user->getGroups())
             ->getQuery()
             ->getResult();
     }
@@ -98,11 +100,11 @@ class MenuRepository extends AbstractRepository
             ->innerJoin(sprintf('block_%s.widget', $index), sprintf('widget_%s', $index), Join::WITH, sprintf('widget_%s.active = TRUE', $index))
             ->groupBy(sprintf('dashboard_%s', $index));
 
-        if (null !== $user) {
-            $queryBuilder
-                ->innerJoin(sprintf('widget_%s.group', $index), sprintf('group_%s', $index), Join::WITH, sprintf('group_%s IN (:groups) AND group_%s.active = TRUE', $index, $index));
+        if (null === $user) {
+            return $queryBuilder;
         }
 
-        return $queryBuilder;
+        return $queryBuilder
+            ->innerJoin(sprintf('widget_%s.group', $index), sprintf('group_%s', $index), Join::WITH, sprintf('group_%s IN (:groups) AND group_%s.active = TRUE', $index, $index));
     }
 }

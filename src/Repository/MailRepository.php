@@ -58,17 +58,19 @@ class MailRepository extends AbstractRepository
             ->leftJoin('mail.users', 'user')
             ->where('mail.active = TRUE');
 
-        if ($authentication) {
-            $user = $this->userService->getUser();
-
-            if (null !== $user) {
-                $queryBuilder
-                    ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
-                    ->setParameter('groups', $user->getGroups());
-            }
+        if (false === $authentication) {
+            return $queryBuilder;
         }
 
-        return $queryBuilder;
+        $user = $this->userService->getUser();
+
+        if (null === $user) {
+            return $queryBuilder;
+        }
+
+        return $queryBuilder
+            ->innerJoin('widget.group', 'groupRequired', Join::WITH, 'groupRequired IN (:groups) AND groupRequired.active = TRUE')
+            ->setParameter('groups', $user->getGroups());
     }
 
     public function patchMail(Mail $mail, array $fields, ?ArrayCollection $users = null): void
