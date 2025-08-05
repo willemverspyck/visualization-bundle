@@ -9,18 +9,20 @@ use Exception;
 use Psr\Cache\InvalidArgumentException;
 use ReflectionClass;
 use Spyck\VisualizationBundle\Entity\Dashboard as DashboardAsEntity;
+use Spyck\VisualizationBundle\Event\DashboardEvent;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Model\Route as RouteAsModel;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class DashboardService
 {
-    public function __construct(private BlockService $blockService, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private WidgetService $widgetService, private ViewService $viewService)
+    public function __construct(private BlockService $blockService, private EventDispatcherInterface $eventDispatcher, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private WidgetService $widgetService, private ViewService $viewService)
     {
     }
 
@@ -55,6 +57,10 @@ readonly class DashboardService
 
             $dashboardAsModel->addBlock($blockAsModel);
         }
+
+        $dashboardEvent = new DashboardEvent($dashboardAsModel);
+
+        $this->eventDispatcher->dispatch($dashboardEvent);
 
         return $dashboardAsModel;
     }

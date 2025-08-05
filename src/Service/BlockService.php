@@ -8,6 +8,7 @@ use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Entity\Block as BlockAsEntity;
 use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
+use Spyck\VisualizationBundle\Event\BlockEvent;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
 use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
@@ -15,13 +16,14 @@ use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
 use Spyck\VisualizationBundle\Model\Filter as FilterAsModel;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class BlockService
 {
-    public function __construct(private RouterInterface $router, private RepositoryService $repositoryService, private TranslatorInterface $translator, private WidgetService $widgetService, private ViewService $viewService)
+    public function __construct(private EventDispatcherInterface $eventDispatcher, private RouterInterface $router, private RepositoryService $repositoryService, private TranslatorInterface $translator, private WidgetService $widgetService, private ViewService $viewService)
     {
     }
 
@@ -54,6 +56,10 @@ readonly class BlockService
         $blockAsModel->setCharts($this->getCharts($blockAsEntity, $widgetAsEntity));
         $blockAsModel->setFilter($blockAsEntity->hasFilter());
         $blockAsModel->setFilterView($blockAsEntity->hasFilterView());
+
+        $blockEvent = new BlockEvent($blockAsModel);
+
+        $this->eventDispatcher->dispatch($blockEvent);
 
         return $blockAsModel;
     }

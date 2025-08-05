@@ -19,6 +19,7 @@ use Spyck\VisualizationBundle\Callback\Callback;
 use Spyck\VisualizationBundle\Entity\Block as BlockAsEntity;
 use Spyck\VisualizationBundle\Entity\Dashboard as DashboardAsEntity;
 use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
+use Spyck\VisualizationBundle\Event\WidgetEvent;
 use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Field\AbstractFieldInterface;
 use Spyck\VisualizationBundle\Field\Field;
@@ -59,6 +60,7 @@ use Stringable;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -75,7 +77,7 @@ readonly class WidgetService
     /**
      * @param Countable&IteratorAggregate $widgets
      */
-    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.config.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.config.request')] private array $request, #[AutowireIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
+    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly EventDispatcherInterface $eventDispatcher, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.config.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.config.request')] private array $request, #[AutowireIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
     {
     }
 
@@ -229,6 +231,10 @@ readonly class WidgetService
         $widgetAsModel->setParameters($this->getParameters($widget));
         $widgetAsModel->setFilters($this->getFilters($widget));
         $widgetAsModel->setPagination($this->getPagination($widget, $total, $totalIncluded));
+
+        $widgetEvent = new WidgetEvent($widgetAsModel);
+
+        $this->eventDispatcher->dispatch($widgetEvent);
 
         return $widgetAsModel;
     }
