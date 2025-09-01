@@ -8,7 +8,7 @@ abstract class AbstractEntityParameter extends AbstractParameter implements Enti
 {
     private ?int $data = null;
     private ?object $dataAsObject = null;
-    private bool $request;
+    private bool $request = false;
 
     public function getData(): ?int
     {
