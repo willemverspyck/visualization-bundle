@@ -10,6 +10,7 @@ use Psr\Cache\InvalidArgumentException;
 use ReflectionClass;
 use Spyck\VisualizationBundle\Entity\Dashboard as DashboardAsEntity;
 use Spyck\VisualizationBundle\Event\DashboardEvent;
+use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Model\Route as RouteAsModel;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
@@ -69,34 +70,32 @@ readonly class DashboardService
      * Check for missing dashboard parameters.
      *
      * @throws Exception
+     * @throws ParameterException
      */
     public function getErrors(DashboardAsEntity $dashboardAsEntity, array $variables = []): array
     {
-        $returnData = [];
+        $data = [];
 
         $parameters = $this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables);
 
         foreach ($parameters as $parameter) {
-            if ($parameter instanceof EntityParameterInterface) {
-                $data = $parameter->getData();
-
-                if (null === $data) {
-                    $returnData[] = [
-                        'url' => $this->router->generate($parameter->getRoute(), [], UrlGeneratorInterface::ABSOLUTE_URL),
-                        'variables' => $variables,
-                        'field' => $parameter->getField(),
-                    ];
-                }
+            if (null === $parameter->getDataAsString()) {
+                $data[] = [
+                    'url' => $this->router->generate($parameter->getRoute(), [], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'variables' => $variables,
+                    'field' => $parameter->getField(),
+                ];
             }
         }
 
-        return $returnData;
+        return $data;
     }
 
     /**
      * @return array<string, string>
      *
      * @throws Exception
+     * @throws ParameterException
      */
     public function getParameters(DashboardAsEntity $dashboardAsEntity, array $variables, bool $field = false): array
     {
@@ -124,9 +123,28 @@ readonly class DashboardService
     }
 
     /**
+     * @throws ParameterException
+     */
+    public function getParametersAsArray(DashboardAsEntity $dashboard, array $variables = []): array
+    {
+        $data = [];
+
+        $parameters = $this->widgetService->getParametersByDashboard($dashboard, $variables);
+
+        foreach ($parameters as $parameter) {
+            if ($parameter instanceof ParameterInterface && null === $parameter->getDataAsString()) {
+                $data[] = $parameter::getField();
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * @return array<string, string>
      *
      * @throws Exception
+     * @throws ParameterException
      */
     public function getParametersAsString(DashboardAsEntity $dashboardAsEntity, array $variables, bool $slug = false): array
     {
@@ -190,6 +208,9 @@ readonly class DashboardService
         return array_intersect_key($variables, $data);
     }
 
+    /**
+     * @throws Exception
+     */
     private function getViews(): array
     {
         $data = [];
