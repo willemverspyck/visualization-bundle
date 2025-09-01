@@ -15,8 +15,6 @@ final class MailNormalizer extends AbstractNormalizer
 
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $this->setNormalized($data, $context);
-
         $user = $this->tokenStorage->getToken()?->getUser();
 
         $normalize = $this->normalizer->normalize($data, $format, $context);
@@ -27,17 +25,13 @@ final class MailNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if ($this->hasNormalized($data, $context)) {
-            return false;
-        }
-
         return $data instanceof Mail;
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            Mail::class => false,
+            Mail::class => true,
         ];
     }
 }

@@ -15,8 +15,6 @@ final class MenuNormalizer extends AbstractNormalizer
 
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $this->setNormalized($data, $context);
-
         $normalize = $this->normalizer->normalize($data, $format, $context);
         $normalize['dashboard'] = null;
 
@@ -37,17 +35,13 @@ final class MenuNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if ($this->hasNormalized($data, $context)) {
-            return false;
-        }
-
         return $data instanceof Menu;
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            Menu::class => false,
+            Menu::class => true,
         ];
     }
 }

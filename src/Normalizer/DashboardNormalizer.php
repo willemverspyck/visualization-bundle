@@ -26,7 +26,7 @@ final class DashboardNormalizer extends AbstractNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [
-            Dashboard::class => false,
+            Dashboard::class => true,
         ];
     }
 }

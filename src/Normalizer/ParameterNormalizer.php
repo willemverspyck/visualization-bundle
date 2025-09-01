@@ -28,7 +28,7 @@ final class ParameterNormalizer extends AbstractNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [
-            EntityParameterInterface::class => false,
+            EntityParameterInterface::class => true,
         ];
     }
 }
