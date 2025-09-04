@@ -4,17 +4,32 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Normalizer;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Contracts\Service\Attribute\Required;
 
-abstract class AbstractNormalizer implements NormalizerInterface
+abstract class AbstractNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
-    protected NormalizerInterface $normalizer;
+    use NormalizerAwareTrait;
 
-    #[Required]
-    public function setNormalizer(#[Autowire(service: 'serializer.normalizer.object')] NormalizerInterface $normalizer)
+    private array $normalized = [];
+
+    protected function isNormalized(mixed $data): bool
     {
-        $this->normalizer = $normalizer;
+        if (false === is_object($data)) {
+            return false;
+        }
+
+        return in_array($this->getKey($data), $this->normalized, true);
+    }
+
+    protected function setNormalized(mixed $data): void
+    {
+        $this->normalized[] = $this->getKey($data);
+    }
+
+    protected function getKey(object $object): string
+    {
+        return sprintf('%s_%s', spl_object_hash($this), spl_object_hash($object));
     }
 }

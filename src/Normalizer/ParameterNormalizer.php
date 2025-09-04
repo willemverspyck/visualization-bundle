@@ -11,6 +11,8 @@ final class ParameterNormalizer extends AbstractNormalizer
 {
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
+        $this->setNormalized($data);
+
         $group = $data->getGroup();
 
         if (null !== $group) {
@@ -22,13 +24,17 @@ final class ParameterNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
+        if ($this->isNormalized($data)) {
+            return false;
+        }
+
         return $data instanceof EntityParameterInterface;
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            EntityParameterInterface::class => true,
+            EntityParameterInterface::class => false,
         ];
     }
 }

@@ -15,6 +15,8 @@ final class BookmarkNormalizer extends AbstractNormalizer
 
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
+        $this->setNormalized($data);
+
         $name = 'spyck_visualization_dashboard_show';
         $parameters = [
             'dashboardId' => $data->getDashboard()->getId(),
@@ -29,13 +31,17 @@ final class BookmarkNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
+        if ($this->isNormalized($data)) {
+            return false;
+        }
+
         return $data instanceof Bookmark;
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            Bookmark::class => true,
+            Bookmark::class => false,
         ];
     }
 }

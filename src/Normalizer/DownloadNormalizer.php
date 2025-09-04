@@ -16,6 +16,8 @@ final class DownloadNormalizer extends AbstractNormalizer
 
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
+        $this->setNormalized($data);
+
         $name = 'spyck_visualization_download_item';
         $parameters = [
             'downloadId' => $data->getId(),
@@ -29,13 +31,17 @@ final class DownloadNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
+        if ($this->isNormalized($data)) {
+            return false;
+        }
+
         return $data instanceof Download;
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            Download::class => true,
+            Download::class => false,
         ];
     }
 }
