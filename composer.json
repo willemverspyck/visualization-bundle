@@ -21,7 +21,7 @@
     "homepage": "https://github.com/willemverspyck/visualization-bundle",
     "type": "library",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "doctrine/collections": "^2",
         "doctrine/doctrine-bundle": "^2",
         "doctrine/orm": "^2|^3",
