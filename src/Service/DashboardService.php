@@ -83,7 +83,7 @@ readonly class DashboardService
                 $data[] = [
                     'url' => $this->router->generate($parameter->getRoute(), [], UrlGeneratorInterface::ABSOLUTE_URL),
                     'variables' => $variables,
-                    'field' => $parameter->getField(),
+                    'field' => $parameter::getField(),
                 ];
             }
         }
@@ -97,18 +97,12 @@ readonly class DashboardService
      * @throws Exception
      * @throws ParameterException
      */
-    public function getParameters(DashboardAsEntity $dashboardAsEntity, array $variables, bool $field = false): array
+    public function getParameters(DashboardAsEntity $dashboardAsEntity, array $variables): array
     {
         $data = [];
 
         foreach ($this->widgetService->getParametersByDashboard($dashboardAsEntity, $variables, true) as $parameter) {
-            if ($field) {
-                $name = $parameter::getField();
-            } else {
-                $reflectionClass = new ReflectionClass($parameter);
-
-                $name = $reflectionClass->getShortName();
-            }
+            $name = new ReflectionClass($parameter)->getShortName();
 
             if ($parameter instanceof DateParameterInterface) {
                 $data[$name] = $parameter->getDataForRequest();

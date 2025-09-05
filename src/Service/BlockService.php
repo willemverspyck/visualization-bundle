@@ -167,7 +167,6 @@ readonly class BlockService
             $parameterAsModel = new ParameterAsModel();
             $parameterAsModel->setName($this->translator->trans(id: sprintf('parameter.%s.description', $parameter::getName()), domain: 'SpyckVisualizationBundle'));
             $parameterAsModel->setField($parameter::getField());
-            $parameterAsModel->setData($parameter->getDataAsString());
 
             $data[] = $parameterAsModel;
         }
