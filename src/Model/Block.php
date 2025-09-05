@@ -36,7 +36,7 @@ final class Block
      */
     #[OpenApi\Property(type: 'array', items: new OpenApi\Items(type: 'string'))]
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
-    private array $parameters = [];
+    private array $variables = [];
 
     /**
      * @var array<int, Filter>
@@ -44,6 +44,13 @@ final class Block
     #[OpenApi\Property(type: 'array', items: new OpenApi\Items(ref: new Model(type: Filter::class)))]
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $filters = [];
+
+    /**
+     * @var array<int, Parameter>
+     */
+    #[OpenApi\Property(type: 'array', items: new OpenApi\Items(ref: new Model(type: Parameter::class)))]
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
+    private array $parameters = [];
 
     /**
      * @todo: Can be replaced with object
@@ -149,14 +156,14 @@ final class Block
         return $this;
     }
 
-    public function getParameters(): array
+    public function getVariables(): array
     {
-        return $this->parameters;
+        return $this->variables;
     }
 
-    public function setParameters(array $parameters): static
+    public function setVariables(array $variables): static
     {
-        $this->parameters = $parameters;
+        $this->variables = $variables;
 
         return $this;
     }
@@ -172,6 +179,21 @@ final class Block
     public function setFilters(array $filters): static
     {
         $this->filters = $filters;
+
+        return $this;
+    }
+
+    /**
+     * @return array<int, Parameter>
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
+    public function setParameters(array $parameters): static
+    {
+        $this->parameters = $parameters;
 
         return $this;
     }

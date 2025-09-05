@@ -16,6 +16,9 @@ final class Route
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM, MenuController::GROUP_LIST])]
     private string $url;
 
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM, MenuController::GROUP_LIST])]
+    private array $variables;
+
     public function getName(): string
     {
         return $this->name;
@@ -38,5 +41,26 @@ final class Route
         $this->url = $url;
 
         return $this;
+    }
+
+    public function getVariables(): array
+    {
+        return $this->variables;
+    }
+
+    public function setVariables(array $variables): static
+    {
+        $this->variables = $variables;
+
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->getName(),
+            'url' => $this->getUrl(),
+            'variables' => $this->getVariables(),
+        ];
     }
 }

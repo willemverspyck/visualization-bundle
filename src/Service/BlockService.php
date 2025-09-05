@@ -14,6 +14,7 @@ use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\OptionFilterInterface;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
 use Spyck\VisualizationBundle\Model\Filter as FilterAsModel;
+use Spyck\VisualizationBundle\Model\Parameter as ParameterAsModel;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -49,8 +50,9 @@ readonly class BlockService
         $blockAsModel->setDescription(null !== $blockAsEntity->getDescription() ? $blockAsEntity->getDescription() : $widgetAsEntity->getDescription());
         $blockAsModel->setDescriptionEmpty($widgetAsEntity->getDescriptionEmpty());
         $blockAsModel->setSize($blockAsEntity->getSize());
-        $blockAsModel->setFilters($this->getBlockFilter($widget));
+        $blockAsModel->setFilters($this->getBlockFilters($widget));
         $blockAsModel->setParameters($this->getBlockParameters($widget));
+        $blockAsModel->setVariables($this->getBlockVariables($widget));
         $blockAsModel->setDownloads($this->getDownloads($blockAsEntity));
         $blockAsModel->setUrl($this->getBlockUrl($blockAsEntity, ViewInterface::JSON));
         $blockAsModel->setCharts($this->getCharts($blockAsEntity, $widgetAsEntity));
@@ -80,7 +82,7 @@ readonly class BlockService
     /**
      * Get filters of the widget.
      */
-    private function getBlockFilter(WidgetInterface $widget): array
+    private function getBlockFilters(WidgetInterface $widget): array
     {
         $data = [];
 
@@ -155,6 +157,25 @@ readonly class BlockService
     }
 
     /**
+     * Get filters of the widget.
+     */
+    private function getBlockParameters(WidgetInterface $widget): array
+    {
+        $data = [];
+
+        foreach ($widget->getParameterData() as $parameter) {
+            $parameterAsModel = new ParameterAsModel();
+            $parameterAsModel->setName($this->translator->trans(id: sprintf('parameter.%s.description', $parameter::getName()), domain: 'SpyckVisualizationBundle'));
+            $parameterAsModel->setField($parameter::getField());
+            $parameterAsModel->setData($parameter->getDataAsString());
+
+            $data[] = $parameterAsModel;
+        }
+
+        return $data;
+    }
+
+    /**
      * Get url of the widget.
      */
     private function getBlockUrl(BlockAsEntity $blockAsEntity, string $format): string
@@ -172,7 +193,7 @@ readonly class BlockService
     /**
      * Get url of the widget.
      */
-    private function getBlockParameters(WidgetInterface $widget): array
+    private function getBlockVariables(WidgetInterface $widget): array
     {
         return array_merge($widget->getParameterDataRequest(), $widget->getFilterDataRequest());
     }
