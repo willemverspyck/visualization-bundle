@@ -9,7 +9,7 @@ final class RouteForDashboard implements RouteInterface
     private ?string $name = null;
     private string $code;
     private ?string $url = null;
-    private array $parameters = [];
+    private array $variables = [];
     private array $data;
 
     public function __construct(string $code, array $data)
@@ -54,14 +54,14 @@ final class RouteForDashboard implements RouteInterface
         return $this;
     }
 
-    public function getParameters(): array
+    public function getVariables(): array
     {
-        return $this->parameters;
+        return $this->variables;
     }
 
-    public function setParameters(array $parameters): static
+    public function setVariables(array $variables): static
     {
-        $this->parameters = $parameters;
+        $this->variables = $variables;
 
         return $this;
     }

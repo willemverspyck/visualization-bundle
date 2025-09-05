@@ -418,22 +418,24 @@ readonly class WidgetService
             'dashboardId' => $dashboard->getId(),
         ], UrlGeneratorInterface::ABSOLUTE_URL));
 
-        $parameters = [];
-        $parametersForDashboard = $this->getParametersByDashboard($dashboard);
+        $variables = [];
 
         $fields = $route->getData();
 
         $request = $this->requestStack->getCurrentRequest();
 
-        foreach ($parametersForDashboard as $parameter) {
-            if ($parameter instanceof EntityParameterInterface) {
-                $name = $parameter->getName();
+        $parameters = $this->getParametersByDashboard($dashboard);
 
-                $parameters[$parameter->getField()] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request?->get($parameter->getField());
+        foreach ($parameters as $parameter) {
+            if ($parameter instanceof EntityParameterInterface) {
+                $name = $parameter::getName();
+                $field = $parameter::getField();
+
+                $variables[$field] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request?->get($field);
             }
         }
 
-        $route->setParameters($parameters);
+        $route->setVariables($variables);
     }
 
     /**
@@ -778,12 +780,14 @@ readonly class WidgetService
         $content = [];
 
         foreach ($field->getRoutes() as $route) {
-            $url = $this->getUrl($route, $data);
+            $url = $this->getRouteUrl($route);
+            $variables = $this->getRouteVariables($route, $data);
 
-            if (null !== $url) {
+            if (null !== $url && null !== $variables) {
                 $content[] = [
                     'name' => $route->getName(),
                     'url' => $url,
+                    'variables' => $variables,
                 ];
             }
         }
@@ -794,7 +798,19 @@ readonly class WidgetService
     /**
      * @throws Exception
      */
-    private function getUrl(RouteInterface $route, array $data): ?string
+    private function getRouteUrl(RouteInterface $route): ?string
+    {
+        if (null === $route->getName() || null === $route->getUrl()) {
+            return null;
+        }
+
+        return $route->getUrl();
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getRouteVariables(RouteInterface $route, array $data): ?array
     {
         if (null === $route->getName() || null === $route->getUrl()) {
             return null;
@@ -802,7 +818,7 @@ readonly class WidgetService
 
         $query = [];
 
-        $parameters = $route->getParameters();
+        $parameters = $route->getVariables();
 
         foreach ($parameters as $name => $value) {
             if (null === $value) {
@@ -826,9 +842,7 @@ readonly class WidgetService
             $query[$name] = $value;
         }
 
-        $url = $route->getUrl();
-
-        return sprintf('%s?%s', $url, http_build_query($query));
+        return $query;
     }
 
     /**

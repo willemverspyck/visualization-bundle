@@ -10,5 +10,5 @@ interface RouteInterface
 
     public function getUrl(): ?string;
 
-    public function getParameters(): array;
+    public function getVariables(): array;
 }
