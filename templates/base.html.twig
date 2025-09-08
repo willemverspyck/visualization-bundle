@@ -85,7 +85,12 @@
                                                                                 <div class="route">
                                                                                     {% block route %}
                                                                                         {% for route in cell.routes %}
-                                                                                            <a href="{{ absolute_url(route.url) }}" target="_blank" title="{{ route.name }}">{{ route.name }}</a>
+                                                                                            {% set url = route.url %}
+
+                                                                                            {% if route.variables|length > 0 %}
+                                                                                                {% set url = url ~ '?' ~ route.variables|url_encode %}
+                                                                                            {% endif %}
+                                                                                            <a href="{{ absolute_url(url) }}" target="_blank" title="{{ route.name }}">{{ route.name }}</a>
                                                                                             <span>&nbsp;</span>
                                                                                         {% endfor %}
                                                                                     {% endblock %}
