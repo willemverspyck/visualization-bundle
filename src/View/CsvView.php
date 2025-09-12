@@ -69,13 +69,14 @@ class CsvView extends AbstractView
         return false;
     }
 
-    protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): bool|float|int|string|null
+    protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): array|bool|float|int|string|null
     {
         if (null === $value) {
             return null;
         }
 
         return match ($type) {
+            FieldInterface::TYPE_ARRAY => implode(', ', $value),
             FieldInterface::TYPE_BOOLEAN => $value ? 'TRUE' : 'FALSE',
             default => parent::getValue($type, $config, $value),
         };

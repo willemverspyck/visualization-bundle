@@ -73,7 +73,7 @@ abstract class AbstractSerializerView extends AbstractView
     /**
      * @throws Exception
      */
-    private function getValueFormat(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): bool|float|int|string|null
+    private function getValueFormat(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): array|bool|float|int|string|null
     {
         if (null === $value) {
             return null;

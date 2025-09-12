@@ -35,14 +35,13 @@ abstract class AbstractView implements ViewInterface
     /**
      * @throws Exception
      */
-    protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): bool|float|int|string|null
+    protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): array|bool|float|int|string|null
     {
         if (null === $value) {
             return null;
         }
 
         return match ($type) {
-            FieldInterface::TYPE_ARRAY => implode(', ', $value),
             FieldInterface::TYPE_DATE => $value->format('Y-m-d'),
             FieldInterface::TYPE_DATETIME => $value->format('Y-m-d H:i:s'),
             FieldInterface::TYPE_TIME => $value->format('H:i:s'),

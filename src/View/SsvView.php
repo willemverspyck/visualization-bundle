@@ -20,7 +20,7 @@ final class SsvView extends CsvView
         return ';';
     }
 
-    protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): bool|float|int|string|null
+    protected function getValue(string $type, Config $config, array|bool|DateTimeInterface|float|int|string|null $value): array|bool|float|int|string|null
     {
         if (null === $value) {
             return null;
