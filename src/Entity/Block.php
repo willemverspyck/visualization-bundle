@@ -63,6 +63,9 @@ class Block implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'filter_view', type: Types::BOOLEAN)]
     private bool $filterView;
 
+    #[Doctrine\Column(name: 'lazy', type: Types::BOOLEAN)]
+    private bool $lazy;
+
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
     private bool $active;
 
@@ -70,6 +73,7 @@ class Block implements Stringable, TimestampInterface
     {
         $this->setFilter(true);
         $this->setFilterView(true);
+        $this->setLazy(false);
         $this->setActive(true);
     }
 
@@ -194,6 +198,18 @@ class Block implements Stringable, TimestampInterface
     public function setFilterView(bool $filterView): static
     {
         $this->filterView = $filterView;
+
+        return $this;
+    }
+
+    public function isLazy(): bool
+    {
+        return $this->lazy;
+    }
+
+    public function setLazy(bool $lazy): static
+    {
+        $this->lazy = $lazy;
 
         return $this;
     }

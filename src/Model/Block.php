@@ -72,6 +72,9 @@ final class Block
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?bool $filterView = null;
 
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
+    private ?bool $lazy = null;
+
     public function getDashboard(): Dashboard
     {
         return $this->dashboard;
@@ -242,6 +245,18 @@ final class Block
     public function setFilterView(?bool $filterView): static
     {
         $this->filterView = $filterView;
+
+        return $this;
+    }
+
+    public function isLazy(): ?bool
+    {
+        return $this->lazy;
+    }
+
+    public function setLazy(?bool $lazy): static
+    {
+        $this->lazy = $lazy;
 
         return $this;
     }

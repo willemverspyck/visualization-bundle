@@ -58,6 +58,7 @@ readonly class BlockService
         $blockAsModel->setCharts($this->getCharts($blockAsEntity, $widgetAsEntity));
         $blockAsModel->setFilter($blockAsEntity->hasFilter());
         $blockAsModel->setFilterView($blockAsEntity->hasFilterView());
+        $blockAsModel->setLazy($blockAsEntity->isLazy());
 
         $blockEvent = new BlockEvent($blockAsModel);
 
