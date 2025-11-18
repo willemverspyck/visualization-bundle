@@ -16,25 +16,25 @@ final class DateTimeUtility
     /**
      * @throws Exception
      */
-    public static function getDateFromString(?string $content): ?DateTimeImmutable
+    public static function getDateFromString(?string $content, string $format = self::FORMAT_DATE): ?DateTimeImmutable
     {
-        return self::getFromString($content, self::FORMAT_DATE)?->setTime(0, 0);
+        return self::getFromString($content, $format)?->setTime(0, 0);
     }
 
     /**
      * @throws Exception
      */
-    public static function getDateTimeFromString(?string $content): ?DateTimeImmutable
+    public static function getDateTimeFromString(?string $content, string $format = self::FORMAT_DATETIME): ?DateTimeImmutable
     {
-        return self::getFromString($content, self::FORMAT_DATETIME);
+        return self::getFromString($content, $format);
     }
 
     /**
      * @throws Exception
      */
-    public static function getTimeFromString(?string $content): ?DateTimeImmutable
+    public static function getTimeFromString(?string $content, string $format = self::FORMAT_TIME): ?DateTimeImmutable
     {
-        return self::getFromString($content, self::FORMAT_TIME);
+        return self::getFromString($content, $format);
     }
 
     /**
