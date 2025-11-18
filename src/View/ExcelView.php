@@ -356,7 +356,7 @@ final class ExcelView extends AbstractView
     /**
      * Get the column format.
      */
-    private function getColumnType(string $type, bool|float|int|string|null $value): string
+    private function getColumnType(string $type, array|bool|float|int|string|null $value): string
     {
         if (null === $value) {
             return DataType::TYPE_NULL;
