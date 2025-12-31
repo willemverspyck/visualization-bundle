@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-#[AsMessageHandler]
+#[AsMessageHandler(sign: true)]
 final readonly class DownloadMessageHandler
 {
     public function __construct(private DownloadRepository $downloadRepository, private DownloadService $downloadService, private TokenStorageInterface $tokenStorage)

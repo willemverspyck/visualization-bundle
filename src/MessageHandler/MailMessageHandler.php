@@ -30,7 +30,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-#[AsMessageHandler]
+#[AsMessageHandler(sign: true)]
 final readonly class MailMessageHandler
 {
     public function __construct(private DashboardRepository $dashboardRepository, private DashboardService $dashboardService, private LogRepository $logRepository, private MailService $mailService, private TokenStorageInterface $tokenStorage, private UserRepository $userRepository, private ViewService $viewService)
