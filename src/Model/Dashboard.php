@@ -137,7 +137,7 @@ final class Dashboard
     }
 
     /**
-     * @return array<int, ParameterInterface>
+     * @return list<ParameterInterface>
      */
     public function getParameters(): array
     {
@@ -152,7 +152,7 @@ final class Dashboard
     }
 
     /**
-     * @return array<int, ParameterInterface>
+     * @return array<string, string>
      */
     public function getParametersAsString(): array
     {
@@ -167,7 +167,7 @@ final class Dashboard
     }
 
     /**
-     * @return array<int, ParameterInterface>
+     * @return array<string, string>
      */
     public function getParametersAsStringForSlug(): array
     {
@@ -218,7 +218,7 @@ final class Dashboard
     }
 
     /**
-     * @return ArrayCollection<int, Block>
+     * @return ArrayCollection<Block>
      */
     public function getBlocks(): ArrayCollection
     {

@@ -34,7 +34,7 @@ class BookmarkRepository extends AbstractRepository
     }
 
     /**
-     * @return array<int, Bookmark>
+     * @return list<Bookmark>
      *
      * @throws AuthenticationException
      */

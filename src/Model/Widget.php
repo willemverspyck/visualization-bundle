@@ -60,7 +60,7 @@ final class Widget
     }
 
     /**
-     * @return array<int, FieldInterface|MultipleFieldInterface>
+     * @return list<FieldInterface|MultipleFieldInterface>
      */
     public function getFields(): array
     {

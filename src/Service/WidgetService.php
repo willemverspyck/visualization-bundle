@@ -242,7 +242,7 @@ readonly class WidgetService
     /**
      * Get required parameters for dashboard.
      *
-     * @return array<int, ParameterInterface>
+     * @return array<string, ParameterInterface>
      *
      * @throws Exception
      * @throws ParameterException
@@ -888,7 +888,7 @@ readonly class WidgetService
     }
 
     /**
-     * @return array<int, RequestInterface>
+     * @return array<string, RequestInterface>
      */
     private function mapRequest(iterable $parameters, callable $callback): array
     {

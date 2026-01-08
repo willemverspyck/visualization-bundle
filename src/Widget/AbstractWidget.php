@@ -55,7 +55,7 @@ abstract class AbstractWidget implements WidgetInterface
     }
 
     /**
-     * @return array<int, FilterInterface>
+     * @return list<FilterInterface>
      */
     public function getFilterData(): array
     {
@@ -101,7 +101,7 @@ abstract class AbstractWidget implements WidgetInterface
     }
 
     /**
-     * @return array<int, ParameterInterface>
+     * @return list<ParameterInterface>
      */
     public function getParameterData(): array
     {

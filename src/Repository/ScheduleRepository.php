@@ -28,7 +28,7 @@ class ScheduleRepository extends AbstractRepository
     }
 
     /**
-     * @return array<int, ScheduleInterface>
+     * @return list<ScheduleInterface>
      */
     public function getSchedules(string $discriminator): array
     {

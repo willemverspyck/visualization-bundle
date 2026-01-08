@@ -172,7 +172,7 @@ final class Block
     }
 
     /**
-     * @return array<int, Filter>
+     * @return list<Filter>
      */
     public function getFilters(): array
     {
@@ -187,7 +187,7 @@ final class Block
     }
 
     /**
-     * @return array<int, Parameter>
+     * @return list<Parameter>
      */
     public function getParameters(): array
     {

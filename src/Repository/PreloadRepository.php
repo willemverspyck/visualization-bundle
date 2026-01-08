@@ -17,7 +17,7 @@ class PreloadRepository extends AbstractRepository
     }
 
     /**
-     * @return array<int, Preload>
+     * @return list<Preload>
      */
     public function getPreloadsBySchedule(ScheduleInterface $schedule): array
     {

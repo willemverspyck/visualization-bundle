@@ -24,5 +24,8 @@ interface AbstractFieldInterface
 
     public function addFormat(FormatInterface $format): static;
 
+    /**
+     * @return Collection<int, FormatInterface>
+     */
     public function getFormats(): Collection;
 }

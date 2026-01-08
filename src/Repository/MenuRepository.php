@@ -24,7 +24,7 @@ class MenuRepository extends AbstractRepository
     /**
      * Get menu items with the user group permissions.
      *
-     * @return array<int, Menu>
+     * @return list<Menu>
      */
     public function getMenus(): array
     {
@@ -58,7 +58,7 @@ class MenuRepository extends AbstractRepository
     }
 
     /**
-     * @return array<int, Menu>
+     * @return list<Menu>
      */
     public function getMenusByParent(?Menu $parent): array
     {

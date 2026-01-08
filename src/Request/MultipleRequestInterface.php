@@ -9,7 +9,7 @@ interface MultipleRequestInterface
     public function addChild(RequestInterface $child): static;
 
     /**
-     * @return array<int, RequestInterface>
+     * @return list<RequestInterface>
      */
     public function getChildren(): array;
 

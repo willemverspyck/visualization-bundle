@@ -29,7 +29,7 @@ class MailRepository extends AbstractRepository
     }
 
     /**
-     * @return array<int, Mail>
+     * @return list<Mail>
      */
     public function getMailsBySchedule(ScheduleInterface $schedule): array
     {

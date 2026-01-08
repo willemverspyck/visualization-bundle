@@ -46,7 +46,7 @@ class DashboardRepository extends AbstractRepository
     }
 
     /**
-     * @return array<int, Dashboard>
+     * @return list<Dashboard>
      *
      * @throws AuthenticationException
      */
