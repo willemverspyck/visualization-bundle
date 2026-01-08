@@ -35,6 +35,11 @@ abstract class AbstractWidget implements WidgetInterface
     private ?string $view = null;
     private Widget $widget;
 
+    public static function getName(): string
+    {
+        return static::class;
+    }
+
     public function getFilter(string $name): ?array
     {
         if (false === array_key_exists($name, $this->filters)) {

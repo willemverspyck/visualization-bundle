@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Service;
 
 use App\Utility\DataUtility;
-use Countable;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
-use IteratorAggregate;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Spyck\ApiExtension\Model\Pagination;
@@ -59,7 +57,8 @@ use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Stringable;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -74,10 +73,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
 readonly class WidgetService
 {
-    /**
-     * @param Countable&IteratorAggregate $widgets
-     */
-    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly EventDispatcherInterface $eventDispatcher, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.config.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.config.request')] private array $request, #[AutowireIterator(tag: 'spyck.visualization.widget')] private iterable $widgets)
+    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly EventDispatcherInterface $eventDispatcher, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.config.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.config.request')] private array $request, #[AutowireLocator(services: 'spyck.visualization.widget', defaultIndexMethod: 'getName')] private ServiceLocator $serviceLocator)
     {
     }
 
@@ -89,16 +85,12 @@ readonly class WidgetService
      */
     public function getWidget(string $name, array $variables = [], array $variablesForRequest = [], bool $required = true): WidgetInterface
     {
-        foreach ($this->widgets->getIterator() as $widget) {
-            if (get_class($widget) === $name) {
-                $this->setParameters($widget, $variables, $variablesForRequest, $required);
-                $this->setFilters($widget, $variables);
+        $widget = $this->serviceLocator->get($name);
 
-                return $widget;
-            }
-        }
+        $this->setParameters($widget, $variables, $variablesForRequest, $required);
+        $this->setFilters($widget, $variables);
 
-        throw new Exception(sprintf('Widget "%s" not found', $name));
+        return $widget;
     }
 
     /**
@@ -126,13 +118,7 @@ readonly class WidgetService
      */
     public function getWidgets(): array
     {
-        $data = [];
-
-        foreach ($this->widgets->getIterator() as $widget) {
-            $data[get_class($widget)] = $widget;
-        }
-
-        return $data;
+        return array_keys($this->serviceLocator->getProvidedServices());
     }
 
     /**
