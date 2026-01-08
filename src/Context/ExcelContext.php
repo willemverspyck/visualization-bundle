@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Context;
 
-use Spyck\VisualizationBundle\View\ViewInterface;
-
-final class ExcelContext extends AbstractContext implements ContextInterface
+final class ExcelContext extends AbstractContext
 {
     private ?int $width = null;
     private bool $visible = true;
-
-    public function __construct()
-    {
-        $this->setView(ViewInterface::XLSX);
-    }
 
     public function getWidth(): ?int
     {

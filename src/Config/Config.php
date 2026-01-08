@@ -127,15 +127,21 @@ final class Config
     }
 
     /**
-     * @return ContextInterface<ExcelContext>|null
+     * @template T of ContextInterface
+     *
+     * @param class-string<T> $class
+     *
+     * @return T|null
      */
-    public function getContext(string $view): ?ContextInterface
+    public function getContext(string $class): ?ContextInterface
     {
-        $contexts = $this->getContexts()->filter(function (ContextInterface $context) use ($view): bool {
-            return $view === $context->getView();
-        });
+        foreach ($this->contexts as $context) {
+            if ($context instanceof $class) {
+                return $context;
+            }
+        }
 
-        return $contexts->isEmpty() ? null : $contexts->first();
+        return null;
     }
 
     /**

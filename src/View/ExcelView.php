@@ -154,7 +154,7 @@ final class ExcelView extends AbstractView
         });
 
         WidgetUtility::walkFields($widget->getFields(), function (FieldInterface $field, int $index) use ($sheet, $count): void {
-            $context = $field->getConfig()->getContext(ViewInterface::XLSX);
+            $context = $field->getConfig()->getContext(ExcelContext::class);
 
             $columnDimension = $sheet->getColumnDimensionByColumn($index + 1);
 
