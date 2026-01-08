@@ -11,23 +11,23 @@ use Spyck\VisualizationBundle\Event\ScheduleEvent;
 use Spyck\VisualizationBundle\Repository\ScheduleRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[AsCommand(name: 'spyck:visualization:schedule', description: 'Command for schedule events.')]
-final class ScheduleCommand extends Command
+final class ScheduleCommand
 {
     public function __construct(private readonly EventDispatcherInterface $eventDispatcher, private readonly ScheduleRepository $scheduleRepository)
     {
-        parent::__construct();
     }
 
     /**
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(SymfonyStyle $style): int
     {
+        $style->info('Looking for schedules to execute...');
+
         $date = new DateTimeImmutable();
 
         $schedules = $this->scheduleRepository->getSchedules(ScheduleForSystem::class);
@@ -37,6 +37,8 @@ final class ScheduleCommand extends Command
 
             $this->eventDispatcher->dispatch($scheduleEvent);
         }
+
+        $style->success('Done');
 
         return Command::SUCCESS;
     }
