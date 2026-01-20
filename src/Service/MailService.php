@@ -54,7 +54,7 @@ readonly class MailService
         $this->mailer->send($email);
     }
 
-    public function executeMailAsMessage(Mail $mail, UserInterface $user, array $parameters = []): void
+    public function executeMailAsMessage(Mail $mail, UserInterface $user, array $parameters = [], array $stamps = []): void
     {
         $mailMessage = new MailMessage();
         $mailMessage->setDashboardId($mail->getDashboard()->getId());
@@ -67,7 +67,7 @@ readonly class MailService
         $mailMessage->setRoute($mail->hasRoute());
         $mailMessage->setMerge($mail->isMerge());
 
-        $this->messageBus->dispatch($mailMessage);
+        $this->messageBus->dispatch($mailMessage, $stamps);
     }
 
     public function executeMailAsMessageBySchedule(ScheduleInterface $schedule, array $parameters = []): void

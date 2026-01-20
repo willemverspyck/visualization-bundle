@@ -55,12 +55,12 @@ readonly class DownloadService
         $this->eventDispatcher->dispatch($downloadEvent);
     }
 
-    public function executeDownloadAsMessage(Download $download): void
+    public function executeDownloadAsMessage(Download $download, array $stamps = []): void
     {
         $downloadMessage = new DownloadMessage();
         $downloadMessage->setId($download->getId());
 
-        $this->messageBus->dispatch($downloadMessage);
+        $this->messageBus->dispatch($downloadMessage, $stamps);
     }
 
     public function deleteDownload(Download $download): void

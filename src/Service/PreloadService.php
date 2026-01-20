@@ -32,14 +32,14 @@ readonly class PreloadService
         }
     }
 
-    public function executePreloadAsMessage(Preload $preload, ?UserInterface $user = null): void
+    public function executePreloadAsMessage(Preload $preload, ?UserInterface $user = null, array $stamps = []): void
     {
         $preloadMessage = new PreloadMessage();
         $preloadMessage->setDashboardId($preload->getDashboard()->getId());
         $preloadMessage->setUserId(null === $user ? null : $user->getId());
         $preloadMessage->setVariables($preload->getVariables());
 
-        $this->messageBus->dispatch($preloadMessage);
+        $this->messageBus->dispatch($preloadMessage, $stamps);
     }
 
     public function executePreloadAsMessageBySchedule(ScheduleInterface $schedule): void
