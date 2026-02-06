@@ -54,7 +54,14 @@ readonly class MailService
         $this->mailer->send($email);
     }
 
-    public function executeMailAsMessage(Mail $mail, UserInterface $user, array $parameters = [], array $stamps = []): void
+    public function executeMailAsMessage(Mail $mail, array $parameters = [], array $stamps = []): void
+    {
+        foreach ($mail->getUsers() as $user) {
+            $this->executeMailForUserAsMessage($mail, $user, $parameters, $stamps);
+        }
+    }
+
+    public function executeMailForUserAsMessage(Mail $mail, UserInterface $user, array $parameters = [], array $stamps = []): void
     {
         $mailMessage = new MailMessage();
         $mailMessage->setDashboardId($mail->getDashboard()->getId());
@@ -81,9 +88,7 @@ readonly class MailService
                 $this->eventDispatcher->dispatch($cacheForDashboardEvent);
             }
 
-            foreach ($mail->getUsers() as $user) {
-                $this->executeMailAsMessage($mail, $user, $parameters);
-            }
+            $this->executeMailAsMessage($mail, $parameters);
         }
     }
 }
