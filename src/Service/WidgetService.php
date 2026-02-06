@@ -49,6 +49,7 @@ use Spyck\VisualizationBundle\Request\MultipleRequestInterface;
 use Spyck\VisualizationBundle\Request\RequestInterface;
 use Spyck\VisualizationBundle\Route\RouteForDashboard;
 use Spyck\VisualizationBundle\Route\RouteInterface;
+use Spyck\VisualizationBundle\Utility\ArrayUtility;
 use Spyck\VisualizationBundle\Utility\CacheUtility;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
@@ -561,19 +562,30 @@ readonly class WidgetService
         }
 
         return match (get_class($request)) {
-            DayParameter::class => $this->request['dayParameter'],
-            DayStartParameter::class => $this->request['dayStartParameter'],
-            DayEndParameter::class => $this->request['dayEndParameter'],
-            WeekParameter::class => $this->request['weekParameter'],
-            WeekStartParameter::class => $this->request['weekStartParameter'],
-            WeekEndParameter::class => $this->request['weekEndParameter'],
-            MonthParameter::class => $this->request['monthParameter'],
-            MonthStartParameter::class => $this->request['monthStartParameter'],
-            MonthEndParameter::class => $this->request['monthEndParameter'],
-            LimitFilter::class => sprintf('%d', $this->request['limitFilter']),
-            OffsetFilter::class => sprintf('%d', $this->request['offsetFilter']),
+            DayParameter::class => $this->getRequest('dayParameter'),
+            DayStartParameter::class => $this->getRequest('dayStartParameter'),
+            DayEndParameter::class => $this->getRequest('dayEndParameter'),
+            WeekParameter::class => $this->getRequest('weekParameter'),
+            WeekStartParameter::class => $this->getRequest('weekStartParameter'),
+            WeekEndParameter::class => $this->getRequest('weekEndParameter'),
+            MonthParameter::class => $this->getRequest('monthParameter'),
+            MonthStartParameter::class => $this->getRequest('monthStartParameter'),
+            MonthEndParameter::class => $this->getRequest('monthEndParameter'),
+            LimitFilter::class => sprintf('%d', $this->getRequest('limitFilter')),
+            OffsetFilter::class => sprintf('%d', $this->getRequest('offsetFilter')),
             default => null,
         };
+    }
+
+    private function getRequest(string $name): int|string
+    {
+        ArrayUtility::hasKeysInArray([$name], $this->request);
+
+        if (null === $this->request[$name]) {
+            throw new Exception(sprintf('Request "%s" not found', $name));
+        }
+
+        return $this->request[$name];
     }
 
     /**
