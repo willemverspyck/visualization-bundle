@@ -9,10 +9,11 @@ use Psr\Cache\InvalidArgumentException;
 use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Service\ViewService;
 use Spyck\VisualizationBundle\Service\WidgetService;
+use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -25,14 +26,65 @@ final class WidgetExportCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
+    /**
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    public function __invoke(SymfonyStyle $style, #[Option(name: 'widget')] ?string $optionWidget = null, #[Option(name: 'view')] string $optionView = ViewInterface::CSV, #[Option(name: 'file')] ?string $optionFile = null, #[Option(name: 'variableKey')] array $optionVariableKeys = [], #[Option(name: 'variableValue')] array $optionVariableValues = []): int
     {
-        $this
-            ->addOption('widget', null, InputOption::VALUE_REQUIRED, 'Identifier of the widget')
-            ->addOption('view', null, InputOption::VALUE_REQUIRED, 'View of the export file')
-            ->addOption('file', null, InputOption::VALUE_REQUIRED, 'Location of the export file')
-            ->addOption('variableKey', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Variable key')
-            ->addOption('variableValue', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Variable value');
+        if (null === $optionWidget) {
+            $style->error('Widget "%s" not found.');
+
+            return Command::FAILURE;
+        }
+
+        $widgets = $this->getWidgets();
+
+        if (false === array_key_exists($optionWidget, $widgets)) {
+            $style->error(sprintf('Widget "%s" not found.', $optionWidget));
+
+            return Command::FAILURE;
+        }
+
+        if (false === array_key_exists($optionView, $this->getViews())) {
+            $style->error(sprintf('View "%s" not found.', $optionView));
+
+            return Command::FAILURE;
+        }
+
+        if (null === $optionFile) {
+            $style->error('File "%s" not found.');
+
+            return Command::FAILURE;
+        }
+
+        if (count($optionVariableKeys) !== count($optionVariableValues)) {
+            $style->error('Parameter "variableKey" and "variableValue" must be equal.');
+
+            return Command::FAILURE;
+        }
+
+        $variables = array_combine($optionVariableKeys, $optionVariableValues);
+
+        try {
+            $dashboard = $this->widgetService->getDashboardAsModelByAdapter($widgets[$optionWidget], $variables, $optionView);
+        } catch (ParameterException $parameterException) {
+            $style->error($parameterException->getMessage());
+
+            return Command::FAILURE;
+        }
+
+        $view = $this->viewService->getView($optionView);
+
+        $content = $view->getContent($dashboard);
+
+        if (false === file_put_contents($optionFile, $content)) {
+            $style->error('Failed to write file.');
+
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output): void
@@ -56,64 +108,6 @@ final class WidgetExportCommand extends Command
 
             $input->setOption('view', $option);
         }
-    }
-
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $style = new SymfonyStyle($input, $output);
-
-        $optionWidget = $input->getOption('widget');
-        $optionView = $input->getOption('view');
-        $optionFile = $input->getOption('file');
-
-        $optionVariableKey = $input->getOption('variableKey');
-        $optionVariableValue = $input->getOption('variableValue');
-
-        $widgets = $this->getWidgets();
-
-        if (false === array_key_exists($optionWidget, $widgets)) {
-            $style->error(sprintf('Widget "%s" not found.', $optionWidget));
-
-            return Command::FAILURE;
-        }
-
-        if (false === array_key_exists($optionView, $this->getViews())) {
-            $style->error(sprintf('View "%s" not found.', $optionView));
-
-            return Command::FAILURE;
-        }
-
-        if (count($optionVariableKey) !== count($optionVariableValue)) {
-            $style->error('Parameter "variableKey" and "variableValue" must be equal.');
-
-            return Command::FAILURE;
-        }
-
-        $variables = array_combine($optionVariableKey, $optionVariableValue);
-
-        try {
-            $dashboard = $this->widgetService->getDashboardAsModelByAdapter($widgets[$optionWidget], $variables, $optionView);
-        } catch (ParameterException $parameterException) {
-            $style->error($parameterException->getMessage());
-
-            return Command::FAILURE;
-        }
-
-        $view = $this->viewService->getView($optionView);
-
-        $content = $view->getContent($dashboard);
-
-        if (false === file_put_contents($optionFile, $content)) {
-            $style->error('Failed to write file.');
-
-            return Command::FAILURE;
-        }
-
-        return Command::SUCCESS;
     }
 
     private function getOption(InputInterface $input, OutputInterface $output, string $name, array $data): string
