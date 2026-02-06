@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Service;
 
-use App\Utility\DataUtility;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -51,6 +50,7 @@ use Spyck\VisualizationBundle\Route\RouteForDashboard;
 use Spyck\VisualizationBundle\Route\RouteInterface;
 use Spyck\VisualizationBundle\Utility\ArrayUtility;
 use Spyck\VisualizationBundle\Utility\CacheUtility;
+use Spyck\VisualizationBundle\Utility\DataUtility;
 use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Spyck\VisualizationBundle\View\ViewInterface;
