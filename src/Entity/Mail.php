@@ -11,11 +11,13 @@ use Doctrine\ORM\Mapping as Doctrine;
 use Spyck\VisualizationBundle\Controller\MailController;
 use Spyck\VisualizationBundle\Repository\MailRepository;
 use Stringable;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute as Serializer;
 use Symfony\Component\Validator\Constraints as Validator;
 
 #[Doctrine\Entity(repositoryClass: MailRepository::class)]
 #[Doctrine\Table(name: 'visualization_mail')]
+#[UniqueEntity(fields: 'code')]
 class Mail implements Stringable, TimestampInterface
 {
     use TimestampTrait;
@@ -35,6 +37,9 @@ class Mail implements Stringable, TimestampInterface
     #[Validator\NotNull]
     #[Serializer\Groups(groups: [MailController::GROUP_LIST])]
     private string $name;
+
+    #[Doctrine\Column(name: 'code', type: Types::STRING, length: 128, unique: true, nullable: true)]
+    private ?string $code;
 
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description;
@@ -115,6 +120,18 @@ class Mail implements Stringable, TimestampInterface
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }

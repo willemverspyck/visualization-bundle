@@ -38,14 +38,14 @@ class Dashboard implements Stringable, TimestampInterface
     #[Validator\NotNull]
     private string $name;
 
+    #[Doctrine\Column(name: 'code', type: Types::STRING, length: 128, unique: true, nullable: true)]
+    private ?string $code;
+
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description;
 
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
-
-    #[Doctrine\Column(name: 'code', type: Types::STRING, length: 128, unique: true, nullable: true)]
-    private ?string $code;
 
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
     private bool $active;
@@ -104,6 +104,18 @@ class Dashboard implements Stringable, TimestampInterface
         return $this;
     }
 
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -124,18 +136,6 @@ class Dashboard implements Stringable, TimestampInterface
     public function setVariables(array $variables): static
     {
         $this->variables = $variables;
-
-        return $this;
-    }
-
-    public function getCode(): ?string
-    {
-        return $this->code;
-    }
-
-    public function setCode(?string $code): static
-    {
-        $this->code = $code;
 
         return $this;
     }

@@ -28,6 +28,15 @@ class MailRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
+    public function getMailByCode(string $code): ?Mail
+    {
+        return $this->getMailAsQueryBuilder(false)
+            ->andWhere('mail.code = :code')
+            ->setParameter('code', $code)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * @return list<Mail>
      */
