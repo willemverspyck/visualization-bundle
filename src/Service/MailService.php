@@ -54,21 +54,21 @@ readonly class MailService
         $this->mailer->send($email);
     }
 
-    public function executeMailAsMessage(Mail $mail, array $parameters = [], array $stamps = []): void
+    public function executeMailAsMessage(Mail $mail, array $variables = [], array $stamps = []): void
     {
         foreach ($mail->getUsers() as $user) {
-            $this->executeMailForUserAsMessage($mail, $user, $parameters, $stamps);
+            $this->executeMailForUserAsMessage($mail, $user, $variables, $stamps);
         }
     }
 
-    public function executeMailForUserAsMessage(Mail $mail, UserInterface $user, array $parameters = [], array $stamps = []): void
+    public function executeMailForUserAsMessage(Mail $mail, UserInterface $user, array $variables = [], array $stamps = []): void
     {
         $mailMessage = new MailMessage();
         $mailMessage->setDashboardId($mail->getDashboard()->getId());
         $mailMessage->setUserId($user->getId());
         $mailMessage->setName($mail->getName());
         $mailMessage->setDescription($mail->getDescription());
-        $mailMessage->setVariables(array_merge($mail->getVariables(), $parameters));
+        $mailMessage->setVariables(array_merge($mail->getVariables(), $variables));
         $mailMessage->setView($mail->getView());
         $mailMessage->setInline($mail->isInline());
         $mailMessage->setRoute($mail->hasRoute());
@@ -77,7 +77,7 @@ readonly class MailService
         $this->messageBus->dispatch($mailMessage, $stamps);
     }
 
-    public function executeMailAsMessageBySchedule(ScheduleInterface $schedule, array $parameters = []): void
+    public function executeMailAsMessageBySchedule(ScheduleInterface $schedule, array $variables = []): void
     {
         $mails = $this->mailRepository->getMailsBySchedule($schedule);
 
@@ -88,7 +88,7 @@ readonly class MailService
                 $this->eventDispatcher->dispatch($cacheForDashboardEvent);
             }
 
-            $this->executeMailAsMessage($mail, $parameters);
+            $this->executeMailAsMessage($mail, $variables);
         }
     }
 }
