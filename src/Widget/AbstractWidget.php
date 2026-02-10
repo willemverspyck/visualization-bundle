@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Widget;
 
+use DateTimeInterface;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Filter\DayFilter;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
 use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Filter\LimitFilter;
@@ -15,6 +17,7 @@ use Spyck\VisualizationBundle\Filter\QueryFilter;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
+use Spyck\VisualizationBundle\Utility\DateTimeUtility;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -263,5 +266,27 @@ abstract class AbstractWidget implements WidgetInterface
         }
 
         return array_shift($filter);
+    }
+
+    /**
+     * Return filter for date.
+     */
+    protected function hasFilterDate(string $name = DayFilter::class): bool
+    {
+        return null !== $this->getFilter($name);
+    }
+
+    /**
+     * Return filter for date.
+     */
+    protected function getFilterDate(string $name = DayFilter::class): ?DateTimeInterface
+    {
+        $filter = $this->getFilter($name);
+
+        if (null === $filter) {
+            return null;
+        }
+
+        return DateTimeUtility::getDateFromString(array_shift($filter));
     }
 }
