@@ -539,6 +539,26 @@ readonly class WidgetService
         return $data;
     }
 
+    private function filterRequest(mixed $data): ?string
+    {
+        if (is_scalar($data)) {
+            return trim(sprintf('%s', $data));
+        }
+
+        return null;
+    }
+
+    private function getRequest(string $name): int|string
+    {
+        ArrayUtility::hasKeysInArray([$name], $this->request);
+
+        if (null === $this->request[$name]) {
+            throw new Exception(sprintf('Request "%s" not found', $name));
+        }
+
+        return $this->request[$name];
+    }
+
     private function getRequestForFilter(RequestInterface $request, array $variables): ?array
     {
         $parameterBag = new ParameterBag($variables);
@@ -594,26 +614,6 @@ readonly class WidgetService
             MonthEndParameter::class => $this->getRequest('monthEndParameter'),
             default => null,
         };
-    }
-
-    private function filterRequest(mixed $data): ?string
-    {
-        if (is_scalar($data)) {
-            return trim(sprintf('%s', $data));
-        }
-
-        return null;
-    }
-
-    private function getRequest(string $name): int|string
-    {
-        ArrayUtility::hasKeysInArray([$name], $this->request);
-
-        if (null === $this->request[$name]) {
-            throw new Exception(sprintf('Request "%s" not found', $name));
-        }
-
-        return $this->request[$name];
     }
 
     /**
