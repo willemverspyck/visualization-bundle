@@ -746,9 +746,15 @@ readonly class WidgetService
      */
     private function getPagination(WidgetInterface $widget, int $total, bool $totalIncluded): ?Pagination
     {
-        $pagination = $widget->getPagination();
+        $limit = $widget->getFilterLimit();
 
-        if (null === $pagination) {
+        if (null === $limit) {
+            return null;
+        }
+
+        $offset = $widget->getFilterOffset();
+
+        if (null === $offset) {
             return null;
         }
 
@@ -778,19 +784,19 @@ readonly class WidgetService
 
         $next = null;
 
-        if ($totalIncluded ? $total >= $pagination['limit'] : $total > $pagination['limit']) {
+        if ($totalIncluded ? $total >= $limit : $total > $limit) {
             $next = $this->urlGenerator->generate($name, array_merge($parameters, [
-                'limit' => $pagination['limit'],
-                'offset' => $pagination['offset'] + $pagination['limit'],
+                'limit' => $limit,
+                'offset' => $offset + $limit,
             ]), UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         $previous = null;
 
-        if ($pagination['offset'] - $pagination['limit'] >= 0) {
+        if ($offset - $limit >= 0) {
             $previous = $this->urlGenerator->generate($name, array_merge($parameters, [
-                'limit' => $pagination['limit'],
-                'offset' => $pagination['offset'] - $pagination['limit'],
+                'limit' => $limit,
+                'offset' => $offset - $limit,
             ]), UrlGeneratorInterface::ABSOLUTE_URL);
         }
 

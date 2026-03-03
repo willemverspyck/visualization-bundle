@@ -62,6 +62,28 @@ abstract class AbstractWidget implements WidgetInterface
         return null;
     }
 
+    public function getFilterLimit(): ?int
+    {
+        $data = $this->getFilter(LimitFilter::class);
+
+        if (null === $data) {
+            return null;
+        }
+
+        return (int) array_shift($data);
+    }
+
+    public function getFilterOffset(): ?int
+    {
+        $data = $this->getFilter(OffsetFilter::class);
+
+        if (null === $data) {
+            return null;
+        }
+
+        return (int) array_shift($data);
+    }
+    
     /**
      * @return list<FilterInterface>
      */
@@ -157,36 +179,6 @@ abstract class AbstractWidget implements WidgetInterface
     public function getEvents(): array
     {
         return [];
-    }
-
-    public function getPagination(): ?array
-    {
-        return [
-            'limit' => $this->getLimit(),
-            'offset' => $this->getOffset(),
-        ];
-    }
-
-    public function getLimit(): ?int
-    {
-        $data = $this->getFilter(LimitFilter::class);
-
-        if (null === $data) {
-            return null;
-        }
-
-        return (int) array_shift($data);
-    }
-
-    public function getOffset(): ?int
-    {
-        $data = $this->getFilter(OffsetFilter::class);
-
-        if (null === $data) {
-            return null;
-        }
-
-        return (int) array_shift($data);
     }
 
     public function getFilters(): iterable
