@@ -161,26 +161,32 @@ abstract class AbstractWidget implements WidgetInterface
 
     public function getPagination(): ?array
     {
+        return [
+            'limit' => $this->getLimit(),
+            'offset' => $this->getOffset(),
+        ];
+    }
+
+    public function getLimit(): ?int
+    {
         $data = $this->getFilter(LimitFilter::class);
 
         if (null === $data) {
             return null;
         }
 
-        $limit = array_shift($data);
+        return (int) array_shift($data);
+    }
 
+    public function getOffset(): ?int
+    {
         $data = $this->getFilter(OffsetFilter::class);
 
         if (null === $data) {
             return null;
         }
 
-        $offset = array_shift($data);
-
-        return [
-            'limit' => (int) $limit,
-            'offset' => (int) $offset,
-        ];
+        return (int) array_shift($data);
     }
 
     public function getFilters(): iterable

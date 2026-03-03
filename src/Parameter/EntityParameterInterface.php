@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Parameter;
 
 interface EntityParameterInterface extends ParameterInterface
 {
-    public function getData(): ?int;
+    public function getData(): ?string;
 
     public function getDataAsObject(): ?object;
 

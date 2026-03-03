@@ -28,7 +28,7 @@ readonly class RepositoryService
      * @throws Exception
      * @throws NotFoundHttpException
      */
-    public function getEntityById(string $entityName, int $entityId): ?object
+    public function getEntityById(string $entityName, string $entityId): ?object
     {
         return $this->getRepository($entityName)->getVisualizationEntityById($entityId);
     }

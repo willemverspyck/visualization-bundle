@@ -12,7 +12,7 @@ interface RepositoryInterface
 {
     public static function getVisualizationName(): string;
 
-    public function getVisualizationEntityById(int $id): ?object;
+    public function getVisualizationEntityById(string $id): ?object;
 
     public function getVisualizationEntities(WidgetInterface $widget): array;
 }

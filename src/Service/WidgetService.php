@@ -323,19 +323,19 @@ readonly class WidgetService
     private function setFilters(WidgetInterface $widget, array $variables): void
     {
         $filters = $this->mapRequest($widget->getFilters(), function (FilterInterface $filter) use ($variables): void {
-            $data = $this->getDataForRequest($filter, $variables);
+            $data = $this->getRequestForFilter($filter, $variables);
 
             if (null === $data) {
                 return;
             }
 
-            $filter->setData(explode(',', $data));
+            $filter->setData($data);
 
             if ($filter instanceof EntityFilterInterface) {
                 $dataAsObject = [];
 
                 foreach ($filter->getData() as $entityId) {
-                    $entity = $this->getEntityById($filter->getName(), (int) $entityId);
+                    $entity = $this->getEntityById($filter->getName(), $entityId);
 
                     $dataAsObject[] = $entity;
                 }
@@ -356,7 +356,7 @@ readonly class WidgetService
     private function setParameters(WidgetInterface $widget, array $variables, array $variablesForRequest, bool $required = true): void
     {
         $parameters = $this->mapRequest($widget->getParameters(), function (ParameterInterface $parameter) use ($variables, $variablesForRequest, $required): void {
-            $data = $this->getDataForRequest($parameter, $variables);
+            $data = $this->getRequestForParameter($parameter, $variables);
 
             if (null === $data) {
                 if ($required) {
@@ -430,7 +430,7 @@ readonly class WidgetService
      *
      * @throws NotFoundHttpException
      */
-    private function getEntityById(string $entityName, int $entityId): object
+    private function getEntityById(string $entityName, string $entityId): object
     {
         $entity = $this->repositoryService->getEntityById($entityName, $entityId);
 
@@ -539,26 +539,47 @@ readonly class WidgetService
         return $data;
     }
 
-    /**
-     * @throws Exception
-     */
-    private function getDataForRequest(RequestInterface $request, array $variables): ?string
+    private function getRequestForFilter(RequestInterface $request, array $variables): ?array
     {
-        $parameterBag = new ParameterBag();
-        $parameterBag->add($variables);
+        $parameterBag = new ParameterBag($variables);
 
         $field = $request->getField();
 
         if ($parameterBag->has($field)) {
             $variable = $parameterBag->get($field);
 
-            $type = gettype($variable);
+            $data = match (true) {
+                is_array($variable) => $variable,
+                is_scalar($variable) => explode(',', sprintf('%s', $variable)),
+                default => throw new Exception(sprintf('Request "%s" must be array or scalar', $field)),
+            };
 
-            if (false === in_array($type, ['integer', 'string'], true)) {
-                throw new Exception(sprintf('Request data of field "%s" must be "integer" or "string", not "%s"', $field, $type));
-            }
+            return array_filter(array_map(function (mixed $data): ?string {
+                return $this->filterRequest($data);
+            }, $data));
+        }
 
-            return sprintf('%s', $variable);
+        return match (get_class($request)) {
+            LimitFilter::class => [
+                sprintf('%d', $this->getRequest('limitFilter')),
+            ],
+            OffsetFilter::class => [
+                sprintf('%d', $this->getRequest('offsetFilter')),
+            ],
+            default => null,
+        };
+    }
+
+    private function getRequestForParameter(RequestInterface $request, array $variables): ?string
+    {
+        $parameterBag = new ParameterBag($variables);
+
+        $field = $request->getField();
+
+        if ($parameterBag->has($field)) {
+            $variable = $parameterBag->get($field);
+
+            return $this->filterRequest($variable);
         }
 
         return match (get_class($request)) {
@@ -571,10 +592,17 @@ readonly class WidgetService
             MonthParameter::class => $this->getRequest('monthParameter'),
             MonthStartParameter::class => $this->getRequest('monthStartParameter'),
             MonthEndParameter::class => $this->getRequest('monthEndParameter'),
-            LimitFilter::class => sprintf('%d', $this->getRequest('limitFilter')),
-            OffsetFilter::class => sprintf('%d', $this->getRequest('offsetFilter')),
             default => null,
         };
+    }
+
+    private function filterRequest(mixed $data): ?string
+    {
+        if (is_scalar($data)) {
+            return trim(sprintf('%s', $data));
+        }
+
+        return null;
     }
 
     private function getRequest(string $name): int|string

@@ -6,11 +6,11 @@ namespace Spyck\VisualizationBundle\Parameter;
 
 abstract class AbstractEntityParameter extends AbstractParameter implements EntityParameterInterface
 {
-    private ?int $data = null;
+    private ?string $data = null;
     private ?object $dataAsObject = null;
     private bool $request = false;
 
-    public function getData(): ?int
+    public function getData(): ?string
     {
         return $this->data;
     }
@@ -37,7 +37,7 @@ abstract class AbstractEntityParameter extends AbstractParameter implements Enti
 
     public function setData(string $data): void
     {
-        $this->data = intval($data);
+        $this->data = $data;
     }
 
     public function setDataAsObject(?object $dataAsObject): void
