@@ -418,7 +418,7 @@ readonly class WidgetService
                 $name = $parameter::getName();
                 $field = $parameter::getField();
 
-                $variables[$field] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request?->get($field);
+                $variables[$field] = array_key_exists($name, $fields) ? sprintf('{%s}', $fields[$name]) : $request?->query->get($field);
             }
         }
 
