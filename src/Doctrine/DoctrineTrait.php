@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Exception;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -22,14 +23,22 @@ trait DoctrineTrait
 
     public function getData(): iterable
     {
+        if (false === $this instanceof DoctrineInterface) {
+            throw new Exception(sprintf('"%s" must be instance of "%s"', __CLASS__, DoctrineInterface::class));
+        }
+
         $queryBuilder = $this->getDataFromDoctrine();
 
-        $pagination = $this->getPagination();
+        $filterLimit = $this->getFilterLimit();
 
-        if (null !== $pagination) {
-            $queryBuilder
-                ->setMaxResults($pagination['limit'])
-                ->setFirstResult($pagination['offset']);
+        if (null !== $filterLimit) {
+            $queryBuilder->setMaxResults($filterLimit);
+        }
+
+        $filterOffset = $this->getFilterOffset();
+
+        if (null !== $filterOffset) {
+            $queryBuilder->setFirstResult($filterOffset);
         }
 
         return $queryBuilder
