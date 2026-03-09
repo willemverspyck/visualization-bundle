@@ -6,7 +6,7 @@ namespace Spyck\VisualizationBundle\Filter;
 
 use Spyck\VisualizationBundle\Request\RequestInterface;
 
-final class DayFilter extends AbstractFilter
+final class DayFilter extends AbstractDateFilter
 {
     public static function getField(): string
     {
@@ -16,10 +16,5 @@ final class DayFilter extends AbstractFilter
     public static function getName(): string
     {
         return RequestInterface::DATE;
-    }
-
-    public function getType(): string
-    {
-        return FilterInterface::TYPE_DATE;
     }
 }

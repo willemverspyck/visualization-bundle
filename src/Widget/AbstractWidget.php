@@ -83,7 +83,7 @@ abstract class AbstractWidget implements WidgetInterface
 
         return (int) array_shift($data);
     }
-    
+
     /**
      * @return list<FilterInterface>
      */
