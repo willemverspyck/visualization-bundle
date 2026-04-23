@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spyck\VisualizationBundle\Listener;
 
 use DateTimeImmutable;
