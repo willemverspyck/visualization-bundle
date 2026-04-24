@@ -83,7 +83,7 @@ final class ExcelView extends AbstractView
         }
 
         return match ($type) {
-            FieldInterface::TYPE_ARRAY => implode(PHP_EOL, $value),
+            FieldInterface::TYPE_ARRAY => implode(', ', $value),
             FieldInterface::TYPE_DATE, FieldInterface::TYPE_DATETIME, FieldInterface::TYPE_TIME => Date::dateTimeToExcel($value),
             FieldInterface::TYPE_POSITION => 0 === $value ? null : $value,
             default => $value,
