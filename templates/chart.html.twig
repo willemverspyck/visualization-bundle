@@ -35,6 +35,16 @@
                 {% endif %}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) %}
                 {{ getNumber(config, value) }}
+            {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_OBJECT')) %}
+                {% if value|length > 0 %}
+                    <ul>
+                        {% for val, key in value %}
+                            <li>{{ key }}: {{ val }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    -
+                {% endif %}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
                 {{ getNumber(config, value * 100) }}%
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_POSITION')) %}
