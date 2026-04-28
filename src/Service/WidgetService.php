@@ -481,7 +481,7 @@ readonly class WidgetService
 
         $type = array_shift($types);
 
-        if (in_array($type, [FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_BOOLEAN, FieldInterface::TYPE_IMAGE, FieldInterface::TYPE_TEXT], true)) {
+        if (in_array($type, [FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_BOOLEAN, FieldInterface::TYPE_IMAGE, FieldInterface::TYPE_OBJECT, FieldInterface::TYPE_TEXT], true)) {
             return $aggregate;
         }
 

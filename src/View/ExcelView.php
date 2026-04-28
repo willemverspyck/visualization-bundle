@@ -83,7 +83,7 @@ final class ExcelView extends AbstractView
         }
 
         return match ($type) {
-            FieldInterface::TYPE_ARRAY => implode(', ', $value),
+            FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_OBJECT => implode(', ', $value),
             FieldInterface::TYPE_DATE, FieldInterface::TYPE_DATETIME, FieldInterface::TYPE_TIME => Date::dateTimeToExcel($value),
             FieldInterface::TYPE_POSITION => 0 === $value ? null : $value,
             default => $value,
@@ -363,7 +363,7 @@ final class ExcelView extends AbstractView
         }
 
         return match ($type) {
-            FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_IMAGE, FieldInterface::TYPE_TEXT => DataType::TYPE_STRING,
+            FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_IMAGE, FieldInterface::TYPE_OBJECT, FieldInterface::TYPE_TEXT => DataType::TYPE_STRING,
             FieldInterface::TYPE_BOOLEAN => DataType::TYPE_BOOL,
             default => DataType::TYPE_NUMERIC,
         };

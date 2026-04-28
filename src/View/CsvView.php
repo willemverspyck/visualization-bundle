@@ -76,7 +76,7 @@ class CsvView extends AbstractView
         }
 
         return match ($type) {
-            FieldInterface::TYPE_ARRAY => implode(', ', $value),
+            FieldInterface::TYPE_ARRAY, FieldInterface::TYPE_OBJECT => implode(', ', $value),
             FieldInterface::TYPE_BOOLEAN => $value ? 'TRUE' : 'FALSE',
             default => parent::getValue($type, $config, $value),
         };

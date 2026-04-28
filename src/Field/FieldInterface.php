@@ -17,6 +17,7 @@ interface FieldInterface extends AbstractFieldInterface
     public const string TYPE_CURRENCY = 'currency';
     public const string TYPE_POSITION = 'position';
     public const string TYPE_ARRAY = 'array';
+    public const string TYPE_OBJECT = 'object';
     public const string TYPE_DATETIME = 'datetime';
     public const string TYPE_DATE = 'date';
     public const string TYPE_PERCENTAGE = 'percentage';
