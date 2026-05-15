@@ -38,8 +38,8 @@
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_OBJECT')) %}
                 {% if value|length > 0 %}
                     <ul>
-                        {% for val, key in value %}
-                            <li>{{ key }}: {{ val }}</li>
+                        {% for key, val in value %}
+                            <li><span class="key">{{ key }}</span>: {{ val }}</li>
                         {% endfor %}
                     </ul>
                 {% else %}
