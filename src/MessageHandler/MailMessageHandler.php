@@ -21,6 +21,7 @@ use Spyck\VisualizationBundle\Repository\UserRepository;
 use Spyck\VisualizationBundle\Service\DashboardService;
 use Spyck\VisualizationBundle\Service\MailService;
 use Spyck\VisualizationBundle\Service\ViewService;
+use Spyck\VisualizationBundle\Utility\UserUtility;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -85,7 +86,9 @@ final readonly class MailMessageHandler
 
         $attachments = $this->getAttachments($dashboardAsModel, $mailMessage);
 
-        $this->mailService->executeMail($user->getEmail(), $user->getName(), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments->toArray());
+        foreach ($mailMessage->getAddresses() as $address) {
+            $this->mailService->executeMail($address, UserUtility::getAddress($user), implode(' | ', $subject), '@SpyckVisualization/mail/index.html.twig', $data, $attachments->toArray());
+        }
     }
 
     /**
@@ -110,10 +113,10 @@ final readonly class MailMessageHandler
         }
 
         return $dashboardAsModel->getBlocks()->map(function (BlockAsModel $block) use ($dashboardAsModel, $view): DataPart {
-            $dashboardAsModelClone = clone $dashboardAsModel;
-            $dashboardAsModelClone->addBlock($block);
+            $cloneOfDashboardAsModel = clone $dashboardAsModel;
+            $cloneOfDashboardAsModel->addBlock($block);
 
-            return $this->getAttachment($dashboardAsModelClone, $view, $block->getName());
+            return $this->getAttachment($cloneOfDashboardAsModel, $view, $block->getName());
         });
     }
 

@@ -10,6 +10,7 @@ use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Event\CacheForDashboardEvent;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Repository\MailRepository;
+use Spyck\VisualizationBundle\Utility\UserUtility;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -29,19 +30,20 @@ readonly class MailService
     /**
      * @throws TransportExceptionInterface
      */
-    public function executeMail(string $toEmail, ?string $toName, string $subject, string $template, array $data = [], array $attachments = []): void
+    public function executeMail(Address $to, ?Address $sender, string $subject, string $template, array $data = [], array $attachments = []): void
     {
-        $email = new TemplatedEmail();
-
         $from = new Address($this->fromEmail, $this->fromName);
-        $to = new Address($toEmail, null === $toName ? '' : $toName);
 
-        $email
+        $email = new TemplatedEmail()
             ->from($from)
             ->to($to)
             ->subject($subject)
             ->htmlTemplate($template)
             ->context($data);
+
+        if (null !== $sender && $sender->toString() !== $to->toString()) {
+            $email->sender($sender);
+        }
 
         foreach ($attachments as $attachment) {
             if ($attachment instanceof DataPart) {
@@ -73,6 +75,7 @@ readonly class MailService
         $mailMessage->setInline($mail->isInline());
         $mailMessage->setRoute($mail->hasRoute());
         $mailMessage->setMerge($mail->isMerge());
+        $mailMessage->addAddress(UserUtility::getAddress($user));
 
         $this->messageBus->dispatch($mailMessage, $stamps);
     }

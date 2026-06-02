@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Message;
 
+use Symfony\Component\Mime\Address;
+
 interface MailMessageInterface
 {
     public function getDashboardId(): int;
@@ -41,4 +43,11 @@ interface MailMessageInterface
     public function isMerge(): bool;
 
     public function setMerge(bool $merge): void;
+
+    public function addAddress(Address $address): void;
+
+    /**
+     * @return list<Address>
+     */
+    public function getAddresses(): array;
 }

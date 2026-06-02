@@ -33,6 +33,11 @@ final class Mail
     #[Validator\Type(type: 'boolean')]
     private bool $merge;
 
+    #[Validator\Count(min: 1)]
+    #[Validator\Type(type: 'array')]
+    #[Validator\Valid]
+    private array $addresses = [];
+
     public function getName(): string
     {
         return $this->name;
@@ -101,5 +106,21 @@ final class Mail
     public function setMerge(bool $merge): void
     {
         $this->merge = $merge;
+    }
+
+    /**
+     * @return list<Address>
+     */
+    public function getAddresses(): array
+    {
+        return $this->addresses;
+    }
+
+    /**
+     * @var list<Address>
+     */
+    public function setAddresses(array $addresses): void
+    {
+        $this->addresses = $addresses;
     }
 }

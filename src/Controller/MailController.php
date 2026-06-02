@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -129,6 +130,12 @@ final class MailController extends AbstractController
         $mailMessage->setRoute($mailAsPayload->hasRoute());
         $mailMessage->setInline($mailAsPayload->isInline());
         $mailMessage->setMerge($mailAsPayload->isMerge());
+
+        foreach ($mailAsPayload->getAddresses() as $addressAsPayload) {
+            $address = new Address($addressAsPayload->getEmail(), null === $addressAsPayload->getName() ? '' : $addressAsPayload->getName());
+
+            $mailMessage->addAddress($address);
+        }
 
         $messageBus->dispatch($mailMessage);
 

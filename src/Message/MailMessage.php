@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Message;
 
+use Symfony\Component\Mime\Address;
+
 final class MailMessage implements MailMessageInterface
 {
     private int $dashboardId;
@@ -15,6 +17,7 @@ final class MailMessage implements MailMessageInterface
     private bool $route;
     private bool $inline;
     private bool $merge;
+    private array $addresses = [];
 
     public function getDashboardId(): int
     {
@@ -104,5 +107,15 @@ final class MailMessage implements MailMessageInterface
     public function setMerge(bool $merge): void
     {
         $this->merge = $merge;
+    }
+
+    public function addAddress(Address $address): void
+    {
+        $this->addresses[] = $address;
+    }
+
+    public function getAddresses(): array
+    {
+        return $this->addresses;
     }
 }
