@@ -8,6 +8,13 @@ filter:
   option:
     name: Options
     description: Filter by options
+parameter:
+  date:
+    description: Date
+  dateStart:
+    description: Date (Start)
+  dateEnd:
+    description: Date (End)
 view:
   csv:
     name: CSV (Comma separated)
