@@ -14,6 +14,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -69,7 +70,11 @@ readonly class ChartService
         $command = $this->getCommand();
         $directory = $this->getDirectory();
 
-        $blockAsArray = new ObjectNormalizer()->normalize($block);
+        $serializer = new Serializer([
+            new ObjectNormalizer(),
+        ]);
+
+        $blockAsArray = $serializer->normalize($block);
 
         $output = sprintf('%s/%s.png', $directory, md5(serialize($blockAsArray)));
 
