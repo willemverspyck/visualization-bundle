@@ -28,11 +28,7 @@
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_DATETIME')) %}
                 {{ value|date(constant('Spyck\\VisualizationBundle\\Utility\\DateTimeUtility::FORMAT_DATETIME')) }}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_IMAGE')) %}
-                {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                    <img src="{{ getDirectory(value) }}" alt="" width="32" height="32" align="top">
-                {% else %}
-                    <img src="{{ absolute_url(value) }}" alt="" width="32" height="32" align="top">
-                {% endif %}
+                <img src="{{ absolute_url(value) }}" alt="" width="32" height="32" align="top">
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) %}
                 {{ getNumber(config, value) }}
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_OBJECT')) %}
@@ -60,11 +56,7 @@
             {% elseif type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_TIME')) %}
                 {{ value|date(constant('Spyck\\VisualizationBundle\\Utility\\DateTimeUtility::FORMAT_TIME')) }}
             {% else %}
-                {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                    {{ value|u.truncate(40, '...') }}
-                {% else %}
-                    {{ value }}
-                {% endif %}
+                {{ value }}
             {% endif %}
         {% else %}
             &nbsp;
@@ -77,11 +69,7 @@
         {% if format.name is same as('bar') %}
             {% if type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_CURRENCY')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_NUMBER')) or type is same as(constant('Spyck\\VisualizationBundle\\Field\\FieldInterface::TYPE_PERCENTAGE')) %}
                 <span style="background-color: rgba({{ format.color.red }}, {{ format.color.green }}, {{ format.color.blue }}, {{ format.color.alpha }});">
-                    {% if view is same as(constant('Spyck\\VisualizationBundle\\View\\ViewInterface::PDF')) %}
-                        <img src="{{ getDirectory('/images/blank.png') }}" alt="" width="{{ value * 80|round }}" height="14">
-                    {% else %}
-                        <img src="{{ absolute_url('/images/blank.png') }}" alt="" width="{{ value * 80|round }}" height="14">
-                    {% endif %}
+                    <img src="{{ absolute_url('/images/blank.png') }}" alt="" width="{{ value * 80|round }}" height="14">
                 </span>
             {% endif %}
         {% endif %}

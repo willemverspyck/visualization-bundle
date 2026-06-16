@@ -16,14 +16,13 @@ use Spyck\VisualizationBundle\Service\ChartService;
 use Spyck\VisualizationBundle\Utility\ViewUtility;
 use Spyck\VisualizationBundle\Utility\WidgetUtility;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 #[Autoconfigure(tags: ['twig.extension'])]
 final class ViewExtension extends AbstractExtension
 {
-    public function __construct(private readonly ChartService $chartService, private readonly KernelInterface $kernel)
+    public function __construct(private readonly ChartService $chartService)
     {
     }
 
@@ -35,7 +34,6 @@ final class ViewExtension extends AbstractExtension
         return [
             new TwigFunction('getChart', [$this, 'getChart']),
             new TwigFunction('getClasses', [$this, 'getClasses']),
-            new TwigFunction('getDirectory', [$this, 'getDirectory']),
             new TwigFunction('getFields', [$this, 'getFields']),
             new TwigFunction('getNumber', [$this, 'getNumber']),
             new TwigFunction('getStyles', [$this, 'getStyles']),
@@ -51,14 +49,6 @@ final class ViewExtension extends AbstractExtension
     public function getChart(Block $block): string
     {
         return $this->chartService->getChart($block);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getDirectory(string $value): string
-    {
-        return sprintf('%s%s', $this->kernel->getProjectDir(), $value);
     }
 
     public function getClasses(AbstractFieldInterface $field): array

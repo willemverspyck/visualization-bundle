@@ -12,7 +12,6 @@ interface ViewInterface
 {
     public const string CSV = 'csv';
     public const string JSON = 'json';
-    public const string PDF = 'pdf';
     public const string SSV = 'ssv';
     public const string TSV = 'tsv';
     public const string XLSX = 'xlsx';
