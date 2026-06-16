@@ -22,8 +22,6 @@ view:
     name: HTML
   json:
     name: JSON
-  pdf:
-    name: PDF
   ssv:
     name: CSV (Semicolon separated)
   tsv:
