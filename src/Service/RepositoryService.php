@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class RepositoryService
 {
-    public function __construct(#[AutowireLocator(services: 'spyck.visualization.repository', defaultIndexMethod: 'getVisualizationName')] private ServiceLocator $serviceLocator)
+    public function __construct(#[AutowireLocator(services: 'spyck.visualization.repository')] private ServiceLocator $serviceLocator)
     {
     }
 
@@ -21,7 +21,13 @@ readonly class RepositoryService
      */
     public function getRepository(string $name): RepositoryInterface
     {
-        return $this->serviceLocator->get($name);
+        $repository = array_find($this->getRepositories(), fn (RepositoryInterface $repository) => $repository->getVisualizationName() === $name);
+
+        if (null === $repository) {
+            throw new Exception(sprintf('Repository "%s" not found', $name));
+        }
+
+        return $repository;
     }
 
     /**
@@ -31,5 +37,13 @@ readonly class RepositoryService
     public function getEntityById(string $entityName, string $entityId): ?object
     {
         return $this->getRepository($entityName)->getVisualizationEntityById($entityId);
+    }
+
+    /**
+     * @return array<string, RepositoryInterface>
+     */
+    private function getRepositories(): array
+    {
+        return iterator_to_array($this->serviceLocator->getIterator());
     }
 }
