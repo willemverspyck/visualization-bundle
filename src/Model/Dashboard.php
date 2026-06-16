@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use OpenApi\Attributes as OpenApi;
 use Spyck\VisualizationBundle\Controller\DashboardController;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
+use Spyck\VisualizationBundle\Request\RequestInterface;
+use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\Serializer\Attribute as Serializer;
 
 final class Dashboard
@@ -28,28 +30,19 @@ final class Dashboard
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private ?string $url = null;
 
-    /**
-     * @todo: How to handle this in OpenApi
-     */
+    #[OpenApi\Property(type: 'object', additionalProperties: new OpenApi\AdditionalProperties(type: 'string'))]
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
-    #[OpenApi\Property(type: 'string')]
     private array $parameters = [];
 
     private array $parametersAsString = [];
 
     private array $parametersAsStringForSlug = [];
 
-    /**
-     * @todo: How to handle this in OpenApi
-     */
-    #[OpenApi\Property(type: 'string')]
+    #[OpenApi\Property(type: 'array', example: [ViewInterface::CSV, ViewInterface::XLSX], items: new OpenApi\Items(type: 'string'))]
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $views = [];
 
-    /**
-     * @todo: How to handle this in OpenApi
-     */
-    #[OpenApi\Property(type: 'string')]
+    #[OpenApi\Property(type: 'object', example: [RequestInterface::DATE_START => '2026-01-01', RequestInterface::DATE_END => '2026-01-07'], additionalProperties: new OpenApi\AdditionalProperties(type: 'string'))]
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM])]
     private array $variables = [];
 
