@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 readonly class UserService
 {
-    public function __construct(private TokenStorageInterface $tokenStorage, #[Autowire(param: 'spyck.visualization.config.authentication')] private bool $authentication)
+    public function __construct(private TokenStorageInterface $tokenStorage, #[Autowire(param: 'spyck.visualization.config.user.authentication')] private bool $authentication)
     {
     }
 

@@ -20,8 +20,6 @@ final class SpyckVisualizationBundle extends AbstractBundle
     {
         $container->import('../config/services.php');
 
-        $builder->setParameter('spyck.visualization.config.authentication', $config['authentication']);
-
         $builder->setParameter('spyck.visualization.config.cache.active', $config['cache']['active']);
         $builder->setAlias('spyck.visualization.config.cache.adapter', $config['cache']['adapter']);
         $builder->setParameter('spyck.visualization.config.cache.expiry', $config['cache']['expiry']);
@@ -31,13 +29,12 @@ final class SpyckVisualizationBundle extends AbstractBundle
         $builder->setParameter('spyck.visualization.config.chart.command', $config['chart']['command']);
         $builder->setParameter('spyck.visualization.config.chart.directory', $config['chart']['directory']);
 
-        $builder->setParameter('spyck.visualization.config.directory', $config['directory']);
-
         $builder->setParameter('spyck.visualization.config.mail.fromEmail', $config['mail']['fromEmail']);
         $builder->setParameter('spyck.visualization.config.mail.fromName', $config['mail']['fromName']);
 
         $builder->setParameter('spyck.visualization.config.request', $config['request']);
 
+        $builder->setParameter('spyck.visualization.config.user.authentication', $config['user']['authentication']);
         $builder->setParameter('spyck.visualization.config.user.class', $config['user']['class']);
 
         $builder->setParameter('spyck.visualization.config.view.exclude', $config['view']['exclude']);
