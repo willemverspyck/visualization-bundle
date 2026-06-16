@@ -131,7 +131,7 @@ readonly class BlockService
 
         foreach ($widget->getParameterData() as $parameter) {
             $parameterAsModel = new ParameterAsModel();
-            $parameterAsModel->setName($this->translator->trans(id: sprintf('parameter.%s.description', $parameter::getName()), domain: 'SpyckVisualizationBundle'));
+            $parameterAsModel->setName($this->translator->trans(id: sprintf('parameter.%s.name', $parameter::getName()), domain: 'SpyckVisualizationBundle'));
             $parameterAsModel->setField($parameter::getField());
 
             $data[] = $parameterAsModel;

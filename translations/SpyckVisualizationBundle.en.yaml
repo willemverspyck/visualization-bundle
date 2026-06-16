@@ -29,11 +29,11 @@ filter:
     description: Filter by options
 parameter:
   date:
-    description: Date
+    name: Date
   dateStart:
-    description: Date (Start)
+    name: Date (Start)
   dateEnd:
-    description: Date (End)
+    name: Date (End)
 view:
   csv:
     name: CSV (Comma separated)
