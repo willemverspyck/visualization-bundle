@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class BlockService
 {
-    public function __construct(private EventDispatcherInterface $eventDispatcher, private RouterInterface $router, private RepositoryService $repositoryService, private TranslatorInterface $translator, private WidgetService $widgetService, private ViewService $viewService)
+    public function __construct(private ChartService $chartService, private EventDispatcherInterface $eventDispatcher, private RouterInterface $router, private RepositoryService $repositoryService, private TranslatorInterface $translator, private WidgetService $widgetService, private ViewService $viewService)
     {
     }
 
@@ -65,17 +65,28 @@ readonly class BlockService
         return $blockAsModel;
     }
 
-    private function getCharts(BlockAsEntity $blockAsEntity, WidgetAsEntity $widget): array
+    private function getCharts(BlockAsEntity $blockAsEntity, WidgetAsEntity $widgetAsEntity): array
     {
-        if (null === $blockAsEntity->getChart()) {
-            return $widget->getCharts();
+        $data = [];
+
+        $charts = match (true) {
+            null === $blockAsEntity->getChart() => $widgetAsEntity->getCharts(),
+            in_array($blockAsEntity->getChart(), $widgetAsEntity->getCharts(), true) => array_values(array_unique(array_merge([$blockAsEntity->getChart()], $widgetAsEntity->getCharts()))),
+            default => $widgetAsEntity->getCharts(),
+        };
+
+        foreach ($this->chartService->getCharts() as $chart) {
+            $code = $chart::getCode();
+
+            if (in_array($code, $charts, true)) {
+                $data[] = [
+                    'code' => $code,
+                    'name' => $this->translator->trans(id: sprintf('chart.%s.name', $code), domain: 'SpyckVisualizationBundle'),
+                ];
+            }
         }
 
-        if (in_array($blockAsEntity->getChart(), $widget->getCharts(), true)) {
-            return array_values(array_unique(array_merge([$blockAsEntity->getChart()], $widget->getCharts())));
-        }
-
-        return $widget->getCharts();
+        return $data;
     }
 
     /**

@@ -1,3 +1,22 @@
+chart:
+  area:
+    name: Area
+  bar:
+    name: Bar
+  column:
+    name: Column
+  country:
+    name: Country
+  gantt:
+    name: Gantt
+  line:
+    name: Line
+  pie:
+    name: Pie
+  region:
+    name: Region
+  table:
+    name: Table
 filter:
   limit:
     name: Limit

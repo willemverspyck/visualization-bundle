@@ -28,6 +28,7 @@ final class SpyckVisualizationBundle extends AbstractBundle
 
         $builder->setParameter('spyck.visualization.config.chart.command', $config['chart']['command']);
         $builder->setParameter('spyck.visualization.config.chart.directory', $config['chart']['directory']);
+        $builder->setParameter('spyck.visualization.config.chart.exclude', $config['chart']['exclude']);
 
         $builder->setParameter('spyck.visualization.config.mail.fromEmail', $config['mail']['fromEmail']);
         $builder->setParameter('spyck.visualization.config.mail.fromName', $config['mail']['fromName']);
