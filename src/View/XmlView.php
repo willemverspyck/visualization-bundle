@@ -6,17 +6,17 @@ namespace Spyck\VisualizationBundle\View;
 
 final class XmlView extends AbstractSerializerView
 {
+    public static function getCode(): string
+    {
+        return ViewInterface::XML;
+    }
+
     public static function getContentType(): string
     {
         return 'application/xml';
     }
 
     public static function getExtension(): string
-    {
-        return ViewInterface::XML;
-    }
-
-    public static function getName(): string
     {
         return ViewInterface::XML;
     }

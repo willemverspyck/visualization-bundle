@@ -10,7 +10,7 @@ use Spyck\VisualizationBundle\Field\FieldInterface;
 
 final class SsvView extends CsvView
 {
-    public static function getName(): string
+    public static function getCode(): string
     {
         return ViewInterface::SSV;
     }

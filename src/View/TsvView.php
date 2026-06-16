@@ -6,17 +6,17 @@ namespace Spyck\VisualizationBundle\View;
 
 final class TsvView extends CsvView
 {
+    public static function getCode(): string
+    {
+        return ViewInterface::TSV;
+    }
+
     public static function getContentType(): string
     {
         return 'text/tab-separated-values';
     }
 
     public static function getExtension(): string
-    {
-        return ViewInterface::TSV;
-    }
-
-    public static function getName(): string
     {
         return ViewInterface::TSV;
     }

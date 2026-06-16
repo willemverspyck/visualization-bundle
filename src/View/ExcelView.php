@@ -61,17 +61,17 @@ final class ExcelView extends AbstractView
         return ob_get_clean();
     }
 
+    public static function getCode(): string
+    {
+        return ViewInterface::XLSX;
+    }
+
     public static function getContentType(): string
     {
         return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     }
 
     public static function getExtension(): string
-    {
-        return ViewInterface::XLSX;
-    }
-
-    public static function getName(): string
     {
         return ViewInterface::XLSX;
     }

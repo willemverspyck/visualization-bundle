@@ -49,17 +49,17 @@ class CsvView extends AbstractView
         return ob_get_clean();
     }
 
+    public static function getCode(): string
+    {
+        return ViewInterface::CSV;
+    }
+
     public static function getContentType(): string
     {
         return 'text/csv';
     }
 
     public static function getExtension(): string
-    {
-        return ViewInterface::CSV;
-    }
-
-    public static function getName(): string
     {
         return ViewInterface::CSV;
     }

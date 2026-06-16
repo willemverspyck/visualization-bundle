@@ -167,11 +167,13 @@ readonly class BlockService
     {
         $data = [];
 
-        foreach ($this->viewService->getViews() as $name => $view) {
+        foreach ($this->viewService->getViews() as $view) {
+            $code = $view->getCode();
+
             $data[] = [
-                'id' => $name,
-                'name' => $this->translator->trans(id: sprintf('view.%s.name', $name), domain: 'SpyckVisualizationBundle'),
-                'url' => $this->getBlockUrl($blockAsEntity, $name),
+                'code' => $code,
+                'name' => $this->translator->trans(id: sprintf('view.%s.name', $code), domain: 'SpyckVisualizationBundle'),
+                'url' => $this->getBlockUrl($blockAsEntity, $code),
             ];
         }
 

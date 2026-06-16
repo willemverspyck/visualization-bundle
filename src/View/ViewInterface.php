@@ -22,11 +22,11 @@ interface ViewInterface
 
     public function getFile(string $name, array $parameters = []): string;
 
+    public static function getCode(): string;
+
     public static function getContentType(): string;
 
     public static function getExtension(): string;
-
-    public static function getName(): string;
 
     /**
      * Return boolean if it can be merged or not, or NULL when it doesn't matter.

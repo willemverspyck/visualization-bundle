@@ -132,6 +132,6 @@ final class WidgetExportCommand extends Command
 
     private function getViews(): array
     {
-        return $this->viewService->getViews();
+        return array_map(fn (ViewInterface $view) => $view->getCode(), $this->viewService->getViews());
     }
 }
