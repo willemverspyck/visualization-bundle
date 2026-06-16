@@ -14,6 +14,9 @@ final class Route
     private string $name;
 
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM, MenuController::GROUP_LIST])]
+    private ?string $description = null;
+
+    #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM, MenuController::GROUP_LIST])]
     private string $url;
 
     #[Serializer\Groups(groups: [DashboardController::GROUP_ITEM, MenuController::GROUP_LIST])]
@@ -27,6 +30,18 @@ final class Route
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }
@@ -59,6 +74,7 @@ final class Route
     {
         return [
             'name' => $this->getName(),
+            'description' => $this->getDescription(),
             'url' => $this->getUrl(),
             'variables' => $this->getVariables(),
         ];

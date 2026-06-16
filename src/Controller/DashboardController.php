@@ -70,24 +70,24 @@ final class DashboardController extends AbstractController
 
         $errors = $dashboardService->getErrors($dashboard, $variables);
 
-        if (count($errors) > 0) {
-            $dashboardAsModel = [
-                'id' => $dashboard->getId(),
-                'name' => $dashboard->getName(),
-                'description' => $dashboard->getDescription(),
-                'variables' => $variables,
-                'errors' => $errors,
-            ];
+        if (0 === count($errors)) {
+            $dashboardAsModel = $dashboardService->getDashboardAsModel($dashboard, $variables);
 
-            return new JsonResponse($dashboardAsModel);
+            $user = $tokenStorage->getToken()?->getUser();
+
+            $logRepository->putLog(user: $user, dashboard: $dashboard, variables: $dashboardAsModel->getVariables(), view: ViewInterface::JSON, type: Log::TYPE_API);
+
+            return $responseService->getResponseForItem(data: $dashboardAsModel, groups: [self::GROUP_ITEM]);
         }
 
-        $dashboardAsModel = $dashboardService->getDashboardAsModel($dashboard, $variables);
+        $dashboardAsModel = [
+            'id' => $dashboard->getId(),
+            'name' => $dashboard->getName(),
+            'description' => $dashboard->getDescription(),
+            'variables' => $variables,
+            'errors' => $errors,
+        ];
 
-        $user = $tokenStorage->getToken()?->getUser();
-
-        $logRepository->putLog(user: $user, dashboard: $dashboard, variables: $dashboardAsModel->getVariables(), view: ViewInterface::JSON, type: Log::TYPE_API);
-
-        return $responseService->getResponseForItem(data: $dashboardAsModel, groups: [self::GROUP_ITEM]);
+        return new JsonResponse($dashboardAsModel);
     }
 }

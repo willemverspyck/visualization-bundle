@@ -25,10 +25,6 @@ class Dashboard implements Stringable, TimestampInterface
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $id = null;
 
-    #[Doctrine\ManyToOne(targetEntity: Category::class, inversedBy: 'dashboards')]
-    #[Doctrine\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
-    private ?Category $category;
-
     #[Doctrine\ManyToOne(targetEntity: UserInterface::class)]
     #[Doctrine\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true)]
     private ?UserInterface $user;
@@ -58,26 +54,24 @@ class Dashboard implements Stringable, TimestampInterface
     #[Validator\Valid]
     private Collection $blocks;
 
+    /**
+     * @var Collection<int, Category>
+     */
+    #[Doctrine\ManyToMany(targetEntity: Category::class, inversedBy: 'dashboards')]
+    #[Doctrine\JoinTable(name: 'visualization_dashboard_category')]
+    #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Doctrine\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Collection $categories;
+
     public function __construct()
     {
         $this->blocks = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
     }
 
     public function getUser(): ?UserInterface
@@ -177,6 +171,31 @@ class Dashboard implements Stringable, TimestampInterface
     public function removeBlock(Block $block): void
     {
         $this->blocks->removeElement($block);
+    }
+
+    public function addCategory(Category $category): static
+    {
+        $this->categories->add($category);
+
+        return $this;
+    }
+
+    public function clearCategories(): void
+    {
+        $this->categories->clear();
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function removeCategory(Category $category): void
+    {
+        $this->categories->removeElement($category);
     }
 
     public function __toString(): string

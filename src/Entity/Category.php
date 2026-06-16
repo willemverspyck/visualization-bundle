@@ -23,7 +23,7 @@ class Category implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
-    #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_LIST])]
     private ?int $id = null;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
@@ -37,7 +37,7 @@ class Category implements Stringable, TimestampInterface
     /**
      * @var Collection<int, Dashboard>
      */
-    #[Doctrine\OneToMany(mappedBy: 'category', targetEntity: Dashboard::class)]
+    #[Doctrine\ManyToMany(targetEntity: Dashboard::class, mappedBy: 'categories')]
     #[Serializer\Groups(groups: [CategoryController::GROUP_LIST])]
     private Collection $dashboards;
 
@@ -77,8 +77,6 @@ class Category implements Stringable, TimestampInterface
 
     public function addDashboard(Dashboard $dashboard): static
     {
-        $dashboard->setCategory($this);
-
         $this->dashboards->add($dashboard);
 
         return $this;

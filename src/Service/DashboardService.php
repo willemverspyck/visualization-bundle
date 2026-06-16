@@ -175,9 +175,14 @@ readonly class DashboardService
 
     public function getRoute(DashboardAsEntity $dashboardAsEntity, array $variables = []): RouteAsModel
     {
+        $url = $this->router->generate('spyck_visualization_dashboard_show', [
+            'dashboardId' => $dashboardAsEntity->getId(),
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
+
         return new RouteAsModel()
             ->setName($dashboardAsEntity->getName())
-            ->setUrl($this->router->generate('spyck_visualization_dashboard_show', ['dashboardId' => $dashboardAsEntity->getId()], UrlGeneratorInterface::ABSOLUTE_URL))
+            ->setDescription($dashboardAsEntity->getDescription())
+            ->setUrl($url)
             ->setVariables($variables);
     }
 
