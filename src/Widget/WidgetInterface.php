@@ -14,8 +14,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 #[Autoconfigure(tags: ['spyck.visualization.widget'])]
 interface WidgetInterface
 {
-    public static function getName(): string;
-
     public function getCache(): ?int;
 
     public function getData(): iterable;

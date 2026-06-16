@@ -127,7 +127,7 @@ final class WidgetExportCommand extends Command
 
     private function getWidgets(): array
     {
-        return $this->widgetService->getWidgets();
+        return array_keys($this->widgetService->getWidgets());
     }
 
     private function getViews(): array

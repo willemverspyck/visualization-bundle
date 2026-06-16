@@ -74,7 +74,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('monolog.logger', ['channel' => 'spyck_visualization'])]
 readonly class WidgetService
 {
-    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly EventDispatcherInterface $eventDispatcher, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.config.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.config.request')] private array $request, #[AutowireLocator(services: 'spyck.visualization.widget', defaultIndexMethod: 'getName')] private ServiceLocator $serviceLocator)
+    public function __construct(#[Autowire(service: 'spyck.visualization.config.cache.adapter')] private CacheInterface $cache, private DashboardRepository $dashboardRepository, private readonly EventDispatcherInterface $eventDispatcher, private readonly LoggerInterface $logger, private RepositoryService $repositoryService, private RequestStack $requestStack, private RouterInterface $router, private TranslatorInterface $translator, private UserService $userService, private UrlGeneratorInterface $urlGenerator, private WidgetRepository $widgetRepository, #[Autowire(param: 'spyck.visualization.config.cache.active')] private bool $cacheActive, #[Autowire(param: 'spyck.visualization.config.request')] private array $request, #[AutowireLocator(services: 'spyck.visualization.widget')] private ServiceLocator $serviceLocator)
     {
     }
 
@@ -119,7 +119,7 @@ readonly class WidgetService
      */
     public function getWidgets(): array
     {
-        return array_keys($this->serviceLocator->getProvidedServices());
+        return iterator_to_array($this->serviceLocator->getITerator());
     }
 
     /**
