@@ -38,7 +38,7 @@ readonly class ViewService
      */
     public function getViews(): array
     {
-        $views = iterator_to_array($this->serviceLocator->getIterator());
+        $views = array_values(iterator_to_array($this->serviceLocator->getIterator()));
 
         return array_filter($views, function (ViewInterface $view): bool {
             return null === $this->exclude || false === in_array($view->getCode(), $this->exclude, true);

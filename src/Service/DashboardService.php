@@ -13,9 +13,11 @@ use Spyck\VisualizationBundle\Event\DashboardEvent;
 use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Model\Route as RouteAsModel;
+use Spyck\VisualizationBundle\Model\View as ViewAsModel;
 use Spyck\VisualizationBundle\Parameter\DateParameterInterface;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
+use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -206,20 +208,19 @@ readonly class DashboardService
 
     /**
      * @throws Exception
+     *
+     * @return list<ViewAsModel>
      */
     private function getViews(): array
     {
-        $data = [];
-
-        foreach ($this->viewService->getViews() as $view) {
+        return array_map(function (ViewInterface $view): ViewAsModel {
             $code = $view->getCode();
 
-            $data[] = [
-                'code' => $code,
-                'name' => $this->translator->trans(id: sprintf('view.%s.name', $code), domain: 'SpyckVisualizationBundle'),
-            ];
-        }
+            $viewAsModel = new ViewAsModel();
+            $viewAsModel->setCode($code);
+            $viewAsModel->setName($this->translator->trans(id: sprintf('view.%s.name', $code), domain: 'SpyckVisualizationBundle'));
 
-        return $data;
+            return $viewAsModel;
+        }, $this->viewService->getViews());
     }
 }

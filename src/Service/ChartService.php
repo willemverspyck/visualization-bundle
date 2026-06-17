@@ -37,7 +37,7 @@ readonly class ChartService
      */
     public function getCharts(): array
     {
-        $charts = iterator_to_array($this->serviceLocator->getIterator());
+        $charts = array_values(iterator_to_array($this->serviceLocator->getIterator()));
 
         return array_filter($charts, function (ChartInterface $chart): bool {
             return null === $this->exclude || false === in_array($chart->getCode(), $this->exclude, true);

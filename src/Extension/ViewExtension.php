@@ -91,7 +91,7 @@ final class ViewExtension extends AbstractExtension
             return false;
         }
 
-        return Widget::CHART_TABLE !== $charts[0];
+        return Widget::CHART_TABLE !== $charts[0]->getCode();
     }
 
     public function hasMultipleFields(array $fields): bool

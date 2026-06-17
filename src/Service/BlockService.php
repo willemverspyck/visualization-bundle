@@ -10,9 +10,13 @@ use Spyck\VisualizationBundle\Entity\Block as BlockAsEntity;
 use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
 use Spyck\VisualizationBundle\Event\BlockEvent;
 use Spyck\VisualizationBundle\Event\FilterEvent;
+use Spyck\VisualizationBundle\Filter\FilterInterface;
 use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
+use Spyck\VisualizationBundle\Model\Chart as ChartAsModel;
+use Spyck\VisualizationBundle\Model\Download as DownloadAsModel;
 use Spyck\VisualizationBundle\Model\Filter as FilterAsModel;
 use Spyck\VisualizationBundle\Model\Parameter as ParameterAsModel;
+use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -76,13 +80,14 @@ readonly class BlockService
         };
 
         foreach ($this->chartService->getCharts() as $chart) {
-            $code = $chart::getCode();
+            $code = $chart->getCode();
 
             if (in_array($code, $charts, true)) {
-                $data[] = [
-                    'code' => $code,
-                    'name' => $this->translator->trans(id: sprintf('chart.%s.name', $code), domain: 'SpyckVisualizationBundle'),
-                ];
+                $chartAsModel = new ChartAsModel();
+                $chartAsModel->setCode($code);
+                $chartAsModel->setName($this->translator->trans(id: sprintf('chart.%s.name', $code), domain: 'SpyckVisualizationBundle'));
+
+                $data[] = $chartAsModel;
             }
         }
 
@@ -94,9 +99,7 @@ readonly class BlockService
      */
     private function getBlockFilters(WidgetInterface $widget): array
     {
-        $data = [];
-
-        foreach ($widget->getFilterData() as $filter) {
+        return array_map(function (FilterInterface $filter) use ($widget): FilterAsModel {
             $name = $filter->getName();
 
             $options = [];
@@ -116,10 +119,8 @@ readonly class BlockService
             $filterAsModel->setOptions($options);
             $filterAsModel->setType($filter->getType());
 
-            $data[] = $filterAsModel;
-        }
-
-        return $data;
+            return $filterAsModel;
+        }, array_values($widget->getFilterData()));
     }
 
     /**
@@ -127,17 +128,13 @@ readonly class BlockService
      */
     private function getBlockParameters(WidgetInterface $widget): array
     {
-        $data = [];
-
-        foreach ($widget->getParameterData() as $parameter) {
+        return array_map(function (ParameterInterface $parameter): ParameterAsModel {
             $parameterAsModel = new ParameterAsModel();
-            $parameterAsModel->setName($this->translator->trans(id: sprintf('parameter.%s.name', $parameter::getName()), domain: 'SpyckVisualizationBundle'));
-            $parameterAsModel->setField($parameter::getField());
+            $parameterAsModel->setName($this->translator->trans(id: sprintf('parameter.%s.name', $parameter->getName()), domain: 'SpyckVisualizationBundle'));
+            $parameterAsModel->setField($parameter->getField());
 
-            $data[] = $parameterAsModel;
-        }
-
-        return $data;
+            return $parameterAsModel;
+        }, array_values($widget->getParameterData()));
     }
 
     /**
@@ -163,20 +160,20 @@ readonly class BlockService
         return array_merge($widget->getParameterDataRequest(), $widget->getFilterDataRequest());
     }
 
+    /**
+     * @return list<DownloadAsModel>
+     */
     private function getDownloads(BlockAsEntity $blockAsEntity): array
     {
-        $data = [];
-
-        foreach ($this->viewService->getViews() as $view) {
+        return array_map(function (ViewInterface $view) use ($blockAsEntity): DownloadAsModel {
             $code = $view->getCode();
 
-            $data[] = [
-                'code' => $code,
-                'name' => $this->translator->trans(id: sprintf('view.%s.name', $code), domain: 'SpyckVisualizationBundle'),
-                'url' => $this->getBlockUrl($blockAsEntity, $code),
-            ];
-        }
+            $downloadAsModel = new DownloadAsModel();
+            $downloadAsModel->setCode($code);
+            $downloadAsModel->setName($this->translator->trans(id: sprintf('view.%s.name', $code), domain: 'SpyckVisualizationBundle'));
+            $downloadAsModel->setUrl($this->getBlockUrl($blockAsEntity, $code));
 
-        return $data;
+            return $downloadAsModel;
+        }, $this->viewService->getViews());
     }
 }

@@ -174,6 +174,9 @@ final class Dashboard
         return $this;
     }
 
+    /**
+     * @return list<View>
+     */
     public function getViews(): array
     {
         return $this->views;

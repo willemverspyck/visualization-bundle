@@ -201,6 +201,9 @@ final class Block
         return $this;
     }
 
+    /**
+     * @return list<Download>
+     */
     public function getDownloads(): array
     {
         return $this->downloads;
@@ -213,6 +216,9 @@ final class Block
         return $this;
     }
 
+    /**
+     * @return list<Chart>
+     */
     public function getCharts(): array
     {
         return $this->charts;
