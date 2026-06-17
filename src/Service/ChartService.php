@@ -6,22 +6,22 @@ namespace Spyck\VisualizationBundle\Service;
 
 use Exception;
 use Spyck\VisualizationBundle\Chart\ChartInterface;
-use Spyck\VisualizationBundle\Model\Block;
+use Spyck\VisualizationBundle\Model\Block as BlockAsModel;
+use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
+use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 readonly class ChartService
 {
-    public function __construct(private Environment $environment, private TranslatorInterface $translator, #[AutowireLocator(services: 'spyck.visualization.chart')] private ServiceLocator $serviceLocator, #[Autowire(param: 'spyck.visualization.config.chart.command')] private ?string $command, #[Autowire(param: 'spyck.visualization.config.chart.directory')] private ?string $directory, #[Autowire(param: 'spyck.visualization.config.chart.exclude')] private readonly ?array $exclude)
+    public function __construct(private Environment $environment, #[AutowireLocator(services: 'spyck.visualization.chart')] private ServiceLocator $serviceLocator, private TranslatorInterface $translator, private readonly ViewService $viewService, #[Autowire(param: 'spyck.visualization.config.chart.command')] private ?string $command, #[Autowire(param: 'spyck.visualization.config.chart.directory')] private ?string $directory, #[Autowire(param: 'spyck.visualization.config.chart.exclude')] private readonly ?array $exclude)
     {
         $loader = $environment->getLoader();
 
@@ -65,35 +65,39 @@ readonly class ChartService
     /**
      * @throws Exception
      */
-    public function getChart(Block $block): string
+    public function getChart(BlockAsModel $blockAsModel): string
     {
-        $command = $this->getCommand();
+        $dashboardAsModel = new DashboardAsModel();
+        $dashboardAsModel->addBlock($blockAsModel);
+
+        $view = $this->viewService->getView(ViewInterface::JSON);
+
         $directory = $this->getDirectory();
+        $content = $view->getContent($dashboardAsModel);
 
-        $serializer = new Serializer([
-            new ObjectNormalizer(),
-        ]);
-
-        $blockAsArray = $serializer->normalize($block);
-
-        $output = sprintf('%s/%s.png', $directory, md5(serialize($blockAsArray)));
+        $output = sprintf('%s/%s.png', $directory, md5(serialize($content)));
 
         if (file_exists($output)) {
             return $output;
         }
 
-        $input = sprintf('%s/%s.html', $directory, md5(serialize($blockAsArray)));
+        $input = sprintf('%s/%s.html', $directory, md5(serialize($content)));
 
-        $content = $this->environment->render('@SpyckVisualization/chart/index.html.twig', [
-            'block' => $blockAsArray,
+        $render = $this->environment->render('@SpyckVisualization/chart/index.html.twig', [
+            'name' => $blockAsModel->getName(),
+            'description' => $blockAsModel->getDescription(),
+            'descriptionEmpty' => $blockAsModel->getDescriptionEmpty(),
+            'size' => $blockAsModel->getSize(),
+            'chart' => $blockAsModel->getCharts()[0],
+            'content' => $content,
         ]);
 
-        if (false === file_put_contents($input, $content)) {
+        if (false === file_put_contents($input, $render)) {
             throw new Exception('File not writable');
         }
 
         $commands = [
-            $command,
+            $this->getCommand(),
             sprintf('--input=%s', $input),
             sprintf('--output=%s', $output),
         ];

@@ -207,9 +207,9 @@ readonly class DashboardService
     }
 
     /**
-     * @throws Exception
-     *
      * @return list<ViewAsModel>
+     *
+     * @throws Exception
      */
     private function getViews(): array
     {
