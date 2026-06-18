@@ -6,6 +6,7 @@ namespace Spyck\VisualizationBundle\Service;
 
 use Exception;
 use Psr\Cache\InvalidArgumentException;
+use Spyck\VisualizationBundle\Chart\ChartInterface;
 use Spyck\VisualizationBundle\Entity\Block as BlockAsEntity;
 use Spyck\VisualizationBundle\Entity\Widget as WidgetAsEntity;
 use Spyck\VisualizationBundle\Event\BlockEvent;
@@ -71,27 +72,34 @@ readonly class BlockService
 
     private function getCharts(BlockAsEntity $blockAsEntity, WidgetAsEntity $widgetAsEntity): array
     {
+        $chartCode = $blockAsEntity->getChart();
+        $chartCodes = $widgetAsEntity->getCharts();
+
+        if (null !== $chartCode) {
+            $chartCodes = [$chartCode, ...array_diff($chartCodes, [$chartCode])];
+        }
+
         $data = [];
 
-        $charts = match (true) {
-            null === $blockAsEntity->getChart() => $widgetAsEntity->getCharts(),
-            in_array($blockAsEntity->getChart(), $widgetAsEntity->getCharts(), true) => array_values(array_unique(array_merge([$blockAsEntity->getChart()], $widgetAsEntity->getCharts()))),
-            default => $widgetAsEntity->getCharts(),
-        };
+        $charts = $this->chartService->getCharts();
 
-        foreach ($this->chartService->getCharts() as $chart) {
-            $code = $chart->getCode();
-
-            if (in_array($code, $charts, true)) {
-                $chartAsModel = new ChartAsModel();
-                $chartAsModel->setCode($code);
-                $chartAsModel->setName($this->translator->trans(id: sprintf('chart.%s.name', $code), domain: 'SpyckVisualizationBundle'));
-
-                $data[] = $chartAsModel;
+        foreach ($chartCodes as $chartCode) {
+            foreach ($charts as $chart) {
+                if ($chartCode === $chart->getCode()) {
+                    $data[] = $chart;
+                }
             }
         }
 
-        return $data;
+        return array_map(function (ChartInterface $chart): ChartAsModel {
+            $code = $chart->getCode();
+
+            $chartAsModel = new ChartAsModel();
+            $chartAsModel->setCode($code);
+            $chartAsModel->setName($this->translator->trans(id: sprintf('chart.%s.name', $code), domain: 'SpyckVisualizationBundle'));
+
+            return $chartAsModel;
+        }, $data);
     }
 
     /**
