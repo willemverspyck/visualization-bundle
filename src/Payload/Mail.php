@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Payload;
 
 use Symfony\Component\Validator\Constraints as Validator;
+Use Spyck\VisualizationBundle\Constraint\ViewConstraint;
 
 final class Mail
 {
@@ -19,6 +20,7 @@ final class Mail
     private array $variables;
 
     #[Validator\Type(type: 'string')]
+    #[ViewConstraint]
     private ?string $view = null;
 
     #[Validator\NotNull]
