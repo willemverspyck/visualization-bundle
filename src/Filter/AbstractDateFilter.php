@@ -12,8 +12,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class AbstractDateFilter extends AbstractFilter implements DateFilterInterface
 {
+    /** @var list<DateTimeInterface|null */
+    private ?array $data = null;
+
     public function getData(): ?array
     {
+        if (null === $this->data) {
+            return null;
+        }
+
         return array_map(function (DateTimeInterface $date): string {
             return $date->format(DateTimeUtility::FORMAT_DATE);
         }, $this->data);
