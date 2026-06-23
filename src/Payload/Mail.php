@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Spyck\VisualizationBundle\Payload;
 
+use Spyck\VisualizationBundle\Constraint\ViewConstraint;
 use Symfony\Component\Validator\Constraints as Validator;
-Use Spyck\VisualizationBundle\Constraint\ViewConstraint;
 
 final class Mail
 {
