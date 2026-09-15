@@ -44,6 +44,9 @@ class Dashboard implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
 
+    #[Doctrine\Column(name: 'score', type: Types::INTEGER, nullable: true, options: ['unsigned' => true])]
+    private ?int $score = null;
+
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
     private bool $active;
 
@@ -131,6 +134,18 @@ class Dashboard implements Stringable, TimestampInterface
     public function setVariables(array $variables): static
     {
         $this->variables = $variables;
+
+        return $this;
+    }
+
+    public function getScore(): ?int
+    {
+        return $this->score;
+    }
+
+    public function setScore(?int $score): static
+    {
+        $this->score = $score;
 
         return $this;
     }

@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use SortDirection;
 use Spyck\VisualizationBundle\Entity\Dashboard;
+use Spyck\VisualizationBundle\Map\DashboardMap;
 use Spyck\VisualizationBundle\Service\UserService;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
@@ -51,11 +52,9 @@ class DashboardRepository extends AbstractRepository
      *
      * @throws AuthenticationException
      */
-    public function getDashboards(): array
+    public function getDashboardsByMapAsQueryBuilder(DashboardMap $dashboardMap): QueryBuilder
     {
-        return $this->getDashboardsAsQueryBuilder(true)
-            ->getQuery()
-            ->getResult();
+        return $this->getDashboardsAsQueryBuilder(true);
     }
 
     /**
@@ -86,7 +85,7 @@ class DashboardRepository extends AbstractRepository
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
             ->where('dashboard.active = TRUE')
-            ->orderBy('dashboard.timestampCreated', SortDirection::Descending)
+            ->orderBy('dashboard.score', SortDirection::Descending)
             ->addOrderBy('block.position');
 
         if (false === $authentication) {

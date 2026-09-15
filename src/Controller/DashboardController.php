@@ -11,6 +11,7 @@ use Psr\Cache\InvalidArgumentException;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Log;
+use Spyck\VisualizationBundle\Map\DashboardMap;
 use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
@@ -56,11 +57,11 @@ final class DashboardController extends AbstractController
     #[Schema\Forbidden]
     #[Schema\NotFound]
     #[Schema\ResponseForList(type: Dashboard::class, groups: [self::GROUP_LIST])]
-    public function list(DashboardRepository $dashboardRepository, ResponseService $responseService): Response
+    public function list(DashboardRepository $dashboardRepository, ResponseService $responseService, #[MapQueryString] DashboardMap $dashboardMap = new DashboardMap()): Response
     {
         $dashboards = $dashboardRepository->getDashboards();
 
-        return $responseService->getResponseForList(data: $dashboards, groups: [self::GROUP_LIST]);
+        return $responseService->getResponseForList(data: $dashboards, map: $dashboardMap, groups: [self::GROUP_LIST]);
     }
 
     /**
