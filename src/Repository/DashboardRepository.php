@@ -8,6 +8,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Service\UserService;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -25,7 +26,7 @@ class DashboardRepository extends AbstractRepository
      */
     public function getDashboardById(int $id, bool $authentication = true): ?Dashboard
     {
-        return $this->getDashboardAsQueryBuilder($authentication)
+        return $this->getDashboardsAsQueryBuilder($authentication)
             ->andWhere('dashboard.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -38,11 +39,23 @@ class DashboardRepository extends AbstractRepository
      */
     public function getDashboardByCode(string $code, bool $authentication = true): ?Dashboard
     {
-        return $this->getDashboardAsQueryBuilder($authentication)
+        return $this->getDashboardsAsQueryBuilder($authentication)
             ->andWhere('dashboard.code = :code')
             ->setParameter('code', $code)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @return list<Dashboard>
+     *
+     * @throws AuthenticationException
+     */
+    public function getDashboards(): array
+    {
+        return $this->getDashboardsAsQueryBuilder(true)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -58,14 +71,14 @@ class DashboardRepository extends AbstractRepository
             return [];
         }
 
-        return $this->getDashboardAsQueryBuilder(true)
+        return $this->getDashboardsAsQueryBuilder(true)
             ->innerJoin('dashboard.user', 'user', Join::WITH, 'user = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
     }
 
-    private function getDashboardAsQueryBuilder(bool $authentication): QueryBuilder
+    private function getDashboardsAsQueryBuilder(bool $authentication): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('dashboard')
             ->addSelect('block')
@@ -73,7 +86,7 @@ class DashboardRepository extends AbstractRepository
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
             ->where('dashboard.active = TRUE')
-            ->orderBy('dashboard.timestampCreated', 'DESC')
+            ->orderBy('dashboard.timestampCreated', SortDirection::Descending)
             ->addOrderBy('block.position');
 
         if (false === $authentication) {

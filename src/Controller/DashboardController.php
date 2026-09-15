@@ -11,6 +11,7 @@ use Psr\Cache\InvalidArgumentException;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Log;
+use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
 use Spyck\VisualizationBundle\Repository\LogRepository;
@@ -30,6 +31,7 @@ use Throwable;
 final class DashboardController extends AbstractController
 {
     public const string GROUP_ITEM = 'spyck:visualization:dashboard:item';
+    public const string GROUP_LIST = 'spyck:visualization:dashboard:list';
 
     /**
      * @throws Throwable
@@ -47,6 +49,18 @@ final class DashboardController extends AbstractController
         return $this->render('@SpyckVisualization/dashboard/index.html.twig', [
             'dashboard' => $dashboard,
         ]);
+    }
+
+    #[Route(path: '/api/dashboards', name: 'spyck_visualization_dashboard_list', methods: [Request::METHOD_GET])]
+    #[Schema\BadRequest]
+    #[Schema\Forbidden]
+    #[Schema\NotFound]
+    #[Schema\ResponseForList(type: Dashboard::class, groups: [self::GROUP_LIST])]
+    public function list(DashboardRepository $dashboardRepository, ResponseService $responseService): Response
+    {
+        $dashboards = $dashboardRepository->getDashboards();
+
+        return $responseService->getResponseForList(data: $dashboards, groups: [self::GROUP_LIST]);
     }
 
     /**
