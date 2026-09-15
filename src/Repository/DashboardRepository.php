@@ -54,7 +54,8 @@ class DashboardRepository extends AbstractRepository
      */
     public function getDashboardsByMapAsQueryBuilder(DashboardMap $dashboardMap): QueryBuilder
     {
-        return $this->getDashboardsAsQueryBuilder(true);
+        return $this->getDashboardsAsQueryBuilder(true)
+            ->orderBy('dashboard.score', SortDirection::Descending);
     }
 
     /**
@@ -72,6 +73,7 @@ class DashboardRepository extends AbstractRepository
 
         return $this->getDashboardsAsQueryBuilder(true)
             ->innerJoin('dashboard.user', 'user', Join::WITH, 'user = :user')
+            ->orderBy('dashboard.score', SortDirection::Descending)
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
@@ -84,8 +86,7 @@ class DashboardRepository extends AbstractRepository
             ->addSelect('widget')
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
-            ->where('dashboard.active = TRUE')
-            ->orderBy('dashboard.score', SortDirection::Descending);
+            ->where('dashboard.active = TRUE');
 
         if (false === $authentication) {
             return $queryBuilder;
