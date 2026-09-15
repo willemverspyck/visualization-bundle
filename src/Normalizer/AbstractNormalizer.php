@@ -36,5 +36,4 @@ abstract class AbstractNormalizer implements NormalizerInterface, NormalizerAwar
     {
         return spl_object_hash($data);
     }
-
 }
