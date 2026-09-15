@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use SortDirection;
 use Spyck\VisualizationBundle\Controller\MenuController;
 use Spyck\VisualizationBundle\Repository\MenuRepository;
 use Stringable;
@@ -39,6 +40,10 @@ class Menu implements Stringable, TimestampInterface
     #[Validator\NotNull]
     private string $name;
 
+    #[Doctrine\Column(name: 'code', type: Types::STRING, length: 128, nullable: true)]
+    #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
+    private ?string $code = null;
+
     /**
      * @var array<string, string|int>
      */
@@ -57,7 +62,7 @@ class Menu implements Stringable, TimestampInterface
      * @var Collection<int, Menu>
      */
     #[Doctrine\OneToMany(mappedBy: 'parent', targetEntity: Menu::class)]
-    #[Doctrine\OrderBy(value: ['position' => 'ASC'])]
+    #[Doctrine\OrderBy(value: ['position' => SortDirection::Ascending])]
     #[Serializer\Groups(groups: [MenuController::GROUP_LIST])]
     private Collection $children;
 
@@ -105,6 +110,18 @@ class Menu implements Stringable, TimestampInterface
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
