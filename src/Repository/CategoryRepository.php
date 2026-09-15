@@ -17,6 +17,21 @@ class CategoryRepository extends AbstractRepository
         parent::__construct($managerRegistry, Category::class);
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function getCategoryById(int $id): ?Category
+    {
+        return $this->getCategoriesAsQueryBuilder()
+            ->andWhere('category.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @return list<Category>
+     */
     public function getCategories(): array
     {
         return $this->getCategoriesAsQueryBuilder()

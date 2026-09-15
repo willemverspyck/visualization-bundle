@@ -23,13 +23,17 @@ class Category implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'id', type: Types::SMALLINT, options: ['unsigned' => true])]
     #[Doctrine\Id]
     #[Doctrine\GeneratedValue(strategy: 'IDENTITY')]
-    #[Serializer\Groups(groups: [CategoryController::GROUP_LIST])]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
     private ?int $id = null;
 
     #[Doctrine\Column(name: 'name', type: Types::STRING, length: 128)]
-    #[Serializer\Groups(groups: [CategoryController::GROUP_LIST])]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
     #[Validator\NotNull]
     private string $name;
+
+    #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
+    private ?string $description;
 
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
     private bool $active;
@@ -38,7 +42,7 @@ class Category implements Stringable, TimestampInterface
      * @var Collection<int, Dashboard>
      */
     #[Doctrine\ManyToMany(targetEntity: Dashboard::class, mappedBy: 'categories')]
-    #[Serializer\Groups(groups: [CategoryController::GROUP_LIST])]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
     private Collection $dashboards;
 
     public function __construct()
@@ -59,6 +63,18 @@ class Category implements Stringable, TimestampInterface
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }
