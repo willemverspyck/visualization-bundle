@@ -10,6 +10,7 @@ use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Entity\UserInterface;
+use Spyck\VisualizationBundle\Map\MailMap;
 use Spyck\VisualizationBundle\Message\MailMessage;
 use Spyck\VisualizationBundle\Payload\Mail as MailAsPayload;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
@@ -37,11 +38,11 @@ final class MailController extends AbstractController
     #[Schema\Forbidden]
     #[Schema\NotFound]
     #[Schema\ResponseForList(type: Mail::class, groups: [self::GROUP_LIST])]
-    public function list(MailRepository $mailRepository, ResponseService $responseService): Response
+    public function list(MailRepository $mailRepository, ResponseService $responseService, #[MapQueryString] MailMap $mailMap = new MailMap()): Response
     {
-        $mails = $mailRepository->getMailsBySubscribe(true);
+        $mails = $mailRepository->getMailsByMapAsQueryBuilder($mailMap);
 
-        return $responseService->getResponseForList(data: $mails, groups: [self::GROUP_LIST]);
+        return $responseService->getResponseForList(data: $mails, map: $mailMap, groups: [self::GROUP_LIST]);
     }
 
     #[Route(path: '/api/mail/{mailId}', name: 'spyck_visualization_mail_post', requirements: ['mailId' => Requirement::DIGITS], methods: [Request::METHOD_POST])]

@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Mail;
 use Spyck\VisualizationBundle\Entity\ScheduleInterface;
+use Spyck\VisualizationBundle\Map\MailMap;
 use Spyck\VisualizationBundle\Service\UserService;
 
 class MailRepository extends AbstractRepository
@@ -49,13 +50,10 @@ class MailRepository extends AbstractRepository
             ->getResult();
     }
 
-    public function getMailsBySubscribe(bool $subscribe): array
+    public function getMailsByMapAsQueryBuilder(MailMap $mailMap): QueryBuilder
     {
         return $this->getMailsAsQueryBuilder(true)
-            ->andWhere('mail.subscribe = :subscribe')
-            ->setParameter('subscribe', $subscribe)
-            ->getQuery()
-            ->getResult();
+            ->andWhere('mail.subscribe = TRUE');
     }
 
     private function getMailsAsQueryBuilder(bool $authentication): QueryBuilder
