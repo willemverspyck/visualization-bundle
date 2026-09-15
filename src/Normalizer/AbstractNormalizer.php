@@ -12,24 +12,22 @@ abstract class AbstractNormalizer implements NormalizerInterface, NormalizerAwar
 {
     use NormalizerAwareTrait;
 
-    private const string KEY = 'spyck_visualization_normalizer';
-
     protected function isNormalize(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if (false === array_key_exists(self::KEY, $context)) {
+        if (false === array_key_exists(self::class, $context)) {
             return false;
         }
 
-        return in_array($this->getKey($data), $context[self::KEY], true);
+        return in_array($this->getKey($data), $context[self::class], true);
     }
 
     protected function getNormalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        if (false === array_key_exists(self::KEY, $context)) {
-            $context[self::KEY] = [];
+        if (false === array_key_exists(self::class, $context)) {
+            $context[self::class] = [];
         }
 
-        $context[self::KEY][] = $this->getKey($data);
+        $context[self::class][] = $this->getKey($data);
 
         return $this->normalizer->normalize($data, $format, $context);
     }
@@ -38,4 +36,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, NormalizerAwar
     {
         return spl_object_hash($data);
     }
+
 }
