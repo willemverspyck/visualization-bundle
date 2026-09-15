@@ -14,16 +14,17 @@ final class DownloadNormalizer extends AbstractNormalizer
     {
     }
 
+    /**
+     * @param Download $data
+     */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $this->setNormalized($data);
-
         $name = 'spyck_visualization_download_item';
         $parameters = [
             'downloadId' => $data->getId(),
         ];
 
-        $normalize = $this->normalizer->normalize($data, $format, $context);
+        $normalize = $this->getNormalize($data, $format, $context);
         $normalize['url'] = $this->router->generate($name, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
 
         return $normalize;
@@ -31,7 +32,7 @@ final class DownloadNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if ($this->isNormalized($data)) {
+        if ($this->isNormalize($data, $format, $context)) {
             return false;
         }
 

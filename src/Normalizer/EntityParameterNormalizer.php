@@ -7,12 +7,13 @@ namespace Spyck\VisualizationBundle\Normalizer;
 use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer as BaseAbstractNormalizer;
 
-final class ParameterNormalizer extends AbstractNormalizer
+final class EntityParameterNormalizer extends AbstractNormalizer
 {
+    /**
+     * @param EntityParameterInterface $data
+     */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $this->setNormalized($data);
-
         $group = $data->getGroup();
 
         if (null !== $group) {
@@ -24,10 +25,6 @@ final class ParameterNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if ($this->isNormalized($data)) {
-            return false;
-        }
-
         return $data instanceof EntityParameterInterface;
     }
 

@@ -6,13 +6,14 @@ namespace Spyck\VisualizationBundle\Normalizer;
 
 use Spyck\VisualizationBundle\Field\MultipleFieldInterface;
 
-final class FieldNormalizer extends AbstractNormalizer
+final class MultipleFieldNormalizer extends AbstractNormalizer
 {
+    /**
+     * @param MultipleFieldInterface $data
+     */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $this->setNormalized($data);
-
-        $normalize = $this->normalizer->normalize($data, $format, $context);
+        $normalize = $this->getNormalize($data, $format, $context);
         $normalize['children'] = [];
 
         foreach ($data->getChildren() as $child) {
@@ -26,7 +27,7 @@ final class FieldNormalizer extends AbstractNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if ($this->isNormalized($data)) {
+        if ($this->isNormalize($data, $format, $context)) {
             return false;
         }
 
