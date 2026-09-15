@@ -8,6 +8,7 @@ use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Category;
+use Spyck\VisualizationBundle\Map\CategoryMap;
 use Spyck\VisualizationBundle\Repository\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +29,11 @@ final class CategoryController extends AbstractController
     #[Schema\Forbidden]
     #[Schema\NotFound]
     #[Schema\ResponseForList(type: Category::class, groups: [self::GROUP_LIST])]
-    public function list(CategoryRepository $categoryRepository, ResponseService $responseService): Response
+    public function list(CategoryRepository $categoryRepository, ResponseService $responseService, #[MapQueryString] CategoryMap $categoryMap = new CategoryMap()): Response
     {
-        $categories = $categoryRepository->getCategories();
+        $categories = $categoryRepository->getCategoriesByMapAsQueryBuilder($categoryMap);
 
-        return $responseService->getResponseForList(data: $categories, groups: [self::GROUP_LIST]);
+        return $responseService->getResponseForList(data: $categories, map: $categoryMap, groups: [self::GROUP_LIST]);
     }
 
     /**

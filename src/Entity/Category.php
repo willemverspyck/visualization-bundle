@@ -35,6 +35,10 @@ class Category implements Stringable, TimestampInterface
     #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
     private ?string $description;
 
+    #[Doctrine\Column(name: 'position', type: Types::SMALLINT, options: ['unsigned' => true])]
+    #[Validator\NotNull]
+    private int $position;
+
     #[Doctrine\Column(name: 'active', type: Types::BOOLEAN)]
     private bool $active;
 
@@ -75,6 +79,18 @@ class Category implements Stringable, TimestampInterface
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): static
+    {
+        $this->position = $position;
 
         return $this;
     }

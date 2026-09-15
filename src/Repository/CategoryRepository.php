@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Spyck\VisualizationBundle\Entity\Category;
+use Spyck\VisualizationBundle\Map\CategoryMap;
 use Spyck\VisualizationBundle\Service\UserService;
 
 class CategoryRepository extends AbstractRepository
@@ -29,16 +30,10 @@ class CategoryRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
-    /**
-     * @return list<Category>
-     */
-    public function getCategories(): array
+    public function getCategoriesByMapAsQueryBuilder(CategoryMap $categoryMap): QueryBuilder
     {
         return $this->getCategoriesAsQueryBuilder()
-            ->orderBy('category.name')
-            ->addOrderBy('dashboard.name')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('category.position');
     }
 
     private function getCategoriesAsQueryBuilder(): QueryBuilder
