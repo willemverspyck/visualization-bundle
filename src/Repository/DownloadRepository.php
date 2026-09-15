@@ -45,7 +45,6 @@ class DownloadRepository extends AbstractRepository
     {
         return $this->getDownloadsAsQueryBuilder($authentication)
             ->andWhere('download.timestamp < :timestamp')
-            ->orderBy('download.timestampCreated', SortDirection::Descending)
             ->setParameter('timestamp', $timestamp)
             ->getQuery()
             ->getResult();
