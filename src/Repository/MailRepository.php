@@ -21,7 +21,7 @@ class MailRepository extends AbstractRepository
 
     public function getMailById(int $id): ?Mail
     {
-        return $this->getMailAsQueryBuilder(true)
+        return $this->getMailsAsQueryBuilder(true)
             ->andWhere('mail.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -30,7 +30,7 @@ class MailRepository extends AbstractRepository
 
     public function getMailByCode(string $code): ?Mail
     {
-        return $this->getMailAsQueryBuilder(false)
+        return $this->getMailsAsQueryBuilder(false)
             ->andWhere('mail.code = :code')
             ->setParameter('code', $code)
             ->getQuery()
@@ -42,7 +42,7 @@ class MailRepository extends AbstractRepository
      */
     public function getMailsBySchedule(ScheduleInterface $schedule): array
     {
-        return $this->getMailAsQueryBuilder(false)
+        return $this->getMailsAsQueryBuilder(false)
             ->innerJoin('mail.schedules', 'schedule', Join::WITH, 'schedule = :schedule')
             ->setParameter('schedule', $schedule)
             ->getQuery()
@@ -51,14 +51,14 @@ class MailRepository extends AbstractRepository
 
     public function getMailsBySubscribe(bool $subscribe): array
     {
-        return $this->getMailAsQueryBuilder(true)
+        return $this->getMailsAsQueryBuilder(true)
             ->andWhere('mail.subscribe = :subscribe')
             ->setParameter('subscribe', $subscribe)
             ->getQuery()
             ->getResult();
     }
 
-    private function getMailAsQueryBuilder(bool $authentication): QueryBuilder
+    private function getMailsAsQueryBuilder(bool $authentication): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('mail')
             ->innerJoin('mail.dashboard', 'dashboard')
