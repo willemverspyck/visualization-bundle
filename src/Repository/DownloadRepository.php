@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 use Spyck\VisualizationBundle\Entity\Download;
 use Spyck\VisualizationBundle\Entity\UserInterface;
 use Spyck\VisualizationBundle\Entity\Widget;
@@ -37,14 +38,14 @@ class DownloadRepository extends AbstractRepository
     public function getDownloadsByMapAsQueryBuilder(DownloadMap $downloadMap): QueryBuilder
     {
         return $this->getDownloadsAsQueryBuilder()
-            ->orderBy('download.timestampCreated', 'DESC');
+            ->orderBy('download.timestampCreated', SortDirection::Descending);
     }
 
     public function getDownloadsByTimestamp(DateTimeImmutable $timestamp, bool $authentication = true): array
     {
         return $this->getDownloadsAsQueryBuilder($authentication)
             ->andWhere('download.timestamp < :timestamp')
-            ->orderBy('download.timestampCreated', 'DESC')
+            ->orderBy('download.timestampCreated', SortDirection::Descending)
             ->setParameter('timestamp', $timestamp)
             ->getQuery()
             ->getResult();

@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Repository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 use Spyck\VisualizationBundle\Entity\Bookmark;
 use Spyck\VisualizationBundle\Entity\Dashboard;
 use Spyck\VisualizationBundle\Entity\UserInterface;
@@ -41,7 +42,7 @@ class BookmarkRepository extends AbstractRepository
     public function getBookmarksByMapAsQueryBuilder(BookmarkMap $bookmarkMap): QueryBuilder
     {
         return $this->getBookmarksAsQueryBuilder()
-            ->orderBy('bookmark.timestampCreated', 'DESC');
+            ->orderBy('bookmark.timestampCreated', SortDirection::Descending);
     }
 
     public function deleteBookmark(Bookmark $bookmark): void
