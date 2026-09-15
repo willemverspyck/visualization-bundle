@@ -12,7 +12,6 @@ use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
 use Spyck\VisualizationBundle\Entity\Log;
 use Spyck\VisualizationBundle\Map\DashboardMap;
-use Spyck\VisualizationBundle\Model\Dashboard;
 use Spyck\VisualizationBundle\Model\Dashboard as DashboardAsModel;
 use Spyck\VisualizationBundle\Repository\DashboardRepository;
 use Spyck\VisualizationBundle\Repository\LogRepository;
@@ -56,10 +55,10 @@ final class DashboardController extends AbstractController
     #[Schema\BadRequest]
     #[Schema\Forbidden]
     #[Schema\NotFound]
-    #[Schema\ResponseForList(type: Dashboard::class, groups: [self::GROUP_LIST])]
+    #[Schema\ResponseForList(type: DashboardAsModel::class, groups: [self::GROUP_LIST])]
     public function list(DashboardRepository $dashboardRepository, ResponseService $responseService, #[MapQueryString] DashboardMap $dashboardMap = new DashboardMap()): Response
     {
-        $dashboards = $dashboardRepository->getDashboards();
+        $dashboards = $dashboardRepository->getDashboardsByMapAsQueryBuilder($dashboardMap);
 
         return $responseService->getResponseForList(data: $dashboards, map: $dashboardMap, groups: [self::GROUP_LIST]);
     }
