@@ -8,7 +8,7 @@ use Exception;
 use OpenApi\Attributes as OpenApi;
 use Spyck\ApiExtension\Schema;
 use Spyck\ApiExtension\Service\ResponseService;
-use Spyck\VisualizationBundle\Entity\Menu;
+use Spyck\VisualizationBundle\Entity\Bookmark;
 use Spyck\VisualizationBundle\Map\BookmarkMap;
 use Spyck\VisualizationBundle\Payload\Bookmark as BookmarkAsPayload;
 use Spyck\VisualizationBundle\Repository\BookmarkRepository;
@@ -34,7 +34,7 @@ final class BookmarkController extends AbstractController
     #[Schema\BadRequest]
     #[Schema\Forbidden]
     #[Schema\NotFound]
-    #[Schema\ResponseForList(type: Menu::class, groups: [self::GROUP_LIST])]
+    #[Schema\ResponseForList(type: Bookmark::class, groups: [self::GROUP_LIST])]
     public function list(BookmarkRepository $bookmarkRepository, ResponseService $responseService, #[MapQueryString] BookmarkMap $bookmarkMap = new BookmarkMap()): Response
     {
         $bookmarks = $bookmarkRepository->getBookmarksByMapAsQueryBuilder($bookmarkMap);
