@@ -42,8 +42,7 @@ class MenuRepository extends AbstractRepository
             ->groupBy('menu')
             ->addGroupBy('menuChildren')
             ->having('(menuChildrenCount > 0 AND menu.dashboard IS NULL) OR (menuChildrenCount = 0 AND menu.dashboard IS NOT NULL)')
-            ->orderBy('menu.position')
-            ->addOrderBy('menuChildren.position');
+            ->orderBy('menu.position');
 
         if (null === $user) {
             return $queryBuilder

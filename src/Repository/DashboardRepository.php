@@ -85,8 +85,7 @@ class DashboardRepository extends AbstractRepository
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
             ->where('dashboard.active = TRUE')
-            ->orderBy('dashboard.score', SortDirection::Descending)
-            ->addOrderBy('block.position');
+            ->orderBy('dashboard.score', SortDirection::Descending);
 
         if (false === $authentication) {
             return $queryBuilder;
