@@ -20,7 +20,7 @@ final class MailNormalizer extends AbstractNormalizer
     {
         $user = $this->tokenStorage->getToken()?->getUser();
 
-        $normalize = $this->normalizer->normalize($data, $format, $context);
+        $normalize = $this->getNormalize($data, $format, $context);
         $normalize['subscribed'] = null === $user ? null : $data->getUsers()->contains($user);
 
         return $normalize;
