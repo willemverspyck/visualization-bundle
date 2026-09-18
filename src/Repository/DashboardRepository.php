@@ -54,7 +54,7 @@ class DashboardRepository extends AbstractRepository
      */
     public function getDashboardsByMapAsQueryBuilder(DashboardMap $dashboardMap): QueryBuilder
     {
-        return $this->getDashboardsAsQueryBuilder(true)
+        return $this->getDashboardsAsQueryBuilder()
             ->orderBy('dashboard.score', SortDirection::Descending);
     }
 
@@ -71,7 +71,7 @@ class DashboardRepository extends AbstractRepository
             return [];
         }
 
-        return $this->getDashboardsAsQueryBuilder(true)
+        return $this->getDashboardsAsQueryBuilder()
             ->innerJoin('dashboard.user', 'user', Join::WITH, 'user = :user')
             ->orderBy('dashboard.score', SortDirection::Descending)
             ->setParameter('user', $user)
@@ -79,7 +79,7 @@ class DashboardRepository extends AbstractRepository
             ->getResult();
     }
 
-    private function getDashboardsAsQueryBuilder(bool $authentication): QueryBuilder
+    public function getDashboardsAsQueryBuilder(bool $authentication = true): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('dashboard')
             ->addSelect('block')
