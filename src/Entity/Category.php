@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as Doctrine;
+use SortDirection;
 use Spyck\VisualizationBundle\Controller\CategoryController;
 use Spyck\VisualizationBundle\Repository\CategoryRepository;
 use Stringable;
@@ -31,6 +32,10 @@ class Category implements Stringable, TimestampInterface
     #[Validator\NotNull]
     private string $name;
 
+    #[Doctrine\Column(name: 'code', type: Types::STRING, length: 128, nullable: true)]
+    #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
+    private ?string $code = null;
+
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
     #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
     private ?string $description;
@@ -46,6 +51,7 @@ class Category implements Stringable, TimestampInterface
      * @var Collection<int, Dashboard>
      */
     #[Doctrine\ManyToMany(targetEntity: Dashboard::class, mappedBy: 'categories')]
+    #[Doctrine\OrderBy(['score' => SortDirection::Descending])]
     #[Serializer\Groups(groups: [CategoryController::GROUP_ITEM, CategoryController::GROUP_LIST])]
     private Collection $dashboards;
 
@@ -67,6 +73,18 @@ class Category implements Stringable, TimestampInterface
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
