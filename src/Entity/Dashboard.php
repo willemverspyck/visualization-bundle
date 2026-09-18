@@ -62,6 +62,7 @@ class Dashboard implements Stringable, TimestampInterface
      * @var Collection<int, Category>
      */
     #[Doctrine\ManyToMany(targetEntity: Category::class, inversedBy: 'dashboards')]
+    #[Doctrine\OrderBy(['position' => SortDirection::Ascending])]
     #[Doctrine\JoinTable(name: 'visualization_dashboard_category')]
     #[Doctrine\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Doctrine\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
