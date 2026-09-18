@@ -21,9 +21,9 @@ class CategoryRepository extends AbstractRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getCategoryById(int $id): ?Category
+    public function getCategoryById(int $id, bool $authentication = true): ?Category
     {
-        return $this->getCategoriesAsQueryBuilder()
+        return $this->getCategoriesAsQueryBuilder($authentication)
             ->andWhere('category.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -32,11 +32,11 @@ class CategoryRepository extends AbstractRepository
 
     public function getCategoriesByMapAsQueryBuilder(CategoryMap $categoryMap): QueryBuilder
     {
-        return $this->getCategoriesAsQueryBuilder()
+        return $this->getCategoriesAsQueryBuilder(true)
             ->orderBy('category.position');
     }
 
-    private function getCategoriesAsQueryBuilder(): QueryBuilder
+    private function getCategoriesAsQueryBuilder(bool $authentication): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('category')
             ->addSelect('dashboard')
@@ -46,6 +46,10 @@ class CategoryRepository extends AbstractRepository
             ->innerJoin('dashboard.blocks', 'block', Join::WITH, 'block.active = TRUE')
             ->innerJoin('block.widget', 'widget', Join::WITH, 'widget.active = TRUE')
             ->where('category.active = TRUE');
+
+        if (false === $authentication) {
+            return $queryBuilder;
+        }
 
         $user = $this->userService->getUser();
 
