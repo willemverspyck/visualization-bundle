@@ -19,7 +19,6 @@ use Spyck\VisualizationBundle\Parameter\EntityParameterInterface;
 use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -83,7 +82,7 @@ readonly class DashboardService
         foreach ($parameters as $parameter) {
             if (null === $parameter->getDataAsString()) {
                 $data[] = [
-                    'url' => $this->router->generate($parameter->getRoute(), [], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'url' => $this->router->generate($parameter->getRoute()),
                     'variables' => $variables,
                     'field' => $parameter::getField(),
                 ];
@@ -179,7 +178,7 @@ readonly class DashboardService
     {
         $url = $this->router->generate('spyck_visualization_dashboard_show', [
             'dashboardId' => $dashboardAsEntity->getId(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        ]);
 
         return new RouteAsModel()
             ->setName($dashboardAsEntity->getName())

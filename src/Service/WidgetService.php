@@ -403,7 +403,7 @@ readonly class WidgetService
 
         $route->setUrl($this->urlGenerator->generate('spyck_visualization_dashboard_show', [
             'dashboardId' => $dashboard->getId(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL));
+        ]));
 
         $variables = [];
 
@@ -788,7 +788,7 @@ readonly class WidgetService
             $next = $this->urlGenerator->generate($name, array_merge($parameters, [
                 'limit' => $limit,
                 'offset' => $offset + $limit,
-            ]), UrlGeneratorInterface::ABSOLUTE_URL);
+            ]));
         }
 
         $previous = null;
@@ -797,7 +797,7 @@ readonly class WidgetService
             $previous = $this->urlGenerator->generate($name, array_merge($parameters, [
                 'limit' => $limit,
                 'offset' => $offset - $limit,
-            ]), UrlGeneratorInterface::ABSOLUTE_URL);
+            ]));
         }
 
         $pagination = new Pagination();

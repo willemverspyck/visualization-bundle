@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Normalizer;
 
 use Spyck\VisualizationBundle\Entity\Download;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 final class DownloadNormalizer extends AbstractNormalizer
@@ -25,7 +24,7 @@ final class DownloadNormalizer extends AbstractNormalizer
         ];
 
         $normalize = $this->getNormalize($data, $format, $context);
-        $normalize['url'] = $this->router->generate($name, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
+        $normalize['url'] = $this->router->generate($name, $parameters);
 
         return $normalize;
     }

@@ -21,7 +21,6 @@ use Spyck\VisualizationBundle\Parameter\ParameterInterface;
 use Spyck\VisualizationBundle\View\ViewInterface;
 use Spyck\VisualizationBundle\Widget\WidgetInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -157,7 +156,7 @@ readonly class BlockService
             '_format' => $format,
         ];
 
-        return $this->router->generate('spyck_visualization_widget_item', $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->router->generate('spyck_visualization_widget_item', $parameters);
     }
 
     /**
