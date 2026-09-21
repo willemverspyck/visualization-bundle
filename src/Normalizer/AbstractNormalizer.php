@@ -14,20 +14,20 @@ abstract class AbstractNormalizer implements NormalizerInterface, NormalizerAwar
 
     protected function isNormalize(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if (false === array_key_exists(self::class, $context)) {
+        if (false === array_key_exists(static::class, $context)) {
             return false;
         }
 
-        return in_array($this->getKey($data), $context[self::class], true);
+        return in_array($this->getKey($data), $context[static::class], true);
     }
 
     protected function getNormalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        if (false === array_key_exists(self::class, $context)) {
-            $context[self::class] = [];
+        if (false === array_key_exists(static::class, $context)) {
+            $context[static::class] = [];
         }
 
-        $context[self::class][] = $this->getKey($data);
+        $context[static::class][] = $this->getKey($data);
 
         return $this->normalizer->normalize($data, $format, $context);
     }
