@@ -7,6 +7,7 @@ namespace Spyck\VisualizationBundle\Widget;
 use DateTimeInterface;
 use Exception;
 use Spyck\VisualizationBundle\Entity\Widget;
+use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Filter\DayFilter;
 use Spyck\VisualizationBundle\Filter\EntityFilterInterface;
 use Spyck\VisualizationBundle\Filter\FilterInterface;
@@ -104,12 +105,12 @@ abstract class AbstractWidget implements WidgetInterface
     }
 
     /**
-     * @throws Exception
+     * @throws ParameterException
      */
     public function getParameter(string $name): ?object
     {
         if (false === array_key_exists($name, $this->parameters)) {
-            throw new Exception(sprintf('Parameter "%s" not found', $name));
+            throw new ParameterException(sprintf('Parameter "%s" not found', $name));
         }
 
         $parameter = $this->parameters[$name];
@@ -122,7 +123,7 @@ abstract class AbstractWidget implements WidgetInterface
             return $parameter->getDataAsObject();
         }
 
-        throw new Exception(sprintf('Parameter "%s" not found', $name));
+        throw new ParameterException(sprintf('Parameter "%s" not found', $name));
     }
 
     /**
