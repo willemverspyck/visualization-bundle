@@ -15,13 +15,30 @@ final class FieldUtility
      */
     public static function getDivision(array $data, array $parameters): ?float
     {
-        ArrayUtility::hasKeysInArrayWithException(['dividend', 'divisor'], $parameters);
+        ArrayUtility::hasKeysInArrayWithException(['value', 'divisor'], $parameters);
 
-        $dataDividend = self::getValue($parameters['dividend'], $data);
+        $dataValue = self::getValue($parameters['value'], $data);
         $dataDivisor = self::getValue($parameters['divisor'], $data);
 
-        if (null !== $dataDividend && null !== $dataDivisor && $dataDivisor > 0) {
-            return $dataDividend / $dataDivisor;
+        if (null !== $dataValue && null !== $dataDivisor && $dataDivisor > 0) {
+            return $dataValue / $dataDivisor;
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function getMultiplication(array $data, array $parameters): ?float
+    {
+        ArrayUtility::hasKeysInArrayWithException(['value', 'multiplier'], $parameters);
+
+        $dataValue = self::getValue($parameters['value'], $data);
+        $dataMultiplier = self::getValue($parameters['multiplier'], $data);
+
+        if (null !== $dataValue && null !== $dataMultiplier) {
+            return $dataValue * $dataMultiplier;
         }
 
         return null;
