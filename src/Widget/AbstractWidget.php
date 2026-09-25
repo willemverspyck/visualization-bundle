@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Spyck\VisualizationBundle\Widget;
 
 use DateTimeInterface;
-use Exception;
 use Spyck\VisualizationBundle\Entity\Widget;
 use Spyck\VisualizationBundle\Exception\ParameterException;
 use Spyck\VisualizationBundle\Filter\DayFilter;
