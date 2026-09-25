@@ -57,6 +57,9 @@ class Widget implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'description_empty', type: Types::TEXT, nullable: true)]
     protected ?string $descriptionEmpty = null;
 
+    #[Doctrine\Column(name: 'summary', type: Types::STRING, length: 128, nullable: true)]
+    private ?string $summary = null;
+
     #[Doctrine\Column(name: 'adapter', type: Types::STRING, length: 128)]
     #[Validator\NotBlank]
     #[Validator\NotNull]
@@ -95,6 +98,13 @@ class Widget implements Stringable, TimestampInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getGroup(): ?GroupInterface
@@ -143,6 +153,18 @@ class Widget implements Stringable, TimestampInterface
     public function getDescriptionEmpty(): ?string
     {
         return $this->descriptionEmpty;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
+    }
+
+    public function setSummary(?string $summary): static
+    {
+        $this->summary = $summary;
+
+        return $this;
     }
 
     public function getAdapter(): string
@@ -254,13 +276,17 @@ class Widget implements Stringable, TimestampInterface
 
     public function __clone()
     {
-        $this->id = null;
-
+        $this->setId(null);
         $this->setName(sprintf('%s (Copy)', $this->getName()));
+        $this->setSummary(null);
     }
 
     public function __toString(): string
     {
-        return $this->getName();
+        if (null === $this->getSummary()) {
+            return $this->getName();
+        }
+
+        return $this->getSummary();
     }
 }
