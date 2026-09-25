@@ -274,7 +274,7 @@ class Widget implements Stringable, TimestampInterface
         return array_flip($data);
     }
 
-    public function __clone()
+    public function __clone(): void
     {
         $this->setId(null);
         $this->setName(sprintf('%s (Copy)', $this->getName()));
