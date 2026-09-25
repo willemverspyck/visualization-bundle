@@ -10,13 +10,7 @@ final class ArrayUtility
 {
     public static function hasKeysInArray(array $keys, array $data): bool
     {
-        foreach ($keys as $key) {
-            if (false === array_key_exists($key, $data)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($keys, fn ($key) => array_key_exists($key, $data));
     }
 
     /**
