@@ -41,6 +41,9 @@ class Dashboard implements Stringable, TimestampInterface
     #[Doctrine\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description;
 
+    #[Doctrine\Column(name: 'keywords', type: Types::TEXT, nullable: true)]
+    private ?string $keywords;
+
     #[Doctrine\Column(name: 'variables', type: Types::JSON)]
     private array $variables;
 
@@ -123,6 +126,18 @@ class Dashboard implements Stringable, TimestampInterface
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getKeywords(): ?string
+    {
+        return $this->keywords;
+    }
+
+    public function setKeywords(?string $keywords): static
+    {
+        $this->keywords = $keywords;
 
         return $this;
     }
